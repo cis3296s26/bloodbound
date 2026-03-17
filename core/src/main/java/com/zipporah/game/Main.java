@@ -167,8 +167,19 @@ public class Main implements ApplicationListener {
         // draw background
         batch.draw(background, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
 
-        // draw animated character
-        batch.draw(currFrame, x, y, 250, 250);
+        // draw animated character keeping in mind the characters direction
+        float drawX;
+        float scaleX;
+
+        if(facing_right) {
+            drawX = x;
+            scaleX = 1;
+        } else{
+            drawX = x + 250;
+            scaleX = -1;
+        }
+
+        batch.draw(currFrame, drawX, y, 0, 0, 250, 250, scaleX, 1, 0);
 
         batch.end();
 
