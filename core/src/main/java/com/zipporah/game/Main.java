@@ -46,6 +46,9 @@ public class Main implements ApplicationListener {
     // sprites
     SpriteBatch batch;
 
+    // boolean to keep track of idle character direction
+    boolean facing_right = true;
+
     @Override
     public void create() {
         // characters
@@ -121,9 +124,13 @@ public class Main implements ApplicationListener {
             x += delta * spriteSpeed;
             currFrame = walk.getKeyFrame(time, true);
             isWalking = true;
+            facing_right = true;
         }
         if (flip) {
             x -= delta  * spriteSpeed;
+            currFrame = walk.getKeyFrame(time, true);
+            isWalking = true;
+            facing_right = false;
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
