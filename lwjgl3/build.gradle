@@ -12,10 +12,18 @@ buildscript {
 }
 plugins {
   id "application"
+  id 'edu.sc.seis.launch4j' version '4.0.0'
 }
 apply plugin: 'io.github.fourlastor.construo'
+apply plugin: 'edu.sc.seis.launch4j'
+
+launch4j {
+  mainClassName = 'com.zipporah.game.Main'
+  icon = "${projectDir}/icons/logo.ico"
+}
 
 
+import edu.sc.seis.launch4j.tasks.Launch4jExternalTask
 import io.github.fourlastor.construo.Target
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
@@ -113,7 +121,10 @@ tasks.register("jarWin") {
       'META-INF/INDEX.LIST', 'META-INF/maven/**')
   }
 }
-
+tasks.register("createMyApp", Launch4jExternalTask) {
+  launch4jCmd = 'launch4j-test'
+  outfile = 'MyApp.exe'
+}
 construo {
     // name of the executable
     name.set(appName)
