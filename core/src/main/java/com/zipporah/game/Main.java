@@ -89,7 +89,7 @@ public class Main implements ApplicationListener {
         for (int i = 0; i < 6; i++) {
             jumpFrames[i] = tmp3[0][i];
         }
-        jump = new Animation<>(0.035f, jumpFrames);
+        jump = new Animation<>(0.075f, jumpFrames);
 
         // Sprite Attack
         attackSpriteSheet = new Texture("Attack_1.png");
