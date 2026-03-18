@@ -148,14 +148,14 @@ public class Main implements ApplicationListener {
         // default frame idle
         currFrame = idle.getKeyFrame(time, true);
         boolean isWalking = false;
-        boolean flip = (Gdx.input.isKeyPressed(Input.Keys.A));
+        boolean flip = (Gdx.input.isKeyPressed(Input.Keys.A)|| Gdx.input.isKeyPressed(Input.Keys.LEFT));
         float delta = Gdx.graphics.getDeltaTime();
         float spriteSpeedSprint;
 
         // Movement
         if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)){
             spriteSpeedSprint = spriteSpeed * sprintMultiplier;
-            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.D)|| Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 x += delta * spriteSpeedSprint;
                 currFrame = sprint.getKeyFrame(time, true);
                 facing_right = true;
@@ -168,7 +168,7 @@ public class Main implements ApplicationListener {
         }
         else{
             spriteSpeedSprint = spriteSpeed;
-            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.D)|| Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 x += delta * spriteSpeedSprint;
                 currFrame = walk.getKeyFrame(time, true);
                 isWalking = true;
@@ -182,7 +182,7 @@ public class Main implements ApplicationListener {
             }
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
              jumping = true;
              jumptime = 0f;
         }
