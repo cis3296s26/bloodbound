@@ -26,7 +26,8 @@ public class Main implements ApplicationListener {
 
     Texture jumpSpriteSheet;
     Animation<TextureRegion> jump;
-
+    boolean jumping = false;
+    float jumptime = 0f;
     Texture idleSpriteSheet;
     Animation<TextureRegion> idle;
 
@@ -160,10 +161,18 @@ public class Main implements ApplicationListener {
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+             jumping = true;
+             jumptime = 0f;
+        }
+        if(jumping) {
+            jumptime += delta;
             float prev = y;
             y += delta * spriteSpeed;
             currFrame = jump.getKeyFrame(time, true);
             y = prev;
+            if(jump.isAnimationFinished((jumptime))) {
+                jumping = false;
+            }
         }
 
         // Sprite Attacks
