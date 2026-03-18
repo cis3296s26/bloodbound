@@ -22,9 +22,5 @@ Karasu_tengu/Idle_2.png
 Karasu_tengu/Jump.png
 Karasu_tengu/Run.png
 Karasu_tengu/Walk.png
-Other_objects.png
 Run.png
 Walk.png
-sounds/gametheme.mp3
-sounds/jump.mp3
-sounds/walk.mp3

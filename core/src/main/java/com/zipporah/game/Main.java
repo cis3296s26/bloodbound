@@ -28,8 +28,12 @@ public class Main implements ApplicationListener {
     Animation<TextureRegion> jump;
     boolean jumping = false;
     float jumptime = 0f;
+
     Texture idleSpriteSheet;
     Animation<TextureRegion> idle;
+
+    Texture sprintSpriteSheet;
+    Animation<TextureRegion> sprint;
 
     Texture attackSpriteSheet;
     Animation<TextureRegion> attack;
@@ -99,6 +103,15 @@ public class Main implements ApplicationListener {
         }
         jump = new Animation<>(0.075f, jumpFrames);
 
+        //sprint spritesheet
+        sprintSpriteSheet = new Texture("Run.png");
+        TextureRegion[][] tmp4 = TextureRegion.split(sprintSpriteSheet, 128, 128);
+        TextureRegion[] sprintFrames = new TextureRegion[6];
+        for (int i = 0; i < 6; i++) {
+            sprintFrames[i] = tmp4[0][i];
+        }
+        sprint = new Animation<>(0.125f, sprintFrames);
+
         // Sprite Attack
         attackSpriteSheet = new Texture("Attack_1.png");
         TextureRegion[][] attackTmp = TextureRegion.split(attackSpriteSheet, 128, 128);
@@ -136,29 +149,39 @@ public class Main implements ApplicationListener {
         currFrame = idle.getKeyFrame(time, true);
         boolean isWalking = false;
         boolean flip = (Gdx.input.isKeyPressed(Input.Keys.A));
-
         float delta = Gdx.graphics.getDeltaTime();
-        boolean isSprinting = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT);
         float spriteSpeedSprint;
 
-        if (isSprinting) {
+        // Movement
+        if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)){
             spriteSpeedSprint = spriteSpeed * sprintMultiplier;
-        } else {
+            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+                x += delta * spriteSpeedSprint;
+                currFrame = sprint.getKeyFrame(time, true);
+                facing_right = true;
+            }
+            if (flip) {
+                x -= delta  * spriteSpeedSprint;
+                currFrame = sprint.getKeyFrame(time, true);
+                facing_right = false;
+            }
+        }
+        else{
             spriteSpeedSprint = spriteSpeed;
+            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+                x += delta * spriteSpeedSprint;
+                currFrame = walk.getKeyFrame(time, true);
+                isWalking = true;
+                facing_right = true;
+            }
+            if (flip) {
+                x -= delta  * spriteSpeedSprint;
+                currFrame = walk.getKeyFrame(time, true);
+                isWalking = true;
+                facing_right = false;
+            }
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            x += delta * spriteSpeedSprint;
-            currFrame = walk.getKeyFrame(time, true);
-            isWalking = true;
-            facing_right = true;
-        }
-        if (flip) {
-            x -= delta  * spriteSpeedSprint;
-            currFrame = walk.getKeyFrame(time, true);
-            isWalking = true;
-            facing_right = false;
-        }
 
         if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
              jumping = true;
