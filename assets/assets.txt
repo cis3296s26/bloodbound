@@ -12,5 +12,15 @@ Dead.png
 Hurt.png
 Idle.png
 Jump.png
+Karasu_tengu/Attack_1.png
+Karasu_tengu/Attack_2.png
+Karasu_tengu/Attack_3.png
+Karasu_tengu/Dead.png
+Karasu_tengu/Hurt.png
+Karasu_tengu/Idle.png
+Karasu_tengu/Idle_2.png
+Karasu_tengu/Jump.png
+Karasu_tengu/Run.png
+Karasu_tengu/Walk.png
 Run.png
 Walk.png
