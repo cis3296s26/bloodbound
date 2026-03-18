@@ -35,6 +35,9 @@ public class Main implements ApplicationListener {
     boolean attacking = false;
     float attackTime = 0f;
 
+    // enemy (crow dude)
+    Karasu karasu;
+
     // Animation<TextureRegion> reversedWalkFrame;
 
     // Attack 1 with Blood Charge 2
@@ -102,6 +105,9 @@ public class Main implements ApplicationListener {
             attackFrames[i] = attackTmp[0][i];
         attack = new Animation<>(0.075f, attackFrames);
 
+        //enemy init
+        karasu = new Karasu();
+        karasu.create();
     }
 
     @Override
@@ -191,6 +197,9 @@ public class Main implements ApplicationListener {
 
         // draw background
         batch.draw(background, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+
+        //enemy
+        karasu.draw(batch, time);
 
         // draw animated character keeping in mind the characters direction
         float drawX;
