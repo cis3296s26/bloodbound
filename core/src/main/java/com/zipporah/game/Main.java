@@ -3,6 +3,7 @@ package com.zipporah.game;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -17,6 +18,7 @@ import static jdk.internal.icu.lang.UCharacter.getDirection;
 public class Main implements ApplicationListener {
     Texture background;
 
+
     // character animations
     TextureRegion currFrame;
 
@@ -30,6 +32,8 @@ public class Main implements ApplicationListener {
 
     Texture idleSpriteSheet;
     Animation<TextureRegion> idle;
+
+    Texture objSpriteSheet;
 
     // Animation<TextureRegion> reversedWalkFrame;
 
@@ -46,6 +50,9 @@ public class Main implements ApplicationListener {
     // sprites
     SpriteBatch batch;
 
+    //audio
+
+
     // boolean to keep track of idle character direction
     boolean facing_right = true;
 
@@ -60,6 +67,13 @@ public class Main implements ApplicationListener {
 
         // background
         background = new Texture("Battleground2.png");
+
+
+        //object sprite sheet
+        objSpriteSheet = new Texture("Other_objects.png");
+        TextureRegion[][] tmp4 =  TextureRegion.split(objSpriteSheet, 128, 128);
+        
+
 
         // idle sprite sheet
         idleSpriteSheet = new Texture("Idle.png");
@@ -121,6 +135,7 @@ public class Main implements ApplicationListener {
         float delta = Gdx.graphics.getDeltaTime();
 
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+
             x += delta * spriteSpeed;
             currFrame = walk.getKeyFrame(time, true);
             isWalking = true;
@@ -138,6 +153,7 @@ public class Main implements ApplicationListener {
             y += delta * spriteSpeed;
             currFrame = jump.getKeyFrame(time, true);
             y = prev;
+
         }
 
         // GUI FOR MENU

@@ -12,5 +12,9 @@ Dead.png
 Hurt.png
 Idle.png
 Jump.png
+Other_objects.png
 Run.png
 Walk.png
+sounds/gametheme.mp3
+sounds/jump.mp3
+sounds/walk.mp3
