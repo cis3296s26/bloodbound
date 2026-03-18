@@ -12,8 +12,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import static jdk.internal.icu.lang.UCharacter.getDirection;
-
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
+/** {link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main implements ApplicationListener {
     Texture background;
 
@@ -30,6 +29,11 @@ public class Main implements ApplicationListener {
 
     Texture idleSpriteSheet;
     Animation<TextureRegion> idle;
+
+    Texture attackSpriteSheet;
+    Animation<TextureRegion> attack;
+    boolean attacking = false;
+    float attackTime = 0f;
 
     // Animation<TextureRegion> reversedWalkFrame;
 
@@ -89,6 +93,15 @@ public class Main implements ApplicationListener {
             jumpFrames[i] = tmp3[0][i];
         }
         jump = new Animation<>(0.075f, jumpFrames);
+
+        // Sprite Attack
+        attackSpriteSheet = new Texture("Attack_1.png");
+        TextureRegion[][] attackTmp = TextureRegion.split(attackSpriteSheet, 128, 128);
+        TextureRegion[] attackFrames = new TextureRegion[6];
+        for (int i = 0; i < 6; ++i)
+            attackFrames[i] = attackTmp[0][i];
+        attack = new Animation<>(0.075f, attackFrames);
+
     }
 
     @Override
@@ -116,8 +129,6 @@ public class Main implements ApplicationListener {
         boolean isWalking = false;
         boolean flip = (Gdx.input.isKeyPressed(Input.Keys.A));
 
-        float width = currFrame.getRegionWidth();
-        float height = currFrame.getRegionHeight();
         float delta = Gdx.graphics.getDeltaTime();
 
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
@@ -138,6 +149,20 @@ public class Main implements ApplicationListener {
             y += delta * spriteSpeed;
             currFrame = jump.getKeyFrame(time, true);
             y = prev;
+        }
+
+        // Sprite Attacks
+        if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
+            attacking = true;
+            attackTime = 0f;
+        }
+
+        // Finish Attack Animation
+        if (attacking) {
+            attackTime += delta;
+            currFrame = attack.getKeyFrame(attackTime, false);
+            if (attack.isAnimationFinished(attackTime))
+                attacking = false;
         }
 
         // GUI FOR MENU
