@@ -1,0 +1,17 @@
+.DS_Store
+
+# IDE
+.idea/
+*.iml
+
+# Gradle
+.gradle/
+
+# Build output
+build/
+*/build/
+out/
+
+# Compiled classes and jars
+*.class
+*.jar

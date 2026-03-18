@@ -3,7 +3,6 @@ package com.zipporah.game;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -13,11 +12,9 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import static jdk.internal.icu.lang.UCharacter.getDirection;
-
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
+/** {link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main implements ApplicationListener {
     Texture background;
-
 
     // character animations
     TextureRegion currFrame;
@@ -33,7 +30,13 @@ public class Main implements ApplicationListener {
     Texture idleSpriteSheet;
     Animation<TextureRegion> idle;
 
-    Texture objSpriteSheet;
+    Texture attackSpriteSheet;
+    Animation<TextureRegion> attack;
+    boolean attacking = false;
+    float attackTime = 0f;
+
+    // enemy (crow dude)
+    Karasu karasu;
 
     // Animation<TextureRegion> reversedWalkFrame;
 
@@ -43,15 +46,13 @@ public class Main implements ApplicationListener {
     float x = 0;
     float y = 150;
     float spriteSpeed = 200.0f;
+    float sprintMultiplier = 2.00f;
 
     // camera
     FitViewport viewport;
 
     // sprites
     SpriteBatch batch;
-
-    //audio
-
 
     // boolean to keep track of idle character direction
     boolean facing_right = true;
@@ -67,13 +68,6 @@ public class Main implements ApplicationListener {
 
         // background
         background = new Texture("Battleground2.png");
-
-
-        //object sprite sheet
-        objSpriteSheet = new Texture("Other_objects.png");
-        TextureRegion[][] tmp4 =  TextureRegion.split(objSpriteSheet, 128, 128);
-        
-
 
         // idle sprite sheet
         idleSpriteSheet = new Texture("Idle.png");
@@ -103,6 +97,18 @@ public class Main implements ApplicationListener {
             jumpFrames[i] = tmp3[0][i];
         }
         jump = new Animation<>(0.075f, jumpFrames);
+
+        // Sprite Attack
+        attackSpriteSheet = new Texture("Attack_1.png");
+        TextureRegion[][] attackTmp = TextureRegion.split(attackSpriteSheet, 128, 128);
+        TextureRegion[] attackFrames = new TextureRegion[6];
+        for (int i = 0; i < 6; ++i)
+            attackFrames[i] = attackTmp[0][i];
+        attack = new Animation<>(0.075f, attackFrames);
+
+        //enemy init
+        karasu = new Karasu();
+        karasu.create();
     }
 
     @Override
@@ -130,19 +136,24 @@ public class Main implements ApplicationListener {
         boolean isWalking = false;
         boolean flip = (Gdx.input.isKeyPressed(Input.Keys.A));
 
-        float width = currFrame.getRegionWidth();
-        float height = currFrame.getRegionHeight();
         float delta = Gdx.graphics.getDeltaTime();
+        boolean isSprinting = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT);
+        float spriteSpeedSprint;
+
+        if (isSprinting) {
+            spriteSpeedSprint = spriteSpeed * sprintMultiplier;
+        } else {
+            spriteSpeedSprint = spriteSpeed;
+        }
 
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-
-            x += delta * spriteSpeed;
+            x += delta * spriteSpeedSprint;
             currFrame = walk.getKeyFrame(time, true);
             isWalking = true;
             facing_right = true;
         }
         if (flip) {
-            x -= delta  * spriteSpeed;
+            x -= delta  * spriteSpeedSprint;
             currFrame = walk.getKeyFrame(time, true);
             isWalking = true;
             facing_right = false;
@@ -153,7 +164,20 @@ public class Main implements ApplicationListener {
             y += delta * spriteSpeed;
             currFrame = jump.getKeyFrame(time, true);
             y = prev;
+        }
 
+        // Sprite Attacks
+        if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
+            attacking = true;
+            attackTime = 0f;
+        }
+
+        // Finish Attack Animation
+        if (attacking) {
+            attackTime += delta;
+            currFrame = attack.getKeyFrame(attackTime, false);
+            if (attack.isAnimationFinished(attackTime))
+                attacking = false;
         }
 
         // GUI FOR MENU
@@ -182,6 +206,9 @@ public class Main implements ApplicationListener {
 
         // draw background
         batch.draw(background, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+
+        //enemy
+        karasu.draw(batch, time);
 
         // draw animated character keeping in mind the characters direction
         float drawX;
