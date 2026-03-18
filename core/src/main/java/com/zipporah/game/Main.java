@@ -43,6 +43,7 @@ public class Main implements ApplicationListener {
     float x = 0;
     float y = 150;
     float spriteSpeed = 200.0f;
+    float sprintMultiplier = 2.00f;
 
     // camera
     FitViewport viewport;
@@ -130,15 +131,23 @@ public class Main implements ApplicationListener {
         boolean flip = (Gdx.input.isKeyPressed(Input.Keys.A));
 
         float delta = Gdx.graphics.getDeltaTime();
+        boolean isSprinting = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT);
+        float spriteSpeedSprint;
+
+        if (isSprinting) {
+            spriteSpeedSprint = spriteSpeed * sprintMultiplier;
+        } else {
+            spriteSpeedSprint = spriteSpeed;
+        }
 
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            x += delta * spriteSpeed;
+            x += delta * spriteSpeedSprint;
             currFrame = walk.getKeyFrame(time, true);
             isWalking = true;
             facing_right = true;
         }
         if (flip) {
-            x -= delta  * spriteSpeed;
+            x -= delta  * spriteSpeedSprint;
             currFrame = walk.getKeyFrame(time, true);
             isWalking = true;
             facing_right = false;
