@@ -15,14 +15,10 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
-import static jdk.internal.icu.lang.UCharacter.getDirection;
 /** {link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main implements ApplicationListener {
     TiledMap map;
     OrthogonalTiledMapRenderer renderer;
-
-
-    Texture background;
 
     // character animations
     TextureRegion currFrame;
@@ -56,8 +52,9 @@ public class Main implements ApplicationListener {
     // Attack 1 with Blood Charge 2
 
     float time = 0;
-    float x = 0;
-    float y = 150;
+    // start player on block far left rather than floating
+    float x = 100f;
+    float y = 65f;
     float spriteSpeed = 200.0f;
     float sprintMultiplier = 2.00f;
     float scale = 4f;
@@ -239,10 +236,30 @@ public class Main implements ApplicationListener {
     }
 
     private void logic() {
-        float worldWidth = viewport.getWorldWidth();
-        float worldHeight = viewport.getWorldHeight();
-
         time += Gdx.graphics.getDeltaTime();
+
+        // camer follows sprite
+        OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
+
+        // get important map values for the camera
+        float mapWorldWidth  = 240 * 16 * scale;
+        float mapWorldHeight = 13  * 16 * scale;
+        float half_of_width = viewport.getWorldWidth()  / 2f;
+        float half_of_height = viewport.getWorldHeight() / 2f;
+
+        float targetX = x + sprit_size / 2f;
+        float targetY = y + sprit_size / 2f;
+
+        // make it so the fatherst the camera will go is in the bounds of the map
+        targetX = Math.max(half_of_width, Math.min(targetX, mapWorldWidth  - half_of_width));
+        targetY = Math.max(half_of_height, Math.min(targetY, mapWorldHeight - half_of_height));
+
+        // fix problem with laggy camera
+        cam.position.x += (targetX - cam.position.x) * 0.1f;
+        cam.position.y += (targetY - cam.position.y) * 0.1f;
+        cam.update();
+
+        batch.setProjectionMatrix(cam.combined);
 
     }
 
@@ -271,11 +288,11 @@ public class Main implements ApplicationListener {
             drawX = x;
             scaleX = 1;
         } else{
-            drawX = x + 250;
+            drawX = x + sprit_size;
             scaleX = -1;
         }
 
-        batch.draw(currFrame, drawX, y, 0, 0, 250, 250, scaleX, 1, 0);
+        batch.draw(currFrame, drawX, y, 0, 0, sprit_size, sprit_size, scaleX, 1, 0);
 
         batch.end();
 
