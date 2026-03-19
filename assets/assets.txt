@@ -9,6 +9,7 @@ Blood_Charge_2.png
 Blood_Charge_3.png
 Blood_Charge_4.png
 Dead.png
+Dungeon Tile Set.png
 Hurt.png
 Idle.png
 Jump.png
@@ -24,3 +25,5 @@ Karasu_tengu/Run.png
 Karasu_tengu/Walk.png
 Run.png
 Walk.png
+test1.tmx
+test2.tmx
