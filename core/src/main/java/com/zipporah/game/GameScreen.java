@@ -1,8 +1,8 @@
 package com.zipporah.game;
 
-import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -11,9 +11,11 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
-import static jdk.internal.icu.lang.UCharacter.getDirection;
 /** {link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
-public class Main implements ApplicationListener {
+public class GameScreen implements Screen {
+
+    private final ScreenManager game;
+
     Texture background;
 
     // character animations
@@ -56,20 +58,18 @@ public class Main implements ApplicationListener {
     // camera
     FitViewport viewport;
 
-    // sprites
-    SpriteBatch batch;
-
     // boolean to keep track of idle character direction
     boolean facing_right = true;
 
-    @Override
-    public void create() {
-        // characters
-        batch = new SpriteBatch();
+    public GameScreen(ScreenManager game){
+        this.game = game;
+    }
 
+    @Override
+    public void show() {
         // viewport (fixed)
         viewport = new FitViewport(1280, 720);
-        batch.setProjectionMatrix(viewport.getCamera().combined);
+        game.batch.setProjectionMatrix(viewport.getCamera().combined);
 
         // background
         background = new Texture("Battleground2.png");
@@ -133,12 +133,11 @@ public class Main implements ApplicationListener {
 
         // Resize your application here. The parameters represent the new window size.
         viewport.update(width, height, true);
-        batch.setProjectionMatrix(viewport.getCamera().combined);
+        game.batch.setProjectionMatrix(viewport.getCamera().combined);
     }
 
     @Override
-    public void render() {
-        // Draw your application here.
+    public void render(float delta) {
         input();
         logic();
         draw();
@@ -233,13 +232,13 @@ public class Main implements ApplicationListener {
         ScreenUtils.clear(Color.BLACK);
         viewport.apply();
 
-        batch.begin();
+        game.batch.begin();
 
         // draw background
-        batch.draw(background, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+        game.batch.draw(background, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
 
         //enemy
-        karasu.draw(batch, time);
+        karasu.draw(game.batch, time);
 
         // draw animated character keeping in mind the characters direction
         float drawX;
@@ -253,9 +252,9 @@ public class Main implements ApplicationListener {
             scaleX = -1;
         }
 
-        batch.draw(currFrame, drawX, y, 0, 0, 250, 250, scaleX, 1, 0);
+        game.batch.draw(currFrame, drawX, y, 0, 0, 250, 250, scaleX, 1, 0);
 
-        batch.end();
+        game.batch.end();
 
     }
 
@@ -273,5 +272,9 @@ public class Main implements ApplicationListener {
     @Override
     public void dispose() {
         // Destroy application's resources here.
+    }
+
+    @Override
+    public void hide() {
     }
 }

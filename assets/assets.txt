@@ -9,6 +9,11 @@ Blood_Charge_2.png
 Blood_Charge_3.png
 Blood_Charge_4.png
 Dead.png
+HomeScreen/ControlsButton.png
+HomeScreen/OptionsButton.png
+HomeScreen/QuitButton.png
+HomeScreen/RankingsButton.png
+HomeScreen/StartButton.png
 Hurt.png
 Idle.png
 Jump.png
