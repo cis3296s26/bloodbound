@@ -1,6 +1,7 @@
 package com.zipporah.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 
@@ -13,6 +14,17 @@ public class HomeScreen implements Screen {
   Texture controlsButton;
   Texture optionsButton;
   Texture quitButton;
+
+  float startX = 500;
+  float startY = 450;
+  float rankingsX = 500;
+  float rankingsY = 350;
+  float controlsX = 500;
+  float controlsY = 250;
+  float optionsX = 500;
+  float optionsY = 150;
+  float quitX = 500;
+  float quitY = 50;
 
   public HomeScreen(ScreenManager game) {
     this.game = game;
@@ -30,14 +42,45 @@ public class HomeScreen implements Screen {
 
   @Override
   public void render(float delta) {
+
+    float mouseX = Gdx.input.getX();
+    float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
+
     game.batch.begin();
-    game.batch.draw(startButton, 500, 450);
-    game.batch.draw(rankingsButton, 500, 350);
-    game.batch.draw(controlsButton, 500, 250);
-    game.batch.draw(optionsButton, 500, 150);
-    game.batch.draw(quitButton, 500, 50);
+    game.batch.draw(startButton, startX, startY);
+    game.batch.draw(rankingsButton, rankingsX, rankingsY);
+    game.batch.draw(controlsButton, controlsX, controlsY);
+    game.batch.draw(optionsButton, optionsX, optionsY);
+    game.batch.draw(quitButton, quitX, quitY);
     game.batch.end();
+
+    boolean startHovering = mouseX >= startX && mouseX <= startX + startButton.getWidth() && mouseY >= startY && mouseY <= startY + startButton.getHeight();
+    boolean rankingsHovering = mouseX >= rankingsX && mouseX <= rankingsX + startButton.getWidth() && mouseY >= rankingsY && mouseY <= rankingsY + startButton.getHeight();
+    boolean controlsHovering = mouseX >= controlsX && mouseX <= controlsX + startButton.getWidth() && mouseY >= controlsY && mouseY <= controlsY + startButton.getHeight();
+    boolean optionsHovering = mouseX >= optionsX && mouseX <= optionsX + startButton.getWidth() && mouseY >= optionsY && mouseY <= optionsY + startButton.getHeight();
+    boolean quitHovering = mouseX >= quitX && mouseX <= quitX + startButton.getWidth() && mouseY >= quitY && mouseY <= quitY + startButton.getHeight();
+
+
+    if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
+      if(startHovering){
+        game.setScreen(new GameScreen(game));
+      }
+      if(rankingsHovering){
+        //To Do
+      }
+      if(controlsHovering){
+        //To Do
+      }
+      if(optionsHovering){
+        //To Do
+      }
+      if(quitHovering){
+        //To Do
+      }
+    }
   }
+
+
 
   @Override
   public void resize(int width, int height) {
