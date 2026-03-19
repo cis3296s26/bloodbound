@@ -67,9 +67,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        // characters
-        game.batch = new SpriteBatch();
-
         // viewport (fixed)
         viewport = new FitViewport(1280, 720);
         game.batch.setProjectionMatrix(viewport.getCamera().combined);
