@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import static jdk.internal.icu.lang.UCharacter.getDirection;
 /** {link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
-public class Main implements ApplicationListener {
+public class GameScreen implements ApplicationListener {
     Texture background;
 
     // character animations
