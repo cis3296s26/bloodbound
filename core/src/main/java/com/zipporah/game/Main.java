@@ -10,10 +10,18 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 import static jdk.internal.icu.lang.UCharacter.getDirection;
 /** {link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main implements ApplicationListener {
+    TiledMap map;
+    OrthogonalTiledMapRenderer renderer;
+
+
     Texture background;
 
     // character animations
@@ -52,6 +60,8 @@ public class Main implements ApplicationListener {
     float y = 150;
     float spriteSpeed = 200.0f;
     float sprintMultiplier = 2.00f;
+    float scale = 4f;
+    float sprit_size = 200f;
 
     // camera
     FitViewport viewport;
@@ -71,8 +81,15 @@ public class Main implements ApplicationListener {
         viewport = new FitViewport(1280, 720);
         batch.setProjectionMatrix(viewport.getCamera().combined);
 
-        // background
-        background = new Texture("Battleground2.png");
+        // render in map
+        map = new TmxMapLoader().load("test2.tmx");
+        renderer = new OrthogonalTiledMapRenderer(map, scale);
+
+        // set camera to start at the furtherst left part, start part
+        OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
+        cam.position.set(640, 360, 0);
+        cam.update();
+        batch.setProjectionMatrix(cam.combined);
 
         // idle sprite sheet
         idleSpriteSheet = new Texture("Idle.png");
@@ -233,10 +250,15 @@ public class Main implements ApplicationListener {
         ScreenUtils.clear(Color.BLACK);
         viewport.apply();
 
+        OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
+
+        // draw the tiled map, renders at scale of 4 so tiles are 64 units each
+        renderer.setView(cam);
+        renderer.render();
+
         batch.begin();
 
-        // draw background
-        batch.draw(background, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+
 
         //enemy
         karasu.draw(batch, time);
