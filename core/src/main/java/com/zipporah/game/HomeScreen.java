@@ -66,13 +66,13 @@ public class HomeScreen implements Screen {
         game.setScreen(new GameScreen(game));
       }
       if(rankingsHovering){
-        //To Do
+        game.setScreen(new RankingsScreen(game));
       }
       if(controlsHovering){
-        //To Do
+        game.setScreen(new ControlsScreen(game));
       }
       if(optionsHovering){
-        //To Do
+        game.setScreen(new OptionsScreen(game));
       }
       if(quitHovering){
         Gdx.app.exit();
