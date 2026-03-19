@@ -8,12 +8,12 @@ Blood_Charge_1.png
 Blood_Charge_2.png
 Blood_Charge_3.png
 Blood_Charge_4.png
+Buttons/ControlsButton.png
+Buttons/OptionsButton.png
+Buttons/QuitButton.png
+Buttons/RankingsButton.png
+Buttons/StartButton.png
 Dead.png
-HomeScreen/ControlsButton.png
-HomeScreen/OptionsButton.png
-HomeScreen/QuitButton.png
-HomeScreen/RankingsButton.png
-HomeScreen/StartButton.png
 Hurt.png
 Idle.png
 Jump.png
@@ -27,5 +27,6 @@ Karasu_tengu/Idle_2.png
 Karasu_tengu/Jump.png
 Karasu_tengu/Run.png
 Karasu_tengu/Walk.png
+Logos/PixelLogo.png
 Run.png
 Walk.png

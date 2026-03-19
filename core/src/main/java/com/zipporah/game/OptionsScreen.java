@@ -12,6 +12,10 @@ public class OptionsScreen implements Screen{
 
   @Override
   public void show() {
+    // settings for 
+    // sound effects to be added
+    // music to be added
+    // other things to change to be added
   }
 
   @Override

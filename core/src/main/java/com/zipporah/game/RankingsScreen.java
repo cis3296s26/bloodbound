@@ -12,6 +12,8 @@ public class RankingsScreen implements Screen{
 
   @Override
   public void show() {
+    // leaderboard to be added
+    // timer to be added
   }
 
   @Override

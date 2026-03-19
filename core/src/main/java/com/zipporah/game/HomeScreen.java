@@ -9,22 +9,25 @@ public class HomeScreen implements Screen {
 
   private final ScreenManager game;
 
+  Texture pixelLogo;
   Texture startButton;
   Texture rankingsButton;
   Texture controlsButton;
   Texture optionsButton;
   Texture quitButton;
 
-  float startX = 500;
-  float startY = 450;
-  float rankingsX = 500;
-  float rankingsY = 350;
-  float controlsX = 500;
-  float controlsY = 250;
-  float optionsX = 500;
-  float optionsY = 150;
-  float quitX = 500;
-  float quitY = 50;
+  float pixelLogoX = 350;
+  float pixelLogoY = 600;
+  float startX = 552;
+  float startY = 460;
+  float rankingsX = 552;
+  float rankingsY = 360;
+  float controlsX = 552;
+  float controlsY = 260;
+  float optionsX = 552;
+  float optionsY = 160;
+  float quitX = 552;
+  float quitY = 60;
 
   public HomeScreen(ScreenManager game) {
     this.game = game;
@@ -32,12 +35,12 @@ public class HomeScreen implements Screen {
 
   @Override
   public void show() {
-    //change pngs
-    startButton = new Texture("HomeScreen/StartButton.png");
-    rankingsButton = new Texture("HomeScreen/RankingsButton.png");
-    controlsButton = new Texture("HomeScreen/ControlsButton.png");
-    optionsButton = new Texture("HomeScreen/OptionsButton.png");
-    quitButton = new Texture("HomeScreen/QuitButton.png");
+    pixelLogo = new Texture("Logos/PixelLogo.png");
+    startButton = new Texture("Buttons/StartButton.png");
+    rankingsButton = new Texture("Buttons/RankingsButton.png");
+    controlsButton = new Texture("Buttons/ControlsButton.png");
+    optionsButton = new Texture("Buttons/OptionsButton.png");
+    quitButton = new Texture("Buttons/QuitButton.png");
   }
 
   @Override
@@ -47,6 +50,7 @@ public class HomeScreen implements Screen {
     float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
     game.batch.begin();
+    game.batch.draw(pixelLogo, pixelLogoX, pixelLogoY);
     game.batch.draw(startButton, startX, startY);
     game.batch.draw(rankingsButton, rankingsX, rankingsY);
     game.batch.draw(controlsButton, controlsX, controlsY);
@@ -66,13 +70,14 @@ public class HomeScreen implements Screen {
         game.setScreen(new GameScreen(game));
       }
       if(rankingsHovering){
-        game.setScreen(new RankingsScreen(game));
+
+        // game.setScreen(new RankingsScreen(game));
       }
       if(controlsHovering){
-        game.setScreen(new ControlsScreen(game));
+        // game.setScreen(new ControlsScreen(game));
       }
       if(optionsHovering){
-        game.setScreen(new OptionsScreen(game));
+        //  game.setScreen(new OptionsScreen(game));
       }
       if(quitHovering){
         Gdx.app.exit();
