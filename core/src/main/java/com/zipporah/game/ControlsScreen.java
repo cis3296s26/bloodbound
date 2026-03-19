@@ -12,6 +12,8 @@ public class ControlsScreen implements Screen{
 
   @Override
   public void show() {
+    // Pending additional functionalities 
+    // user controls (attacks, jump, doge, etc) to be added
   }
 
   @Override
