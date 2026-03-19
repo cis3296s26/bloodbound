@@ -55,10 +55,10 @@ public class HomeScreen implements Screen {
     game.batch.end();
 
     boolean startHovering = mouseX >= startX && mouseX <= startX + startButton.getWidth() && mouseY >= startY && mouseY <= startY + startButton.getHeight();
-    boolean rankingsHovering = mouseX >= rankingsX && mouseX <= rankingsX + startButton.getWidth() && mouseY >= rankingsY && mouseY <= rankingsY + startButton.getHeight();
-    boolean controlsHovering = mouseX >= controlsX && mouseX <= controlsX + startButton.getWidth() && mouseY >= controlsY && mouseY <= controlsY + startButton.getHeight();
-    boolean optionsHovering = mouseX >= optionsX && mouseX <= optionsX + startButton.getWidth() && mouseY >= optionsY && mouseY <= optionsY + startButton.getHeight();
-    boolean quitHovering = mouseX >= quitX && mouseX <= quitX + startButton.getWidth() && mouseY >= quitY && mouseY <= quitY + startButton.getHeight();
+    boolean rankingsHovering = mouseX >= rankingsX && mouseX <= rankingsX + rankingsButton.getWidth() && mouseY >= rankingsY && mouseY <= rankingsY + rankingsButton.getHeight();
+    boolean controlsHovering = mouseX >= controlsX && mouseX <= controlsX + controlsButton.getWidth() && mouseY >= controlsY && mouseY <= controlsY + controlsButton.getHeight();
+    boolean optionsHovering = mouseX >= optionsX && mouseX <= optionsX + optionsButton.getWidth() && mouseY >= optionsY && mouseY <= optionsY + optionsButton.getHeight();
+    boolean quitHovering = mouseX >= quitX && mouseX <= quitX + quitButton.getWidth() && mouseY >= quitY && mouseY <= quitY + quitButton.getHeight();
 
 
     if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
@@ -75,7 +75,7 @@ public class HomeScreen implements Screen {
         //To Do
       }
       if(quitHovering){
-        //To Do
+        Gdx.app.exit();
       }
     }
   }
