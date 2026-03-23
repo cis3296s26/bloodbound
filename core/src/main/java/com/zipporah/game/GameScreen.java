@@ -16,6 +16,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /** {link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class GameScreen implements Screen {
@@ -55,10 +56,10 @@ public class GameScreen implements Screen {
     public static class Projectile {
         Texture projectileSpriteSheet;
         Animation<TextureRegion> projectileAnimation;
-        float lifetime = 5f;
-        float projectileCurrentDuration = 0f;
+        float lifetime = 4f;
+        float currentDuration = 0f;
         float x, y;
-        float speed = 400.0f;
+        float speed = 300.0f;
         boolean direction = true; // True - left, False - right
 
         // Projectile Animation
@@ -74,8 +75,9 @@ public class GameScreen implements Screen {
         }
 
         public void update(float delta) {
-            projectileCurrentDuration += delta;
+            currentDuration += delta;
             x += speed * delta;
+            lifetime -= delta;
         }
 
         // Attack finishes when the projectile hits some object or stays longer than its specified lifetime
@@ -326,10 +328,15 @@ public class GameScreen implements Screen {
         if(attacking) updateSpriteAttack(delta);
 
         // Update Projectiles
-        for (Projectile projectile : projectiles) {
+        Iterator<Projectile> projectilesIterator = projectiles.iterator();
+        while (projectilesIterator.hasNext()) {
+            Projectile projectile = projectilesIterator.next();
             projectile.update(delta);
-            TextureRegion projectileFrame = projectile.projectileAnimation.getKeyFrame(projectile.projectileCurrentDuration, true);
-            game.batch.draw(projectileFrame, projectile.x, projectile.y, 64, 48);
+            if(projectile.lifetime <= 0) projectilesIterator.remove();
+            else {
+                TextureRegion projectileFrame = projectile.projectileAnimation.getKeyFrame(projectile.currentDuration, true);
+                game.batch.draw(projectileFrame, projectile.x, projectile.y, 64, 48);
+            }
         }
 
 
