@@ -57,31 +57,37 @@ public class GameScreen implements Screen {
         Texture projectileSpriteSheet;
         Animation<TextureRegion> projectileAnimation;
         float lifetime = 4f;
-        float currentDuration = 0f;
+        float animationDuration = 0f;
+        float speed = 400f;
         float x, y;
-        float speed = 300.0f;
-        boolean direction = true; // True - left, False - right
+        boolean direction = true; // True - right, False - left
+        int scaleX;
 
         // Projectile Animation
-        public Projectile(float x, float y) {
+        public Projectile(boolean facing_right, float x, float y) {
             projectileSpriteSheet = new Texture("Blood_Charge_1.png");
             TextureRegion[][] projectileTemp = TextureRegion.split(projectileSpriteSheet, 64, 48);
             TextureRegion[] projectileFrames = new TextureRegion[3];
             for (int i = 0; i < 3; ++i) projectileFrames[i] = projectileTemp[0][i];
             projectileAnimation = new Animation<>(0.075f, projectileFrames);
 
-            this.x = 132 + x;
+            direction = !facing_right;
+            if(direction) {
+                scaleX = -1;
+                this.x = x + 64;
+            } else {
+                scaleX = 1;
+                this.x = x + 132;
+            }
             this.y = 60 + y;
         }
 
         public void update(float delta) {
-            currentDuration += delta;
-            x += speed * delta;
+            animationDuration += delta;
+            if(direction) x -= speed * delta;
+            else x += speed * delta;
             lifetime -= delta;
         }
-
-        // Attack finishes when the projectile hits some object or stays longer than its specified lifetime
-
     }
 
     ArrayList<Projectile> projectiles = new ArrayList<>();
@@ -334,8 +340,8 @@ public class GameScreen implements Screen {
             projectile.update(delta);
             if(projectile.lifetime <= 0) projectilesIterator.remove();
             else {
-                TextureRegion projectileFrame = projectile.projectileAnimation.getKeyFrame(projectile.currentDuration, true);
-                game.batch.draw(projectileFrame, projectile.x, projectile.y, 64, 48);
+                TextureRegion projectileFrame = projectile.projectileAnimation.getKeyFrame(projectile.animationDuration, true);
+                game.batch.draw(projectileFrame, projectile.x, projectile.y, 0, 0, 64, 48, projectile.scaleX, 1, 0);
             }
         }
 
@@ -354,7 +360,7 @@ public class GameScreen implements Screen {
             attacking = false;
 
             // Set projectile in motion
-            projectiles.add(new Projectile(x, y));
+            projectiles.add(new Projectile(facing_right, x, y));
         }
     }
 
