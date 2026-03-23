@@ -6,7 +6,6 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -14,6 +13,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import org.w3c.dom.Text;
 
 /** {link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class GameScreen implements Screen {
@@ -46,6 +46,9 @@ public class GameScreen implements Screen {
     Animation<TextureRegion> attack;
     boolean attacking = false;
     float attackTime = 0f;
+
+    Texture projectileSpriteSheet;
+    Animation<TextureRegion> projectile;
 
     // enemy (crow dude)
     Karasu karasu;
@@ -134,6 +137,14 @@ public class GameScreen implements Screen {
             attackFrames[i] = attackTmp[0][i];
         attack = new Animation<>(0.075f, attackFrames);
 
+        // Projectile Animation
+        projectileSpriteSheet = new Texture("Blood_Charge_1.png");
+        TextureRegion[][] projectileTemp = TextureRegion.split(projectileSpriteSheet, 64, 48);
+        TextureRegion[] projectileFrames = new TextureRegion[3];
+        for (int i = 0; i < 3; ++i)
+            projectileFrames[i] = projectileTemp[0][i];
+        projectile = new Animation<>(0.075f, projectileFrames);
+
         //enemy init
         karasu = new Karasu();
         karasu.create();
@@ -152,17 +163,17 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        input();
-        logic();
-        draw();
+        input(delta);
+        logic(delta);
+        draw(delta);
     }
 
-    private void input() {
+    private void input(float delta) {
         // default frame idle
         currFrame = idle.getKeyFrame(time, true);
         boolean isWalking = false;
         boolean flip = (Gdx.input.isKeyPressed(Input.Keys.A)|| Gdx.input.isKeyPressed(Input.Keys.LEFT));
-        float delta = Gdx.graphics.getDeltaTime();
+//        delta = Gdx.graphics.getDeltaTime();
         float spriteSpeedSprint;
 
         // Movement
@@ -210,19 +221,13 @@ public class GameScreen implements Screen {
             }
         }
 
-        // Sprite Attacks
-        if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
+        // Sprite Attack
+        if (!attacking && Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
             attacking = true;
             attackTime = 0f;
         }
 
-        // Finish Attack Animation
-        if (attacking) {
-            attackTime += delta;
-            currFrame = attack.getKeyFrame(attackTime, false);
-            if (attack.isAnimationFinished(attackTime))
-                attacking = false;
-        }
+
 
         // GUI FOR MENU
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
@@ -234,7 +239,9 @@ public class GameScreen implements Screen {
 
     }
 
-    private void logic() {
+
+
+    private void logic(float delta) {
         time += Gdx.graphics.getDeltaTime();
 
         // camera follows sprite
@@ -262,7 +269,7 @@ public class GameScreen implements Screen {
 
     }
 
-    private void draw() {
+    private void draw(float delta) {
         ScreenUtils.clear(Color.BLACK);
         viewport.apply();
 
@@ -289,10 +296,32 @@ public class GameScreen implements Screen {
             scaleX = -1;
         }
 
+        // Update / Finish Attack Animation
+        if(attacking) updateSpriteAttack(delta);
+
+        TextureRegion projectileFrame = projectile.getKeyFrame(0, true);
+        game.batch.draw(projectileFrame, 100, 100, 64, 48);
+
+
         game.batch.draw(currFrame, drawX, y, 0, 0, sprit_size, sprit_size, scaleX, 1, 0);
 
         game.batch.end();
 
+    }
+
+    private void updateSpriteAttack(float delta) {
+        attackTime += delta;
+        currFrame = attack.getKeyFrame(attackTime, false);
+        if (attack.isAnimationFinished(attackTime)) {
+            attacking = false;
+
+            // Set projectile in motion
+//            currFrame = projectile.getKeyFrame(attackTime, false);
+
+
+        }
+
+        // Attack finishes when the projectile hits some object or stays longer than its specified lifetime
     }
 
     @Override
