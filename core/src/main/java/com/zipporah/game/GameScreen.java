@@ -82,7 +82,8 @@ public class GameScreen implements Screen {
         bodys.createFixture(shape, 0.0f);
         shape.dispose();
     }
-    }
+
+
     public static class Projectile {
         Texture projectileSpriteSheet;
         Animation<TextureRegion> projectileAnimation;
