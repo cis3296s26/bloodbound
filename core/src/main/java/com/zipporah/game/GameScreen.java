@@ -6,7 +6,6 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -14,6 +13,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /** {link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class GameScreen implements Screen {
@@ -47,12 +49,52 @@ public class GameScreen implements Screen {
     boolean attacking = false;
     float attackTime = 0f;
 
+
+
+
+    public static class Projectile {
+        Texture projectileSpriteSheet;
+        Animation<TextureRegion> projectileAnimation;
+        float lifetime = 4f;
+        float animationDuration = 0f;
+        float speed = 400f;
+        float x, y;
+        boolean direction = true; // True - right, False - left
+        int scaleX;
+
+        // Projectile Animation
+        public Projectile(boolean facing_right, float x, float y) {
+            projectileSpriteSheet = new Texture("Blood_Charge_1.png");
+            TextureRegion[][] projectileTemp = TextureRegion.split(projectileSpriteSheet, 64, 48);
+            TextureRegion[] projectileFrames = new TextureRegion[3];
+            for (int i = 0; i < 3; ++i) projectileFrames[i] = projectileTemp[0][i];
+            projectileAnimation = new Animation<>(0.075f, projectileFrames);
+
+            direction = !facing_right;
+            if(direction) {
+                scaleX = -1;
+                this.x = x + 64;
+            } else {
+                scaleX = 1;
+                this.x = x + 132;
+            }
+            this.y = 60 + y;
+        }
+
+        public void update(float delta) {
+            animationDuration += delta;
+            if(direction) x -= speed * delta;
+            else x += speed * delta;
+            lifetime -= delta;
+        }
+    }
+
+    ArrayList<Projectile> projectiles = new ArrayList<>();
+
     // enemy (crow dude)
     Karasu karasu;
 
     // Animation<TextureRegion> reversedWalkFrame;
-
-    // Attack 1 with Blood Charge 2
 
     float time = 0;
     float x = 100f;
@@ -134,6 +176,8 @@ public class GameScreen implements Screen {
             attackFrames[i] = attackTmp[0][i];
         attack = new Animation<>(0.075f, attackFrames);
 
+
+
         //enemy init
         karasu = new Karasu();
         karasu.create();
@@ -152,17 +196,17 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        input();
-        logic();
-        draw();
+        input(delta);
+        logic(delta);
+        draw(delta);
     }
 
-    private void input() {
+    private void input(float delta) {
         // default frame idle
         currFrame = idle.getKeyFrame(time, true);
         boolean isWalking = false;
         boolean flip = (Gdx.input.isKeyPressed(Input.Keys.A)|| Gdx.input.isKeyPressed(Input.Keys.LEFT));
-        float delta = Gdx.graphics.getDeltaTime();
+//        delta = Gdx.graphics.getDeltaTime();
         float spriteSpeedSprint;
 
         // Movement
@@ -210,19 +254,13 @@ public class GameScreen implements Screen {
             }
         }
 
-        // Sprite Attacks
-        if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
+        // Sprite Attack
+        if (!attacking && Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
             attacking = true;
             attackTime = 0f;
         }
 
-        // Finish Attack Animation
-        if (attacking) {
-            attackTime += delta;
-            currFrame = attack.getKeyFrame(attackTime, false);
-            if (attack.isAnimationFinished(attackTime))
-                attacking = false;
-        }
+
 
         // GUI FOR MENU
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
@@ -234,7 +272,9 @@ public class GameScreen implements Screen {
 
     }
 
-    private void logic() {
+
+
+    private void logic(float delta) {
         time += Gdx.graphics.getDeltaTime();
 
         // camera follows sprite
@@ -262,7 +302,7 @@ public class GameScreen implements Screen {
 
     }
 
-    private void draw() {
+    private void draw(float delta) {
         ScreenUtils.clear(Color.BLACK);
         viewport.apply();
 
@@ -289,10 +329,38 @@ public class GameScreen implements Screen {
             scaleX = -1;
         }
 
+        // Update / Finish Attack Animation
+        if(attacking) updateSpriteAttack(delta);
+
+        // Update Projectiles
+        Iterator<Projectile> projectilesIterator = projectiles.iterator();
+        while (projectilesIterator.hasNext()) {
+            Projectile projectile = projectilesIterator.next();
+            projectile.update(delta);
+            if(projectile.lifetime <= 0) projectilesIterator.remove();
+            else {
+                TextureRegion projectileFrame = projectile.projectileAnimation.getKeyFrame(projectile.animationDuration, true);
+                game.batch.draw(projectileFrame, projectile.x, projectile.y, 0, 0, 64, 48, projectile.scaleX, 1, 0);
+            }
+        }
+
+
+
         game.batch.draw(currFrame, drawX, y, 0, 0, sprit_size, sprit_size, scaleX, 1, 0);
 
         game.batch.end();
 
+    }
+
+    private void updateSpriteAttack(float delta) {
+        attackTime += delta;
+        currFrame = attack.getKeyFrame(attackTime, false);
+        if (attack.isAnimationFinished(attackTime)) {
+            attacking = false;
+
+            // Set projectile in motion
+            projectiles.add(new Projectile(facing_right, x, y));
+        }
     }
 
     @Override
