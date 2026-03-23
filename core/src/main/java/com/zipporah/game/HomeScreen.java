@@ -45,7 +45,6 @@ public class HomeScreen implements Screen {
 
   @Override
   public void render(float delta) {
-
     float mouseX = Gdx.input.getX();
     float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
