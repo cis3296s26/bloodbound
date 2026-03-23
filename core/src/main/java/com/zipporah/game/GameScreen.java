@@ -59,27 +59,30 @@ public class GameScreen implements Screen {
         bodyDef.position.set(0,0);
 
 
-        // add it to the world
         Body bodyd = world.createBody(bodyDef);
         bodyd.setUserData(currFrame);
 
-        // set the shape (here we use a box 50 meters wide, 1 meter tall )
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(1,1);
 
-        // set the properties of the object ( shape, weight, restitution(bouncyness)
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 1f;
-
-        // create the physical object in our body)
-        // without this our body would just be data in the world
         bodyd.createFixture(shape, 0.0f);
 
-        // we no longer use the shape object here so dispose of it.
         shape.dispose();
     }
-
+    private void Create_Floor() {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.StaticBody;
+        bodyDef.position.set(0, -10);
+        Body bodys = world.createBody(bodyDef);
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(50, 1);
+        bodys.createFixture(shape, 0.0f);
+        shape.dispose();
+    }
+    }
     public static class Projectile {
         Texture projectileSpriteSheet;
         Animation<TextureRegion> projectileAnimation;
