@@ -29,6 +29,10 @@ Karasu_tengu/Jump.png
 Karasu_tengu/Run.png
 Karasu_tengu/Walk.png
 Logos/PixelLogo.png
+Other_objects.png
 Run.png
 Walk.png
+sounds/gametheme.mp3
+sounds/jump.mp3
+sounds/walk.mp3
 test2.tmx
