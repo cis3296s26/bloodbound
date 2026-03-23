@@ -15,6 +15,8 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+
 /** {link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class GameScreen implements Screen {
 
@@ -47,8 +49,29 @@ public class GameScreen implements Screen {
     boolean attacking = false;
     float attackTime = 0f;
 
-    Texture projectileSpriteSheet;
-    Animation<TextureRegion> projectile;
+
+
+
+    public static class Projectile {
+        Texture projectileSpriteSheet;
+        Animation<TextureRegion> projectileAnimation;
+        float lifetime = 0f;
+        float projectileDuration = 0f;
+
+        // Projectile Animation
+        public Projectile() {
+            projectileSpriteSheet = new Texture("Blood_Charge_1.png");
+            TextureRegion[][] projectileTemp = TextureRegion.split(projectileSpriteSheet, 64, 48);
+            TextureRegion[] projectileFrames = new TextureRegion[3];
+            for (int i = 0; i < 3; ++i) projectileFrames[i] = projectileTemp[0][i];
+            projectileAnimation = new Animation<>(0.075f, projectileFrames);
+        }
+
+    }
+
+    ArrayList<Projectile> projectiles = new ArrayList<>();
+
+    float projectileTime = 0f;
 
     // enemy (crow dude)
     Karasu karasu;
@@ -137,13 +160,7 @@ public class GameScreen implements Screen {
             attackFrames[i] = attackTmp[0][i];
         attack = new Animation<>(0.075f, attackFrames);
 
-        // Projectile Animation
-        projectileSpriteSheet = new Texture("Blood_Charge_1.png");
-        TextureRegion[][] projectileTemp = TextureRegion.split(projectileSpriteSheet, 64, 48);
-        TextureRegion[] projectileFrames = new TextureRegion[3];
-        for (int i = 0; i < 3; ++i)
-            projectileFrames[i] = projectileTemp[0][i];
-        projectile = new Animation<>(0.075f, projectileFrames);
+
 
         //enemy init
         karasu = new Karasu();
@@ -299,8 +316,12 @@ public class GameScreen implements Screen {
         // Update / Finish Attack Animation
         if(attacking) updateSpriteAttack(delta);
 
-        TextureRegion projectileFrame = projectile.getKeyFrame(0, true);
-        game.batch.draw(projectileFrame, 100, 100, 64, 48);
+        projectileTime += delta;
+        for (Projectile projectile : projectiles) {
+            TextureRegion projectileFrame = projectile.projectileAnimation.getKeyFrame(projectileTime, true);
+            game.batch.draw(projectileFrame, 100, 100, 64, 48);
+        }
+
 
 
         game.batch.draw(currFrame, drawX, y, 0, 0, sprit_size, sprit_size, scaleX, 1, 0);
@@ -316,6 +337,7 @@ public class GameScreen implements Screen {
             attacking = false;
 
             // Set projectile in motion
+            projectiles.add(new Projectile());
 //            currFrame = projectile.getKeyFrame(attackTime, false);
 
 
