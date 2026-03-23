@@ -75,8 +75,9 @@ public class GameScreen implements Screen {
     private void Create_Floor() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.position.set(0, -10);
+        bodyDef.position.set(0, 0);
         Body bodys = world.createBody(bodyDef);
+        bodys.setUserData(map);
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(50, 1);
         bodys.createFixture(shape, 0.0f);
@@ -233,9 +234,11 @@ public class GameScreen implements Screen {
         input(delta);
         logic(delta);
         draw(delta);
+        Create_Object();
+        Create_Floor();
         world.step(1/60f, 6, 2);
         debugRenderer.render(world, viewport.getCamera().combined);
-        Create_Object();
+
     }
 
     private void input(float delta) {
