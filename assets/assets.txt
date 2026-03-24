@@ -30,5 +30,15 @@ Karasu_tengu/Run.png
 Karasu_tengu/Walk.png
 Logos/PixelLogo.png
 Run.png
+Skeleton/Attack_1.png
+Skeleton/Attack_2.png
+Skeleton/Dead.png
+Skeleton/Fall.png
+Skeleton/Hurt.png
+Skeleton/Idle.png
+Skeleton/Protect.png
+Skeleton/Run+attack.png
+Skeleton/Run.png
+Skeleton/Walk.png
 Walk.png
 test2.tmx
