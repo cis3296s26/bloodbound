@@ -53,6 +53,7 @@ public class GameScreen implements Screen {
 
     World world = new World(new Vector2(0, -10), true);
     Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
+
     private void Create_Object() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -72,6 +73,7 @@ public class GameScreen implements Screen {
 
         shape.dispose();
     }
+
     private void Create_Floor() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
@@ -82,6 +84,7 @@ public class GameScreen implements Screen {
         shape.setAsBox(50, 1);
         bodys.createFixture(shape, 0.0f);
         shape.dispose();
+
     }
 
 
