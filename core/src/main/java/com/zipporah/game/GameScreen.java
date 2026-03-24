@@ -15,6 +15,11 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -51,8 +56,19 @@ public class GameScreen implements Screen {
     boolean attacking = false;
     float attackTime = 0f;
 
-    World world = new World(new Vector2(0, -10), true);
-    Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
+    // array for all colossion rectangles from tiled map
+    Array<Rectangle> collisionRectangles = new Array<>();
+    float Map_Height = 208f;
+    // physics
+    float velocityY = 0f;
+    float gravity = -1500f;
+    float jumpAccel = 750f;
+    float hitbox_width = 60f;
+    float hitbox_height = 80f;
+    Rectangle spriteBox = new Rectangle();
+
+    //World world = new World(new Vector2(0, -10), true);
+    // Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
 
     private void Create_Object() {
         BodyDef bodyDef = new BodyDef();
@@ -283,8 +299,8 @@ public class GameScreen implements Screen {
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
-             jumping = true;
-             jumptime = 0f;
+            jumping = true;
+            jumptime = 0f;
         }
         if(jumping) {
             jumptime += delta;
