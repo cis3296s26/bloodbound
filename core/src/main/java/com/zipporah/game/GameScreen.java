@@ -323,6 +323,9 @@ public class GameScreen implements Screen {
         // camera follows sprite
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
 
+        // enemy follows player
+        karasu.botLogic(x, y, delta);
+
         // get important map values for the camera
         float mapWorldWidth  = 240 * 16 * scale;
         float mapWorldHeight = 13  * 16 * scale;
@@ -357,7 +360,7 @@ public class GameScreen implements Screen {
 
         game.batch.begin();
 
-        //enemy
+        // enemy
         karasu.draw(game.batch, time);
 
         // draw animated character keeping in mind the characters direction
