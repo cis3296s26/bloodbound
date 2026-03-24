@@ -18,5 +18,5 @@ Most recent JRE
 - uses launch4j to bundle and release
 
 
-Follow this project board to know the latest status of the project: [http://...]((https://github.com/orgs/cis3296s26/projects/27/views/2))  
+Follow this project board to know the latest status of the project: [https://github.com/orgs/cis3296s26/projects/27/views/2]
 
