@@ -61,7 +61,7 @@ public class GameScreen implements Screen {
 
 
         Body bodyd = world.createBody(bodyDef);
-        bodyd.setUserData(currFrame);
+        bodyd.setUserData(idleSpriteSheet);
 
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(1,1);
@@ -69,7 +69,7 @@ public class GameScreen implements Screen {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 1f;
-        bodyd.createFixture(shape, 0.0f);
+        bodyd.createFixture(shape, 5.0f);
 
         shape.dispose();
     }
@@ -79,9 +79,9 @@ public class GameScreen implements Screen {
         bodyDef.type = BodyDef.BodyType.StaticBody;
         bodyDef.position.set(0, 0);
         Body bodys = world.createBody(bodyDef);
-        bodys.setUserData(map);
+        bodys.setUserData(renderer);
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(50, 1);
+        shape.setAsBox(viewport.getWorldWidth(), 65);
         bodys.createFixture(shape, 0.0f);
         shape.dispose();
 
@@ -237,11 +237,10 @@ public class GameScreen implements Screen {
         input(delta);
         logic(delta);
         draw(delta);
-        Create_Object();
+        //Create_Object();
         Create_Floor();
         world.step(1/60f, 6, 2);
         debugRenderer.render(world, viewport.getCamera().combined);
-
     }
 
     private void input(float delta) {
