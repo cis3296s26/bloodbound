@@ -3,6 +3,7 @@
 
 # How to run
 Download ZIP folder here: [https://tinyurl.com/bbound1]
+
 OR
 ----
 Go to Releases and download from most recent version released
