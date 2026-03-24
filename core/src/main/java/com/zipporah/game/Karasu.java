@@ -14,12 +14,23 @@ public class Karasu {
     Texture idleSpriteSheet;
     Animation<TextureRegion> idle;
 
+    Texture attackSpriteSheet;
+    Animation<TextureRegion> attack;
+
     float time = 0;
     float x = 1000;
-    float y = 150;
+    float y = 70;
     float spriteSpeed = 200.0f;
 
+    // for flip
+    boolean facingRight = true;
+
+    // variables for bot states. i need idle, walk and attack
+    enum botState {idle, walk, attack}
+
+
     public void create(){
+        // idle anim
         idleSpriteSheet = new Texture("Skeleton/Idle.png");
 
         TextureRegion[][] tmp = TextureRegion.split(idleSpriteSheet, 128, 128);
@@ -28,6 +39,26 @@ public class Karasu {
             idleFrames[i] = tmp[0][i];
         }
         idle = new Animation<>(0.1f, idleFrames);
+
+        // walk anim
+        walkSpriteSheet = new Texture("Skeleton/Walk.png");
+
+        TextureRegion[][] tmp1 = TextureRegion.split(walkSpriteSheet, 128, 128);
+        TextureRegion[] walkFrames = new TextureRegion[7];
+        for (int i = 0; i < 7; i++) {
+            walkFrames[i] = tmp[0][i];
+        }
+        walk = new Animation<>(0.1f, walkFrames);
+
+        // attack
+        attackSpriteSheet = new Texture("Skeleton/Attack_1.png");
+
+        TextureRegion[][] tmp2 = TextureRegion.split(attackSpriteSheet, 128, 128);
+        TextureRegion[] attackFrames = new TextureRegion[4];
+        for (int i = 0; i < 4; i++) {
+            attackFrames[i] = tmp[0][i];
+        }
+        attack = new Animation<>(0.1f, attackFrames);
     }
 
     public void botLogic() {
