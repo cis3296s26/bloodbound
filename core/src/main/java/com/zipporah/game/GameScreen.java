@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -49,7 +51,41 @@ public class GameScreen implements Screen {
     boolean attacking = false;
     float attackTime = 0f;
 
+    World world = new World(new Vector2(0, -10), true);
+    Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
 
+    private void Create_Object() {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(0,0);
+
+
+        Body bodyd = world.createBody(bodyDef);
+        bodyd.setUserData(currFrame);
+
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(1,1);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.density = 1f;
+        bodyd.createFixture(shape, 0.0f);
+
+        shape.dispose();
+    }
+
+    private void Create_Floor() {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.StaticBody;
+        bodyDef.position.set(0, 0);
+        Body bodys = world.createBody(bodyDef);
+        bodys.setUserData(map);
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(50, 1);
+        bodys.createFixture(shape, 0.0f);
+        shape.dispose();
+
+    }
 
 
     public static class Projectile {
@@ -181,6 +217,8 @@ public class GameScreen implements Screen {
         //enemy init
         karasu = new Karasu();
         karasu.create();
+
+
     }
 
     @Override
@@ -199,6 +237,11 @@ public class GameScreen implements Screen {
         input(delta);
         logic(delta);
         draw(delta);
+        Create_Object();
+        Create_Floor();
+        world.step(1/60f, 6, 2);
+        debugRenderer.render(world, viewport.getCamera().combined);
+
     }
 
     private void input(float delta) {
