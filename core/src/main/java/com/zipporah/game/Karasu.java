@@ -20,11 +20,11 @@ public class Karasu {
     float spriteSpeed = 200.0f;
 
     public void create(){
-        idleSpriteSheet = new Texture("Karasu_tengu/Idle.png");
+        idleSpriteSheet = new Texture("Skeleton/Idle.png");
 
         TextureRegion[][] tmp = TextureRegion.split(idleSpriteSheet, 128, 128);
-        TextureRegion[] idleFrames = new TextureRegion[6];
-        for (int i = 0; i < 6; i++) {
+        TextureRegion[] idleFrames = new TextureRegion[7];
+        for (int i = 0; i < 7; i++) {
             idleFrames[i] = tmp[0][i];
         }
         idle = new Animation<>(0.1f, idleFrames);
