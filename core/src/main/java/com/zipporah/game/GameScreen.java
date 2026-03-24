@@ -70,37 +70,54 @@ public class GameScreen implements Screen {
     //World world = new World(new Vector2(0, -10), true);
     // Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
 
-    private void Create_Object() {
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(0,0);
+//    private void Create_Object() {
+//        BodyDef bodyDef = new BodyDef();
+//        bodyDef.type = BodyDef.BodyType.DynamicBody;
+//        bodyDef.position.set(0,0);
+//
+//
+//        Body bodyd = world.createBody(bodyDef);
+//        bodyd.setUserData(idleSpriteSheet);
+//
+//        PolygonShape shape = new PolygonShape();
+//        shape.setAsBox(1,1);
+//
+//        FixtureDef fixtureDef = new FixtureDef();
+//        fixtureDef.shape = shape;
+//        fixtureDef.density = 1f;
+//        bodyd.createFixture(shape, 5.0f);
+//
+//        shape.dispose();
+//    }
+//
+//    private void Create_Floor() {
+//        BodyDef bodyDef = new BodyDef();
+//        bodyDef.type = BodyDef.BodyType.StaticBody;
+//        bodyDef.position.set(0, 0);
+//        Body bodys = world.createBody(bodyDef);
+//        bodys.setUserData(renderer);
+//        PolygonShape shape = new PolygonShape();
+//        shape.setAsBox(viewport.getWorldWidth(), 65);
+//        bodys.createFixture(shape, 0.0f);
+//        shape.dispose();
+//
+//    }
 
+    private void getCollisionObject(){
+        MapLayer layer = map.getLayers().get("collision");
+        for (MapObject obj : layer.getObjects()){
+            if(obj instanceof RectangleMapObject){
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
 
-        Body bodyd = world.createBody(bodyDef);
-        bodyd.setUserData(idleSpriteSheet);
-
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(1,1);
-
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = shape;
-        fixtureDef.density = 1f;
-        bodyd.createFixture(shape, 5.0f);
-
-        shape.dispose();
-    }
-
-    private void Create_Floor() {
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.position.set(0, 0);
-        Body bodys = world.createBody(bodyDef);
-        bodys.setUserData(renderer);
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(viewport.getWorldWidth(), 65);
-        bodys.createFixture(shape, 0.0f);
-        shape.dispose();
-
+                // scale cords so they fit with the specific map dimensions
+                collisionRectangles.add(new Rectangle(
+                        r.x     * scale,
+                        r.y     * scale,
+                        r.width  * scale,
+                        r.height * scale
+                ));
+            }
+        }
     }
 
 
