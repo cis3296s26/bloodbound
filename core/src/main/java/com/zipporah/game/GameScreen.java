@@ -192,6 +192,7 @@ public class GameScreen implements Screen {
         // render in map
         map = new TmxMapLoader().load("test2.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, scale);
+        getCollisionObject();
 
         // set camera to start at far left
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
@@ -271,9 +272,9 @@ public class GameScreen implements Screen {
         logic(delta);
         draw(delta);
         //Create_Object();
-        Create_Floor();
-        world.step(1/60f, 6, 2);
-        debugRenderer.render(world, viewport.getCamera().combined);
+        //Create_Object();
+        //world.step(1/60f, 6, 2);
+        //debugRenderer.render(world, viewport.getCamera().combined);
     }
 
     private void input(float delta) {
@@ -351,6 +352,24 @@ public class GameScreen implements Screen {
 
     private void logic(float delta) {
         time += Gdx.graphics.getDeltaTime();
+
+        // gravity pulls the player position down
+        velocityY += gravity * delta;
+        y += velocityY * delta;
+
+        // change players hitbox with the position due to gravity
+        float changedHitbox = (sprit_size - hitbox_width) / 2f;
+        spriteBox.set(x + changedHitbox, y, hitbox_width, hitbox_height);
+
+        // this is where the player interacts with the collisions*****
+        for (Rectangle rectangle : collisionRectangles) {
+            if (spriteBox.overlaps(rectangle) && velocityY <= 0) {
+                y         = rectangle.y + rectangle.height;
+                velocityY = 0;
+                jumping = false;
+            }
+        }
+
 
         // camera follows sprite
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
