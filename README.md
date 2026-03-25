@@ -2,10 +2,20 @@
    For bored gamers who are looking for something fun in their spare time, without spending any money, Bloodbound is a new 2D platformer that is fully free and open source. Unlike other platformers from publishers like Nintendo, which come at a high cost, Bloodbound is free and accessible to all who wish to play or contribute.  
 
 # How to run
-Download ZIP folder here: [INSERT LINK]
-OR
-Go to Releases and download from most recent version released
+Windows:
+Download ZIP folder here: [https://tinyurl.com/bbound2]
 
+Mac:
+clone this repository, open the project, and run these commands in your terminal: 
+- chmod +x gradlew
+- ./gradlew build
+- ./gradlew lwjgl3:run
+
+OR
+----
+Go to Releases and download from most recent version released
+GitHub main page > Releases > download the .zip folder
+----
 unzip onto your computer, and run the .exe file 
 
 Enjoy!
@@ -15,8 +25,8 @@ Needed resources:
 Tiled (for map editing)
 LibGDX for the project
 Most recent JRE
-- uses launch4j to bundle and release
+launch4j to bundle and release
 
 
-Follow this project board to know the latest status of the project: [http://...]((https://github.com/orgs/cis3296s26/projects/27/views/2))  
+Follow this project board to know the latest status of the project: [https://github.com/orgs/cis3296s26/projects/27/views/2]
 

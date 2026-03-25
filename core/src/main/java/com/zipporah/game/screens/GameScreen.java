@@ -1,4 +1,4 @@
-package com.zipporah.game;
+package com.zipporah.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -7,15 +7,18 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.zipporah.game.enemies.Karasu;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -52,40 +55,32 @@ public class GameScreen implements Screen {
     boolean attacking = false;
     float attackTime = 0f;
 
-    World world = new World(new Vector2(0, -10), true);
-    Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
+    // array for all colossion rectangles from tiled map
+    Array<Rectangle> collisionRectangles = new Array<>();
+    float Map_Height = 208f;
+    // physics
+    float velocityY = 0f;
+    float gravity = -1500f;
+    float jumpAccel = 700;
+    float hitbox_width = 60f;
+    float hitbox_height = 80f;
+    Rectangle spriteBox = new Rectangle();
 
-    private void Create_Object() {
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(0,0);
+    private void getCollisionObject(){
+        MapLayer layer = map.getLayers().get("collision");
+        for (MapObject obj : layer.getObjects()){
+            if(obj instanceof RectangleMapObject){
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
 
-
-        Body bodyd = world.createBody(bodyDef);
-        bodyd.setUserData(idleSpriteSheet);
-
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(1,1);
-
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = shape;
-        fixtureDef.density = 1f;
-        bodyd.createFixture(shape, 5.0f);
-
-        shape.dispose();
-    }
-
-    private void Create_Floor() {
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.position.set(0, 0);
-        Body bodys = world.createBody(bodyDef);
-        bodys.setUserData(renderer);
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(viewport.getWorldWidth(), 65);
-        bodys.createFixture(shape, 0.0f);
-        shape.dispose();
-
+                // scale cords so they fit with the specific map dimensions
+                collisionRectangles.add(new Rectangle(
+                        r.x     * scale,
+                        r.y     * scale,
+                        r.width  * scale,
+                        r.height * scale
+                ));
+            }
+        }
     }
 
 
@@ -101,7 +96,7 @@ public class GameScreen implements Screen {
 
         // Projectile Animation
         public Projectile(boolean facing_right, float x, float y) {
-            projectileSpriteSheet = new Texture("Blood_Charge_1.png");
+            projectileSpriteSheet = new Texture("Player/Blood_Charge_1.png");
             TextureRegion[][] projectileTemp = TextureRegion.split(projectileSpriteSheet, 64, 48);
             TextureRegion[] projectileFrames = new TextureRegion[3];
             for (int i = 0; i < 3; ++i) projectileFrames[i] = projectileTemp[0][i];
@@ -160,6 +155,7 @@ public class GameScreen implements Screen {
         // render in map
         map = new TmxMapLoader().load("test2.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, scale);
+        getCollisionObject();
 
         // set camera to start at far left
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
@@ -168,7 +164,7 @@ public class GameScreen implements Screen {
         game.batch.setProjectionMatrix(cam.combined);
 
         // idle sprite sheet
-        idleSpriteSheet = new Texture("Idle.png");
+        idleSpriteSheet = new Texture("Player/Idle.png");
         TextureRegion[][] tmp2 = TextureRegion.split(idleSpriteSheet, 128, 128);
         TextureRegion[] idleFrames = new TextureRegion[5];
         for (int i = 0; i < 5; i++) {
@@ -177,7 +173,7 @@ public class GameScreen implements Screen {
         idle = new Animation<>(0.1f, idleFrames);
 
         // walk sprite sheet
-        walkSpriteSheet = new Texture("Walk.png");
+        walkSpriteSheet = new Texture("Player/Walk.png");
         TextureRegion[][] tmp = TextureRegion.split(walkSpriteSheet, 128, 128);
         TextureRegion[] walkFrames = new TextureRegion[6];
         for (int i = 0; i < 6; i++) {
@@ -188,7 +184,7 @@ public class GameScreen implements Screen {
         // reversed walk
 
         //jump spritesheet
-        jumpSpriteSheet = new Texture("Jump.png");
+        jumpSpriteSheet = new Texture("Player/Jump.png");
         TextureRegion[][] tmp3 = TextureRegion.split(jumpSpriteSheet, 128, 128);
         TextureRegion[] jumpFrames = new TextureRegion[6];
         for (int i = 0; i < 6; i++) {
@@ -197,7 +193,7 @@ public class GameScreen implements Screen {
         jump = new Animation<>(0.075f, jumpFrames);
 
         //sprint spritesheet
-        sprintSpriteSheet = new Texture("Run.png");
+        sprintSpriteSheet = new Texture("Player/Run.png");
         TextureRegion[][] tmp4 = TextureRegion.split(sprintSpriteSheet, 128, 128);
         TextureRegion[] sprintFrames = new TextureRegion[6];
         for (int i = 0; i < 6; i++) {
@@ -206,7 +202,7 @@ public class GameScreen implements Screen {
         sprint = new Animation<>(0.125f, sprintFrames);
 
         // Sprite Attack
-        attackSpriteSheet = new Texture("Attack_1.png");
+        attackSpriteSheet = new Texture("Player/Attack_1.png");
         TextureRegion[][] attackTmp = TextureRegion.split(attackSpriteSheet, 128, 128);
         TextureRegion[] attackFrames = new TextureRegion[6];
         for (int i = 0; i < 6; ++i)
@@ -238,10 +234,6 @@ public class GameScreen implements Screen {
         input(delta);
         logic(delta);
         draw(delta);
-        //Create_Object();
-        Create_Floor();
-        world.step(1/60f, 6, 2);
-        debugRenderer.render(world, viewport.getCamera().combined);
     }
 
     private void input(float delta) {
@@ -282,19 +274,13 @@ public class GameScreen implements Screen {
             }
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
-             jumping = true;
-             jumptime = 0f;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.W) || Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyJustPressed(Input.Keys.UP) && !jumping) {
+            jumping = true;
+            // inc y velo
+            velocityY = jumpAccel;
         }
         if(jumping) {
-            jumptime += delta;
-            float prev = y;
-            y += delta * spriteSpeed;
-            currFrame = jump.getKeyFrame(time, true);
-            y = prev;
-            if(jump.isAnimationFinished((jumptime))) {
-                jumping = false;
-            }
+            currFrame = jump.getKeyFrame(time, false);
         }
 
         // Sprite Attack
@@ -312,6 +298,7 @@ public class GameScreen implements Screen {
 //        if (!isWalking) {
 //            currFrame = idle.getKeyFrame(time, true);
 //        }
+
     }
 
 
@@ -319,8 +306,29 @@ public class GameScreen implements Screen {
     private void logic(float delta) {
         time += Gdx.graphics.getDeltaTime();
 
+        // gravity pulls the player position down
+        velocityY += gravity * delta;
+        y += velocityY * delta;
+
+        // change players hitbox with the position due to gravity
+        float changedHitbox = (sprit_size - hitbox_width) / 2f;
+        spriteBox.set(x + changedHitbox, y, hitbox_width, hitbox_height);
+
+        // this is where the player interacts with the collisions*****
+        for (Rectangle rectangle : collisionRectangles) {
+            if (spriteBox.overlaps(rectangle) && velocityY <= 0) {
+                y         = rectangle.y + rectangle.height;
+                velocityY = 0;
+                jumping = false;
+            }
+        }
+
+
         // camera follows sprite
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
+
+        // enemy follows player
+        karasu.botLogic(x, y, delta);
 
         // get important map values for the camera
         float mapWorldWidth  = 240 * 16 * scale;
@@ -356,7 +364,7 @@ public class GameScreen implements Screen {
 
         game.batch.begin();
 
-        //enemy
+        // enemy
         karasu.draw(game.batch, time);
 
         // draw animated character keeping in mind the characters direction

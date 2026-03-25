@@ -1,19 +1,21 @@
-package com.zipporah.game;
+package com.zipporah.game.screens;
 
 import com.badlogic.gdx.Screen;
 
-public class RankingsScreen implements Screen{
+public class OptionsScreen implements Screen{
 
   private final ScreenManager game;
   
-  public RankingsScreen(ScreenManager game){
+  public OptionsScreen(ScreenManager game){
     this.game = game;
   }
 
   @Override
   public void show() {
-    // leaderboard to be added
-    // timer to be added
+    // settings for 
+    // sound effects to be added
+    // music to be added
+    // other things to change to be added
   }
 
   @Override
