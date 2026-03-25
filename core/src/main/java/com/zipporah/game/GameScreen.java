@@ -62,7 +62,7 @@ public class GameScreen implements Screen {
     // physics
     float velocityY = 0f;
     float gravity = -1500f;
-    float jumpAccel = 750f;
+    float jumpAccel = 700;
     float hitbox_width = 60f;
     float hitbox_height = 80f;
     Rectangle spriteBox = new Rectangle();
@@ -315,19 +315,13 @@ public class GameScreen implements Screen {
             }
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.W) || Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyJustPressed(Input.Keys.UP) && !jumping) {
             jumping = true;
-            jumptime = 0f;
+            // inc y velo
+            velocityY = jumpAccel;
         }
         if(jumping) {
-            jumptime += delta;
-            float prev = y;
-            y += delta * spriteSpeed;
-            currFrame = jump.getKeyFrame(time, true);
-            y = prev;
-            if(jump.isAnimationFinished((jumptime))) {
-                jumping = false;
-            }
+            currFrame = jump.getKeyFrame(time, false);
         }
 
         // Sprite Attack
