@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.zipporah.game.enemies.Karasu;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -137,7 +138,8 @@ public class GameScreen implements Screen {
     float sprit_size = 200f;
 
     // camera
-    FitViewport viewport;
+    ExtendViewport viewport;
+    FitViewport viewportHUD;
 
     // boolean to keep track of idle character direction
     boolean facing_right = true;
@@ -149,7 +151,8 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         // viewport (fixed)
-        viewport = new FitViewport(1280, 720);
+        viewport = new ExtendViewport(1280, 720);
+        viewportHUD = new FitViewport(1280, 720);
         game.batch.setProjectionMatrix(viewport.getCamera().combined);
 
         // render in map
@@ -209,13 +212,9 @@ public class GameScreen implements Screen {
             attackFrames[i] = attackTmp[0][i];
         attack = new Animation<>(0.075f, attackFrames);
 
-
-
         //enemy init
         karasu = new Karasu();
         karasu.create();
-
-
     }
 
     @Override
@@ -226,7 +225,7 @@ public class GameScreen implements Screen {
 
         // Resize your application here. The parameters represent the new window size.
         viewport.update(width, height, true);
-        game.batch.setProjectionMatrix(viewport.getCamera().combined);
+        viewportHUD.update(width, height, true);
     }
 
     @Override
@@ -306,6 +305,8 @@ public class GameScreen implements Screen {
     private void logic(float delta) {
         time += Gdx.graphics.getDeltaTime();
 
+        game.timer.update();
+
         // gravity pulls the player position down
         velocityY += gravity * delta;
         y += velocityY * delta;
@@ -362,6 +363,7 @@ public class GameScreen implements Screen {
         renderer.setView(cam);
         renderer.render();
 
+        game.batch.setProjectionMatrix(cam.combined);
         game.batch.begin();
 
         // enemy
@@ -400,6 +402,11 @@ public class GameScreen implements Screen {
 
         game.batch.end();
 
+        viewportHUD.apply();
+        game.batch.setProjectionMatrix(viewportHUD.getCamera().combined);
+        game.batch.begin();
+        game.timer.draw(game.batch);
+        game.batch.end();
     }
 
     private void updateSpriteAttack(float delta) {
