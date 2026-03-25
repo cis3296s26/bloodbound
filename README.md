@@ -3,7 +3,7 @@
 
 # How to run
 Windows:
-Download ZIP folder here: [https://tinyurl.com/bbound1]
+Download ZIP folder here: [https://tinyurl.com/bbound2]
 
 Mac:
 clone this repository, open the project, and run these commands in your terminal: 
