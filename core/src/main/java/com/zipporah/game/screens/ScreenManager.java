@@ -1,4 +1,4 @@
-package com.zipporah.game;
+package com.zipporah.game.screens;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;

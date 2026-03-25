@@ -1,23 +1,9 @@
 .gitkeep
-Attack_1.png
-Attack_2.png
-Attack_3.png
-Attack_4.png
-Battleground2.png
-Blood_Charge_1.png
-Blood_Charge_2.png
-Blood_Charge_3.png
-Blood_Charge_4.png
 Buttons/ControlsButton.png
 Buttons/OptionsButton.png
 Buttons/QuitButton.png
 Buttons/RankingsButton.png
 Buttons/StartButton.png
-Dead.png
-Dungeon Tile Set.png
-Hurt.png
-Idle.png
-Jump.png
 Karasu_tengu/Attack_1.png
 Karasu_tengu/Attack_2.png
 Karasu_tengu/Attack_3.png
@@ -29,7 +15,22 @@ Karasu_tengu/Jump.png
 Karasu_tengu/Run.png
 Karasu_tengu/Walk.png
 Logos/PixelLogo.png
-Run.png
+Maps/Battleground2.png
+Maps/Dungeon Tile Set.png
+Player/Attack_1.png
+Player/Attack_2.png
+Player/Attack_3.png
+Player/Attack_4.png
+Player/Blood_Charge_1.png
+Player/Blood_Charge_2.png
+Player/Blood_Charge_3.png
+Player/Blood_Charge_4.png
+Player/Dead.png
+Player/Hurt.png
+Player/Idle.png
+Player/Jump.png
+Player/Run.png
+Player/Walk.png
 Skeleton/Attack_1.png
 Skeleton/Attack_2.png
 Skeleton/Dead.png
@@ -40,5 +41,4 @@ Skeleton/Protect.png
 Skeleton/Run+attack.png
 Skeleton/Run.png
 Skeleton/Walk.png
-Walk.png
 test2.tmx

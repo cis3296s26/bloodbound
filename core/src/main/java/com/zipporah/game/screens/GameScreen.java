@@ -1,4 +1,4 @@
-package com.zipporah.game;
+package com.zipporah.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.zipporah.game.enemies.Karasu;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -95,7 +96,7 @@ public class GameScreen implements Screen {
 
         // Projectile Animation
         public Projectile(boolean facing_right, float x, float y) {
-            projectileSpriteSheet = new Texture("Blood_Charge_1.png");
+            projectileSpriteSheet = new Texture("Player/Blood_Charge_1.png");
             TextureRegion[][] projectileTemp = TextureRegion.split(projectileSpriteSheet, 64, 48);
             TextureRegion[] projectileFrames = new TextureRegion[3];
             for (int i = 0; i < 3; ++i) projectileFrames[i] = projectileTemp[0][i];
@@ -163,7 +164,7 @@ public class GameScreen implements Screen {
         game.batch.setProjectionMatrix(cam.combined);
 
         // idle sprite sheet
-        idleSpriteSheet = new Texture("Idle.png");
+        idleSpriteSheet = new Texture("Player/Idle.png");
         TextureRegion[][] tmp2 = TextureRegion.split(idleSpriteSheet, 128, 128);
         TextureRegion[] idleFrames = new TextureRegion[5];
         for (int i = 0; i < 5; i++) {
@@ -172,7 +173,7 @@ public class GameScreen implements Screen {
         idle = new Animation<>(0.1f, idleFrames);
 
         // walk sprite sheet
-        walkSpriteSheet = new Texture("Walk.png");
+        walkSpriteSheet = new Texture("Player/Walk.png");
         TextureRegion[][] tmp = TextureRegion.split(walkSpriteSheet, 128, 128);
         TextureRegion[] walkFrames = new TextureRegion[6];
         for (int i = 0; i < 6; i++) {
@@ -183,7 +184,7 @@ public class GameScreen implements Screen {
         // reversed walk
 
         //jump spritesheet
-        jumpSpriteSheet = new Texture("Jump.png");
+        jumpSpriteSheet = new Texture("Player/Jump.png");
         TextureRegion[][] tmp3 = TextureRegion.split(jumpSpriteSheet, 128, 128);
         TextureRegion[] jumpFrames = new TextureRegion[6];
         for (int i = 0; i < 6; i++) {
@@ -192,7 +193,7 @@ public class GameScreen implements Screen {
         jump = new Animation<>(0.075f, jumpFrames);
 
         //sprint spritesheet
-        sprintSpriteSheet = new Texture("Run.png");
+        sprintSpriteSheet = new Texture("Player/Run.png");
         TextureRegion[][] tmp4 = TextureRegion.split(sprintSpriteSheet, 128, 128);
         TextureRegion[] sprintFrames = new TextureRegion[6];
         for (int i = 0; i < 6; i++) {
@@ -201,7 +202,7 @@ public class GameScreen implements Screen {
         sprint = new Animation<>(0.125f, sprintFrames);
 
         // Sprite Attack
-        attackSpriteSheet = new Texture("Attack_1.png");
+        attackSpriteSheet = new Texture("Player/Attack_1.png");
         TextureRegion[][] attackTmp = TextureRegion.split(attackSpriteSheet, 128, 128);
         TextureRegion[] attackFrames = new TextureRegion[6];
         for (int i = 0; i < 6; ++i)
