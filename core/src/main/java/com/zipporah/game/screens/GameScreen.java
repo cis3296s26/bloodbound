@@ -273,7 +273,7 @@ public class GameScreen implements Screen {
             }
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.W) || Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyJustPressed(Input.Keys.UP) && !jumping) {
+        if ((Gdx.input.isKeyJustPressed(Input.Keys.W) || Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyJustPressed(Input.Keys.UP)) && !jumping) {
             jumping = true;
             // inc y velo
             velocityY = jumpAccel;
@@ -318,7 +318,7 @@ public class GameScreen implements Screen {
         // this is where the player interacts with the collisions*****
         for (Rectangle rectangle : collisionRectangles) {
             if (spriteBox.overlaps(rectangle) && velocityY <= 0) {
-                y         = rectangle.y + rectangle.height;
+                y = rectangle.y + rectangle.height;
                 velocityY = 0;
                 jumping = false;
             }

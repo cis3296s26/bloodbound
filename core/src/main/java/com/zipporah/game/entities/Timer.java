@@ -18,7 +18,7 @@ public class Timer {
   }
 
   public void draw(SpriteBatch batch) {
-      font.draw(batch, String.format("Time: %.1f", elapsedTime), 20, 700);
+      font.draw(batch, String.format("Time: %.1f", elapsedTime), 1100, 700);
   }
 
   public void dispose() {
