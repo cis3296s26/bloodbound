@@ -6,8 +6,9 @@ Windows:
 Download ZIP folder here: [https://tinyurl.com/bbound1]
 
 Mac:
-clone this repository and run these commands in your terminal: 
+clone this repository, open the project, and run these commands in your terminal: 
 - chmod +x gradlew
+- ./gradlew build
 - ./gradlew lwjgl3:run
 
 OR
