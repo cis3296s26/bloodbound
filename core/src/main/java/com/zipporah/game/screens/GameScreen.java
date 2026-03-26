@@ -61,12 +61,17 @@ public class GameScreen implements Screen {
     // array for all wall collisions
     Array<Rectangle> wallRectangles = new Array<>();
     float Map_Height = 208f;
+    // array for ladders
+    Array<Rectangle> ladderRectangles = new Array<>();
     // physics
     float velocityY = 0f;
     float gravity = -1500f;
     float jumpAccel = 700;
     float hitbox_width = 60f;
     float hitbox_height = 80f;
+    boolean onLadder = false;
+    float ladderCenterX = 0f;
+    boolean touchingLadder = false;
     Rectangle spriteBox = new Rectangle();
 
     private void getCollisionObject(){
@@ -88,14 +93,25 @@ public class GameScreen implements Screen {
 
     private void getWallObjects() {
         MapLayer layer = map.getLayers().get("walls");
-        if (layer == null) {
-            Gdx.app.log("Map", "No walls layer found!");
-            return;
-        }
         for (MapObject obj : layer.getObjects()) {
             if (obj instanceof RectangleMapObject) {
                 Rectangle r = ((RectangleMapObject) obj).getRectangle();
                 wallRectangles.add(new Rectangle(
+                        r.x     * scale,
+                        r.y     * scale,
+                        r.width  * scale,
+                        r.height * scale
+                ));
+            }
+        }
+    }
+
+    private void getLadderObjects() {
+        MapLayer layer = map.getLayers().get("ladder");
+        for (MapObject obj : layer.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                ladderRectangles.add(new Rectangle(
                         r.x     * scale,
                         r.y     * scale,
                         r.width  * scale,
@@ -181,6 +197,7 @@ public class GameScreen implements Screen {
         renderer = new OrthogonalTiledMapRenderer(map, scale);
         getCollisionObject();
         getWallObjects();
+        getLadderObjects();
 
         // set camera to start at far left
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
@@ -295,7 +312,7 @@ public class GameScreen implements Screen {
             }
         }
 
-        if ((Gdx.input.isKeyJustPressed(Input.Keys.W) || Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyJustPressed(Input.Keys.UP)) && !jumping) {
+        if ((Gdx.input.isKeyJustPressed(Input.Keys.W) || Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyJustPressed(Input.Keys.UP)) && !jumping && !onLadder) {
             jumping = true;
             // inc y velo
             velocityY = jumpAccel;
@@ -303,6 +320,29 @@ public class GameScreen implements Screen {
         if(jumping) {
             currFrame = jump.getKeyFrame(time, false);
         }
+
+        if (touchingLadder || onLadder) {
+            if (Gdx.input.isKeyPressed(Input.Keys.W) ||
+                    Gdx.input.isKeyPressed(Input.Keys.UP)) {
+                onLadder = true;
+                y += spriteSpeed * delta;
+                currFrame = walk.getKeyFrame(time, true);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.S) ||
+                    Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+                onLadder = true;
+                y -= spriteSpeed * delta;
+                currFrame = walk.getKeyFrame(time, true);
+            }
+            // get off ladder by pressing left or right
+            if (Gdx.input.isKeyPressed(Input.Keys.A)    ||
+                    Gdx.input.isKeyPressed(Input.Keys.LEFT)  ||
+                    Gdx.input.isKeyPressed(Input.Keys.D)     ||
+                    Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+                onLadder = false;
+            }
+        }
+
 
         // Sprite Attack
         if (!attacking && Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
@@ -329,9 +369,15 @@ public class GameScreen implements Screen {
 
         game.timer.update();
 
-        // gravity pulls the player position down
-        velocityY += gravity * delta;
-        y += velocityY * delta;
+        if (onLadder) {
+            // on ladder, disable gravity and lock x
+            velocityY = 0;
+            x = ladderCenterX;
+        } else {
+            // normal gravity, pull player down
+            velocityY += gravity * delta;
+            y += velocityY * delta;
+        }
 
         // change players hitbox with the position due to gravity
         float changedHitbox = (sprit_size - hitbox_width) / 2f;
@@ -350,7 +396,7 @@ public class GameScreen implements Screen {
 
         // floor loop
         for (Rectangle rectangle : collisionRectangles) {
-            if (spriteBox.overlaps(rectangle) && velocityY <= 0) {
+            if (spriteBox.overlaps(rectangle) && velocityY <= 0 && !onLadder) {
                 y = rectangle.y + rectangle.height;
                 velocityY = 0;
                 jumping = false;
@@ -358,6 +404,7 @@ public class GameScreen implements Screen {
             }
         }
 
+        // wall loop
         for (Rectangle rectangle : wallRectangles) {
             spriteBox.set(x + changedHitbox, y, hitbox_width, hitbox_height);
 
@@ -374,6 +421,26 @@ public class GameScreen implements Screen {
             }
         }
 
+        // check if on ladder
+        touchingLadder = false;
+        for (Rectangle ladder : ladderRectangles) {
+            if (spriteBox.overlaps(ladder)) {
+                touchingLadder = true;
+                ladderCenterX = ladder.x + ladder.width / 2f - sprit_size / 2f;
+
+                // get off ladder if feet at top
+                if (onLadder && spriteBox.y >= ladder.y + ladder.height - hitbox_height) {
+                    onLadder = false;
+                    jumping  = false;
+                }
+                break;
+            }
+        }
+
+        // if not touching ladder get off
+        if (!touchingLadder) {
+            onLadder = false;
+        }
 
         // camera follows sprite
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
