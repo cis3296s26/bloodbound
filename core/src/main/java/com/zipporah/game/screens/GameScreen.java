@@ -58,6 +58,8 @@ public class GameScreen implements Screen {
 
     // array for all colossion rectangles from tiled map
     Array<Rectangle> collisionRectangles = new Array<>();
+    // array for all wall collisions
+    Array<Rectangle> wallRectangles = new Array<>();
     float Map_Height = 208f;
     // physics
     float velocityY = 0f;
@@ -75,6 +77,25 @@ public class GameScreen implements Screen {
 
                 // scale cords so they fit with the specific map dimensions
                 collisionRectangles.add(new Rectangle(
+                        r.x     * scale,
+                        r.y     * scale,
+                        r.width  * scale,
+                        r.height * scale
+                ));
+            }
+        }
+    }
+
+    private void getWallObjects() {
+        MapLayer layer = map.getLayers().get("walls");
+        if (layer == null) {
+            Gdx.app.log("Map", "No walls layer found!");
+            return;
+        }
+        for (MapObject obj : layer.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                wallRectangles.add(new Rectangle(
                         r.x     * scale,
                         r.y     * scale,
                         r.width  * scale,
@@ -159,6 +180,7 @@ public class GameScreen implements Screen {
         map = new TmxMapLoader().load("level_1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, scale);
         getCollisionObject();
+        getWallObjects();
 
         // set camera to start at far left
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
@@ -316,11 +338,39 @@ public class GameScreen implements Screen {
         spriteBox.set(x + changedHitbox, y, hitbox_width, hitbox_height);
 
         // this is where the player interacts with the collisions*****
+        // ceiling loop
+        for (Rectangle rectangle : collisionRectangles) {
+            float rectBottom = rectangle.y;
+            if (spriteBox.overlaps(rectangle) && velocityY >= 0 && spriteBox.y < rectBottom) {
+                velocityY = 0;
+                y = rectBottom - hitbox_height;
+                spriteBox.set(x + changedHitbox, y, hitbox_width, hitbox_height);
+            }
+        }
+
+        // floor loop
         for (Rectangle rectangle : collisionRectangles) {
             if (spriteBox.overlaps(rectangle) && velocityY <= 0) {
                 y = rectangle.y + rectangle.height;
                 velocityY = 0;
                 jumping = false;
+                spriteBox.set(x + changedHitbox, y, hitbox_width, hitbox_height);
+            }
+        }
+
+        for (Rectangle rectangle : wallRectangles) {
+            spriteBox.set(x + changedHitbox, y, hitbox_width, hitbox_height);
+
+            if (spriteBox.overlaps(rectangle)) {
+                float playerCenterX = spriteBox.x + spriteBox.width / 2f;
+                float rectCenterX   = rectangle.x + rectangle.width / 2f;
+
+                if (playerCenterX < rectCenterX) {
+                    x = rectangle.x - hitbox_width - changedHitbox;
+                } else {
+                    x = rectangle.x + rectangle.width - changedHitbox;
+                }
+                spriteBox.set(x + changedHitbox, y, hitbox_width, hitbox_height);
             }
         }
 
