@@ -156,7 +156,7 @@ public class GameScreen implements Screen {
         game.batch.setProjectionMatrix(viewport.getCamera().combined);
 
         // render in map
-        map = new TmxMapLoader().load("test2.tmx");
+        map = new TmxMapLoader().load("level_1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, scale);
         getCollisionObject();
 
