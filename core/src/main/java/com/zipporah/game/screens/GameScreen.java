@@ -34,7 +34,7 @@ public class GameScreen implements Screen {
     float scale = 4f;
     ExtendViewport viewport;
     FitViewport viewportHUD;
-    float time = 0;
+
 
     // array for all colossion rectangles from tiled map
     Array<Rectangle> collisionRectangles = new Array<>();
@@ -160,13 +160,13 @@ public class GameScreen implements Screen {
                     Gdx.input.isKeyPressed(Input.Keys.UP)) {
                 onLadder = true;
                 player.y += player.spriteSpeed * delta;
-                player.currFrame = player.walk.getKeyFrame(time, true);
+                player.currFrame = player.walk.getKeyFrame(player.time, true);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.S) ||
                     Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
                 onLadder = true;
                 player.y -= player.spriteSpeed * delta;
-                player.currFrame = player.walk.getKeyFrame(time, true);
+                player.currFrame = player.walk.getKeyFrame(player.time, true);
             }
             // get off ladder by pressing left or right
             if (Gdx.input.isKeyPressed(Input.Keys.A)    ||
@@ -179,7 +179,7 @@ public class GameScreen implements Screen {
     }
 
     private void logic(float delta) {
-        time += Gdx.graphics.getDeltaTime();
+        player.time += Gdx.graphics.getDeltaTime();
         game.timer.update();
 
 
@@ -300,7 +300,7 @@ public class GameScreen implements Screen {
 
         game.batch.begin();
 
-        karasu.draw(game.batch, time);
+        karasu.draw(game.batch, karasu.time);
 
         float drawX;
         float scaleX;

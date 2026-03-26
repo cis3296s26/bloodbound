@@ -17,7 +17,7 @@ public class  Karasu {
     Texture attackSpriteSheet;
     Animation<TextureRegion> attack;
 
-    float time = 0;
+    public float time = 0;
     float x = 1000;
     float y = 70;
     float spriteSpeed = 150.0f;

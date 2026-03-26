@@ -53,7 +53,7 @@ public class Player extends Sprite {
     public Animation<TextureRegion> attack;
     public boolean attacking = false;
     float attackTime = 0f;
-    float time = 0;
+    public float time = 0;
     public boolean facing_right = true;
     public float x = 100f;
     public float y = 65f;
