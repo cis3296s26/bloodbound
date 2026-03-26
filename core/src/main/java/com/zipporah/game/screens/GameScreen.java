@@ -8,7 +8,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.zipporah.game.Player;
 import com.zipporah.game.enemies.Karasu;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -23,334 +25,51 @@ import com.badlogic.gdx.utils.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-/** {link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class GameScreen implements Screen {
 
     private final ScreenManager game;
 
     TiledMap map;
     OrthogonalTiledMapRenderer renderer;
-
-    // character animations
-    TextureRegion currFrame;
-
-    Texture walkSpriteSheet;
-    Animation<TextureRegion> walk;
-
-    // Animation<TextureRegion> run;
-
-    Texture jumpSpriteSheet;
-    Animation<TextureRegion> jump;
-    boolean jumping = false;
-    float jumptime = 0f;
-
-    Texture idleSpriteSheet;
-    Animation<TextureRegion> idle;
-
-    Texture sprintSpriteSheet;
-    Animation<TextureRegion> sprint;
-
-    Texture attackSpriteSheet;
-    Animation<TextureRegion> attack;
-    boolean attacking = false;
-    float attackTime = 0f;
-
-    // array for all colossion rectangles from tiled map
-    Array<Rectangle> collisionRectangles = new Array<>();
-    float Map_Height = 208f;
-    // physics
-    float velocityY = 0f;
-    float gravity = -1500f;
-    float jumpAccel = 700;
-    float hitbox_width = 60f;
-    float hitbox_height = 80f;
-    Rectangle spriteBox = new Rectangle();
-
-    private void getCollisionObject(){
-        MapLayer layer = map.getLayers().get("collision");
-        for (MapObject obj : layer.getObjects()){
-            if(obj instanceof RectangleMapObject){
-                Rectangle r = ((RectangleMapObject) obj).getRectangle();
-
-                // scale cords so they fit with the specific map dimensions
-                collisionRectangles.add(new Rectangle(
-                        r.x     * scale,
-                        r.y     * scale,
-                        r.width  * scale,
-                        r.height * scale
-                ));
-            }
-        }
-    }
+    float scale = 4f;
+    ExtendViewport viewport;
+    FitViewport viewportHUD;
 
 
-    public static class Projectile {
-        Texture projectileSpriteSheet;
-        Animation<TextureRegion> projectileAnimation;
-        float lifetime = 4f;
-        float animationDuration = 0f;
-        float speed = 400f;
-        float x, y;
-        boolean direction = true; // True - right, False - left
-        int scaleX;
+    Player player = new Player();
 
-        // Projectile Animation
-        public Projectile(boolean facing_right, float x, float y) {
-            projectileSpriteSheet = new Texture("Player/Blood_Charge_1.png");
-            TextureRegion[][] projectileTemp = TextureRegion.split(projectileSpriteSheet, 64, 48);
-            TextureRegion[] projectileFrames = new TextureRegion[3];
-            for (int i = 0; i < 3; ++i) projectileFrames[i] = projectileTemp[0][i];
-            projectileAnimation = new Animation<>(0.075f, projectileFrames);
-
-            direction = !facing_right;
-            if(direction) {
-                scaleX = -1;
-                this.x = x + 64;
-            } else {
-                scaleX = 1;
-                this.x = x + 132;
-            }
-            this.y = 60 + y;
-        }
-
-        public void update(float delta) {
-            animationDuration += delta;
-            if(direction) x -= speed * delta;
-            else x += speed * delta;
-            lifetime -= delta;
-        }
-    }
-
-    ArrayList<Projectile> projectiles = new ArrayList<>();
-
-    // enemy (crow dude)
-    Karasu karasu;
-
-    // Animation<TextureRegion> reversedWalkFrame;
 
     float time = 0;
-    float x = 100f;
-    float y = 65f;
-    float spriteSpeed = 200.0f;
-    float sprintMultiplier = 2.00f;
-    float scale = 4f;
-    float sprit_size = 200f;
 
-    // camera
-    FitViewport viewport;
-
-    // boolean to keep track of idle character direction
-    boolean facing_right = true;
-
-    public GameScreen(ScreenManager game){
+    public GameScreen(ScreenManager game) {
         this.game = game;
     }
 
     @Override
     public void show() {
-        // viewport (fixed)
-        viewport = new FitViewport(1280, 720);
+        viewport = new ExtendViewport(1280, 720);
+        viewportHUD = new FitViewport(1280, 720);
         game.batch.setProjectionMatrix(viewport.getCamera().combined);
 
         // render in map
         map = new TmxMapLoader().load("test2.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, scale);
-        getCollisionObject();
-
-        // set camera to start at far left
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
         cam.position.set(640, 360, 0);
         cam.update();
         game.batch.setProjectionMatrix(cam.combined);
 
-        // idle sprite sheet
-        idleSpriteSheet = new Texture("Player/Idle.png");
-        TextureRegion[][] tmp2 = TextureRegion.split(idleSpriteSheet, 128, 128);
-        TextureRegion[] idleFrames = new TextureRegion[5];
-        for (int i = 0; i < 5; i++) {
-            idleFrames[i] = tmp2[0][i];
-        }
-        idle = new Animation<>(0.1f, idleFrames);
-
-        // walk sprite sheet
-        walkSpriteSheet = new Texture("Player/Walk.png");
-        TextureRegion[][] tmp = TextureRegion.split(walkSpriteSheet, 128, 128);
-        TextureRegion[] walkFrames = new TextureRegion[6];
-        for (int i = 0; i < 6; i++) {
-            walkFrames[i] = tmp[0][i];
-        }
-        walk = new Animation<>(0.1f, walkFrames);
-
-        // reversed walk
-
-        //jump spritesheet
-        jumpSpriteSheet = new Texture("Player/Jump.png");
-        TextureRegion[][] tmp3 = TextureRegion.split(jumpSpriteSheet, 128, 128);
-        TextureRegion[] jumpFrames = new TextureRegion[6];
-        for (int i = 0; i < 6; i++) {
-            jumpFrames[i] = tmp3[0][i];
-        }
-        jump = new Animation<>(0.075f, jumpFrames);
-
-        //sprint spritesheet
-        sprintSpriteSheet = new Texture("Player/Run.png");
-        TextureRegion[][] tmp4 = TextureRegion.split(sprintSpriteSheet, 128, 128);
-        TextureRegion[] sprintFrames = new TextureRegion[6];
-        for (int i = 0; i < 6; i++) {
-            sprintFrames[i] = tmp4[0][i];
-        }
-        sprint = new Animation<>(0.125f, sprintFrames);
-
-        // Sprite Attack
-        attackSpriteSheet = new Texture("Player/Attack_1.png");
-        TextureRegion[][] attackTmp = TextureRegion.split(attackSpriteSheet, 128, 128);
-        TextureRegion[] attackFrames = new TextureRegion[6];
-        for (int i = 0; i < 6; ++i)
-            attackFrames[i] = attackTmp[0][i];
-        attack = new Animation<>(0.075f, attackFrames);
-
-
-
-        //enemy init
-        karasu = new Karasu();
-        karasu.create();
-
-
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        // If the window is minimized on a desktop (LWJGL3) platform, width and height are 0, which causes problems.
-        // In that case, we don't resize anything, and wait for the window to be a normal size before updating.
-        if(width <= 0 || height <= 0) return;
-
-        // Resize your application here. The parameters represent the new window size.
-        viewport.update(width, height, true);
-        game.batch.setProjectionMatrix(viewport.getCamera().combined);
-    }
-
-    @Override
-    public void render(float delta) {
-        input(delta);
-        logic(delta);
-        draw(delta);
-    }
-
-    private void input(float delta) {
-        // default frame idle
-        currFrame = idle.getKeyFrame(time, true);
-        boolean isWalking = false;
-        boolean flip = (Gdx.input.isKeyPressed(Input.Keys.A)|| Gdx.input.isKeyPressed(Input.Keys.LEFT));
-//        delta = Gdx.graphics.getDeltaTime();
-        float spriteSpeedSprint;
-
-        // Movement
-        if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)){
-            spriteSpeedSprint = spriteSpeed * sprintMultiplier;
-            if (Gdx.input.isKeyPressed(Input.Keys.D)|| Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-                x += delta * spriteSpeedSprint;
-                currFrame = sprint.getKeyFrame(time, true);
-                facing_right = true;
-            }
-            if (flip) {
-                x -= delta  * spriteSpeedSprint;
-                currFrame = sprint.getKeyFrame(time, true);
-                facing_right = false;
-            }
-        }
-        else{
-            spriteSpeedSprint = spriteSpeed;
-            if (Gdx.input.isKeyPressed(Input.Keys.D)|| Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-                x += delta * spriteSpeedSprint;
-                currFrame = walk.getKeyFrame(time, true);
-                isWalking = true;
-                facing_right = true;
-            }
-            if (flip) {
-                x -= delta  * spriteSpeedSprint;
-                currFrame = walk.getKeyFrame(time, true);
-                isWalking = true;
-                facing_right = false;
-            }
-        }
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.W) || Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyJustPressed(Input.Keys.UP) && !jumping) {
-            jumping = true;
-            // inc y velo
-            velocityY = jumpAccel;
-        }
-        if(jumping) {
-            currFrame = jump.getKeyFrame(time, false);
-        }
-
-        // Sprite Attack
-        if (!attacking && Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
-            attacking = true;
-            attackTime = 0f;
-        }
-
-
-
-        // GUI FOR MENU
-        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-        }
-
-//        if (!isWalking) {
-//            currFrame = idle.getKeyFrame(time, true);
-//        }
-
+        player.sprite_init();
     }
 
 
 
-    private void logic(float delta) {
+    public void logic(float delta) {
         time += Gdx.graphics.getDeltaTime();
 
-        // gravity pulls the player position down
-        velocityY += gravity * delta;
-        y += velocityY * delta;
-
-        // change players hitbox with the position due to gravity
-        float changedHitbox = (sprit_size - hitbox_width) / 2f;
-        spriteBox.set(x + changedHitbox, y, hitbox_width, hitbox_height);
-
-        // this is where the player interacts with the collisions*****
-        for (Rectangle rectangle : collisionRectangles) {
-            if (spriteBox.overlaps(rectangle) && velocityY <= 0) {
-                y         = rectangle.y + rectangle.height;
-                velocityY = 0;
-                jumping = false;
-            }
-        }
-
-
-        // camera follows sprite
-        OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
-
-        // enemy follows player
-        karasu.botLogic(x, y, delta);
-
-        // get important map values for the camera
-        float mapWorldWidth  = 240 * 16 * scale;
-        float mapWorldHeight = 13  * 16 * scale;
-        float half_of_width = viewport.getWorldWidth()  / 2f;
-        float half_of_height = viewport.getWorldHeight() / 2f;
-
-        float targetX = x + sprit_size / 2f;
-        float targetY = y + sprit_size / 2f;
-
-        // make it so the fatherst the camera will go is in the bounds of the map
-        targetX = Math.max(half_of_width, Math.min(targetX, mapWorldWidth  - half_of_width));
-        targetY = Math.max(half_of_height, Math.min(targetY, mapWorldHeight - half_of_height));
-
-        // fix problem with laggy camera
-        cam.position.x += (targetX - cam.position.x) * 0.1f;
-        cam.position.y += (targetY - cam.position.y) * 0.1f;
-        cam.update();
-
-        game.batch.setProjectionMatrix(cam.combined);
-
+        game.timer.update();
     }
+
 
     private void draw(float delta) {
         ScreenUtils.clear(Color.BLACK);
@@ -362,30 +81,24 @@ public class GameScreen implements Screen {
         renderer.setView(cam);
         renderer.render();
 
+        game.batch.setProjectionMatrix(cam.combined);
         game.batch.begin();
-
-        // enemy
-        karasu.draw(game.batch, time);
-
-        // draw animated character keeping in mind the characters direction
         float drawX;
         float scaleX;
 
-        if(facing_right) {
-            drawX = x;
+        if(player.facing_right) {
+            drawX = player.x;
             scaleX = 1;
         } else{
-            drawX = x + sprit_size;
+            drawX = player.x + player.sprit_size;
             scaleX = -1;
         }
 
-        // Update / Finish Attack Animation
-        if(attacking) updateSpriteAttack(delta);
+        if(player.attacking) player.updateSpriteAttack(delta);
 
-        // Update Projectiles
-        Iterator<Projectile> projectilesIterator = projectiles.iterator();
+        Iterator<Player.Projectile> projectilesIterator = player.projectiles.iterator();
         while (projectilesIterator.hasNext()) {
-            Projectile projectile = projectilesIterator.next();
+            Player.Projectile projectile = projectilesIterator.next();
             projectile.update(delta);
             if(projectile.lifetime <= 0) projectilesIterator.remove();
             else {
@@ -394,42 +107,54 @@ public class GameScreen implements Screen {
             }
         }
 
-
-
-        game.batch.draw(currFrame, drawX, y, 0, 0, sprit_size, sprit_size, scaleX, 1, 0);
+        game.batch.draw(player.currFrame, drawX, player.y, 0, 0, player.sprit_size, player.sprit_size, scaleX, 1, 0);
 
         game.batch.end();
 
-    }
+        viewportHUD.apply();
+        game.batch.setProjectionMatrix(viewportHUD.getCamera().combined);
 
-    private void updateSpriteAttack(float delta) {
-        attackTime += delta;
-        currFrame = attack.getKeyFrame(attackTime, false);
-        if (attack.isAnimationFinished(attackTime)) {
-            attacking = false;
-
-            // Set projectile in motion
-            projectiles.add(new Projectile(facing_right, x, y));
-        }
+        game.batch.begin();
+        game.timer.draw(game.batch);
+        game.batch.end();
     }
 
     @Override
+    public void resize(int width, int height) {
+        // If the window is minimized on a desktop (LWJGL3) platform, width and height are 0, which causes problems.
+        // In that case, we don't resize anything, and wait for the window to be a normal size before updating.
+        if(width <= 0 || height <= 0) return;
+
+        // Resize your application here. The parameters represent the new window size.
+        viewport.update(width, height, true);
+        viewportHUD.update(width, height, true);
+    }
+    @Override
+    public void render(float delta) {
+        player.input(delta);
+        logic(delta);
+        draw(delta);
+    }
+
+
+
+    @Override
     public void pause() {
-        // Invoked when your application is paused.
 
     }
 
     @Override
     public void resume() {
-        // Invoked when your application is resumed after pause.
-    }
 
-    @Override
-    public void dispose() {
-        // Destroy application's resources here.
     }
 
     @Override
     public void hide() {
+
+    }
+
+    @Override
+    public void dispose() {
+
     }
 }
