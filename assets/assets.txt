@@ -41,4 +41,5 @@ Skeleton/Protect.png
 Skeleton/Run+attack.png
 Skeleton/Run.png
 Skeleton/Walk.png
+level_1.tmx
 test2.tmx
