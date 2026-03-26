@@ -21,25 +21,87 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 
 public class GameScreen implements Screen {
 
     private final ScreenManager game;
+    Player player = new Player();
 
     TiledMap map;
     OrthogonalTiledMapRenderer renderer;
     float scale = 4f;
     ExtendViewport viewport;
     FitViewport viewportHUD;
-
-
-    Player player = new Player();
-
-
     float time = 0;
+
+    // array for all colossion rectangles from tiled map
+    Array<Rectangle> collisionRectangles = new Array<>();
+    // array for all wall collisions
+    Array<Rectangle> wallRectangles = new Array<>();
+    float Map_Height = 208f;
+    // array for ladders
+    Array<Rectangle> ladderRectangles = new Array<>();
+    // physics
+    float velocityY = 0f;
+    float gravity = -1500f;
+    float jumpAccel = 700;
+    float hitbox_width = 60f;
+    float hitbox_height = 80f;
+    boolean onLadder = false;
+    float ladderCenterX = 0f;
+    boolean touchingLadder = false;
+    Rectangle spriteBox = new Rectangle();
+
+
+
+    private void getCollisionObject(){
+        MapLayer layer = map.getLayers().get("collision");
+        for (MapObject obj : layer.getObjects()){
+            if(obj instanceof RectangleMapObject){
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
+
+                // scale cords so they fit with the specific map dimensions
+                collisionRectangles.add(new Rectangle(
+                        r.x     * scale,
+                        r.y     * scale,
+                        r.width  * scale,
+                        r.height * scale
+                ));
+            }
+        }
+    }
+
+    private void getWallObjects() {
+        MapLayer layer = map.getLayers().get("walls");
+        for (MapObject obj : layer.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                wallRectangles.add(new Rectangle(
+                        r.x     * scale,
+                        r.y     * scale,
+                        r.width  * scale,
+                        r.height * scale
+                ));
+            }
+        }
+    }
+
+    private void getLadderObjects() {
+        MapLayer layer = map.getLayers().get("ladder");
+        for (MapObject obj : layer.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                ladderRectangles.add(new Rectangle(
+                        r.x     * scale,
+                        r.y     * scale,
+                        r.width  * scale,
+                        r.height * scale
+                ));
+            }
+        }
+    }
 
     public GameScreen(ScreenManager game) {
         this.game = game;
@@ -54,6 +116,10 @@ public class GameScreen implements Screen {
         // render in map
         map = new TmxMapLoader().load("test2.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, scale);
+        getCollisionObject();
+        getWallObjects();
+        getLadderObjects();
+
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
         cam.position.set(640, 360, 0);
         cam.update();
@@ -62,12 +128,129 @@ public class GameScreen implements Screen {
         player.sprite_init();
     }
 
+    @Override
+    public void resize(int width, int height) {
+        // If the window is minimized on a desktop (LWJGL3) platform, width and height are 0, which causes problems.
+        // In that case, we don't resize anything, and wait for the window to be a normal size before updating.
+        if(width <= 0 || height <= 0) return;
 
+        // Resize your application here. The parameters represent the new window size.
+        viewport.update(width, height, true);
+        viewportHUD.update(width, height, true);
+    }
 
-    public void logic(float delta) {
+    @Override
+    public void render(float delta) {
+        input(delta);
+        logic(delta);
+        draw(delta);
+    }
+
+    private void input(float delta) {
+        player.input(delta);
+    }
+
+    private void logic(float delta) {
         time += Gdx.graphics.getDeltaTime();
-
         game.timer.update();
+
+
+        if (onLadder) {
+            // on ladder, disable gravity and lock x
+            velocityY = 0;
+            player.x = ladderCenterX;
+        } else {
+            // normal gravity, pull player down
+            velocityY += gravity * delta;
+            player.y += velocityY * delta;
+        }
+
+        // change players hitbox with the position due to gravity
+        float changedHitbox = (player.sprit_size - hitbox_width) / 2f;
+        spriteBox.set(player.x + changedHitbox, player.y, hitbox_width, hitbox_height);
+
+        // this is where the player interacts with the collisions*****
+        // ceiling loop
+        for (Rectangle rectangle : collisionRectangles) {
+            float rectBottom = rectangle.y;
+            if (spriteBox.overlaps(rectangle) && velocityY >= 0 && spriteBox.y < rectBottom) {
+                velocityY = 0;
+                player.y = rectBottom - hitbox_height;
+                spriteBox.set(player.x + changedHitbox, player.y, hitbox_width, hitbox_height);
+            }
+        }
+
+        // floor loop
+        for (Rectangle rectangle : collisionRectangles) {
+            if (spriteBox.overlaps(rectangle) && velocityY <= 0 && !onLadder) {
+                player.y = rectangle.y + rectangle.height;
+                velocityY = 0;
+                player.jumping = false;
+                spriteBox.set(player.x + changedHitbox, player.y, hitbox_width, hitbox_height);
+            }
+        }
+
+        // wall loop
+        for (Rectangle rectangle : wallRectangles) {
+            spriteBox.set(player.x + changedHitbox, player.y, hitbox_width, hitbox_height);
+
+            if (spriteBox.overlaps(rectangle)) {
+                float playerCenterX = spriteBox.x + spriteBox.width / 2f;
+                float rectCenterX   = rectangle.x + rectangle.width / 2f;
+
+                if (playerCenterX < rectCenterX) {
+                    player.x = rectangle.x - hitbox_width - changedHitbox;
+                } else {
+                    player.x = rectangle.x + rectangle.width - changedHitbox;
+                }
+                spriteBox.set(player.x + changedHitbox, player.y, hitbox_width, hitbox_height);
+            }
+        }
+
+        // check if on ladder
+        touchingLadder = false;
+        for (Rectangle ladder : ladderRectangles) {
+            if (spriteBox.overlaps(ladder)) {
+                touchingLadder = true;
+                ladderCenterX = ladder.x + ladder.width / 2f - player.sprit_size / 2f;
+
+                // get off ladder if feet at top
+                if (onLadder && spriteBox.y >= ladder.y + ladder.height - hitbox_height) {
+                    onLadder = false;
+                    player.jumping  = false;
+                }
+                break;
+            }
+        }
+
+        // if not touching ladder get off
+        if (!touchingLadder) {
+            onLadder = false;
+        }
+
+
+        OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
+
+        float mapWorldWidth  = 240 * 16 * scale;
+        float mapWorldHeight = 13  * 16 * scale;
+        float half_of_width = viewport.getWorldWidth()  / 2f;
+        float half_of_height = viewport.getWorldHeight() / 2f;
+
+
+        float targetX = player.x + player.sprit_size / 2f;
+        float targetY = player.y + player.sprit_size / 2f;
+
+
+        targetX = Math.max(half_of_width, Math.min(targetX, mapWorldWidth  - half_of_width));
+        targetY = Math.max(half_of_height, Math.min(targetY, mapWorldHeight - half_of_height));
+
+        cam.position.x += (targetX - cam.position.x) * 0.1f;
+        cam.position.y += (targetY - cam.position.y) * 0.1f;
+        cam.update();
+
+        game.batch.setProjectionMatrix(cam.combined);
+
+
     }
 
 
@@ -82,7 +265,9 @@ public class GameScreen implements Screen {
         renderer.render();
 
         game.batch.setProjectionMatrix(cam.combined);
+
         game.batch.begin();
+
         float drawX;
         float scaleX;
 
@@ -119,22 +304,7 @@ public class GameScreen implements Screen {
         game.batch.end();
     }
 
-    @Override
-    public void resize(int width, int height) {
-        // If the window is minimized on a desktop (LWJGL3) platform, width and height are 0, which causes problems.
-        // In that case, we don't resize anything, and wait for the window to be a normal size before updating.
-        if(width <= 0 || height <= 0) return;
 
-        // Resize your application here. The parameters represent the new window size.
-        viewport.update(width, height, true);
-        viewportHUD.update(width, height, true);
-    }
-    @Override
-    public void render(float delta) {
-        player.input(delta);
-        logic(delta);
-        draw(delta);
-    }
 
 
 

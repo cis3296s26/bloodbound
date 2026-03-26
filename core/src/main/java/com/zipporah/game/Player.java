@@ -2,11 +2,26 @@ package com.zipporah.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.zipporah.game.screens.GameScreen;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.zipporah.game.enemies.Karasu;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
+
 
 import java.util.ArrayList;
 
@@ -17,11 +32,10 @@ public class Player extends Sprite {
     Texture walkSpriteSheet;
     Animation<TextureRegion> walk;
 
-    // Animation<TextureRegion> run;
 
     Texture jumpSpriteSheet;
     Animation<TextureRegion> jump;
-    boolean jumping = false;
+    public boolean jumping = false;
     float jumptime = 0f;
 
     Texture idleSpriteSheet;
