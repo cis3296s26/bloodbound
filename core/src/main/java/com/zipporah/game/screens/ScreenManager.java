@@ -9,6 +9,8 @@ public class ScreenManager extends Game{
   public SpriteBatch batch;
   public Timer timer;
 
+  public Timer timer;
+
   @Override
   public void create() {
     batch = new SpriteBatch();

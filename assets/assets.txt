@@ -17,7 +17,6 @@ Karasu_tengu/Walk.png
 Logos/PixelLogo.png
 Maps/Battleground2.png
 Maps/Dungeon Tile Set.png
-Other_objects.png
 Player/Attack_1.png
 Player/Attack_2.png
 Player/Attack_3.png
@@ -42,7 +41,5 @@ Skeleton/Protect.png
 Skeleton/Run+attack.png
 Skeleton/Run.png
 Skeleton/Walk.png
-sounds/gametheme.mp3
-sounds/jump.mp3
-sounds/walk.mp3
+level_1.tmx
 test2.tmx
