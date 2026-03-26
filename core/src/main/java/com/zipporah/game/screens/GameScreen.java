@@ -44,9 +44,7 @@ public class GameScreen implements Screen {
     // array for ladders
     Array<Rectangle> ladderRectangles = new Array<>();
     // physics
-    float velocityY = 0f;
     float gravity = -1500f;
-    float jumpAccel = 700;
     float hitbox_width = 60f;
     float hitbox_height = 80f;
     boolean onLadder = false;
@@ -54,7 +52,7 @@ public class GameScreen implements Screen {
     boolean touchingLadder = false;
     Rectangle spriteBox = new Rectangle();
 
-
+    Karasu karasu;
 
     private void getCollisionObject(){
         MapLayer layer = map.getLayers().get("collision");
@@ -114,8 +112,9 @@ public class GameScreen implements Screen {
         game.batch.setProjectionMatrix(viewport.getCamera().combined);
 
         // render in map
-        map = new TmxMapLoader().load("test2.tmx");
+        map = new TmxMapLoader().load("level_1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, scale);
+
         getCollisionObject();
         getWallObjects();
         getLadderObjects();
@@ -125,7 +124,15 @@ public class GameScreen implements Screen {
         cam.update();
         game.batch.setProjectionMatrix(cam.combined);
 
-        player.sprite_init();
+        player.idle_init();
+        player.walk_init();
+        player.jump_init();
+        player.sprint_init();
+        player.attack_init();
+
+        karasu = new Karasu();
+        karasu.create();
+
     }
 
     @Override
@@ -148,6 +155,27 @@ public class GameScreen implements Screen {
 
     private void input(float delta) {
         player.input(delta);
+        if (touchingLadder || onLadder) {
+            if (Gdx.input.isKeyPressed(Input.Keys.W) ||
+                    Gdx.input.isKeyPressed(Input.Keys.UP)) {
+                onLadder = true;
+                player.y += player.spriteSpeed * delta;
+                player.currFrame = player.walk.getKeyFrame(time, true);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.S) ||
+                    Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+                onLadder = true;
+                player.y -= player.spriteSpeed * delta;
+                player.currFrame = player.walk.getKeyFrame(time, true);
+            }
+            // get off ladder by pressing left or right
+            if (Gdx.input.isKeyPressed(Input.Keys.A)    ||
+                    Gdx.input.isKeyPressed(Input.Keys.LEFT)  ||
+                    Gdx.input.isKeyPressed(Input.Keys.D)     ||
+                    Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+                onLadder = false;
+            }
+        }
     }
 
     private void logic(float delta) {
@@ -157,12 +185,12 @@ public class GameScreen implements Screen {
 
         if (onLadder) {
             // on ladder, disable gravity and lock x
-            velocityY = 0;
+            player.velocityY = 0;
             player.x = ladderCenterX;
         } else {
             // normal gravity, pull player down
-            velocityY += gravity * delta;
-            player.y += velocityY * delta;
+            player.velocityY += gravity * delta;
+            player.y += player.velocityY * delta;
         }
 
         // change players hitbox with the position due to gravity
@@ -173,8 +201,8 @@ public class GameScreen implements Screen {
         // ceiling loop
         for (Rectangle rectangle : collisionRectangles) {
             float rectBottom = rectangle.y;
-            if (spriteBox.overlaps(rectangle) && velocityY >= 0 && spriteBox.y < rectBottom) {
-                velocityY = 0;
+            if (spriteBox.overlaps(rectangle) && player.velocityY >= 0 && spriteBox.y < rectBottom) {
+                player.velocityY = 0;
                 player.y = rectBottom - hitbox_height;
                 spriteBox.set(player.x + changedHitbox, player.y, hitbox_width, hitbox_height);
             }
@@ -182,9 +210,9 @@ public class GameScreen implements Screen {
 
         // floor loop
         for (Rectangle rectangle : collisionRectangles) {
-            if (spriteBox.overlaps(rectangle) && velocityY <= 0 && !onLadder) {
+            if (spriteBox.overlaps(rectangle) && player.velocityY <= 0 && !onLadder) {
                 player.y = rectangle.y + rectangle.height;
-                velocityY = 0;
+                player.velocityY = 0;
                 player.jumping = false;
                 spriteBox.set(player.x + changedHitbox, player.y, hitbox_width, hitbox_height);
             }
@@ -231,6 +259,10 @@ public class GameScreen implements Screen {
 
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
 
+
+        karasu.botLogic(player.x, player.y, delta);
+
+
         float mapWorldWidth  = 240 * 16 * scale;
         float mapWorldHeight = 13  * 16 * scale;
         float half_of_width = viewport.getWorldWidth()  / 2f;
@@ -267,6 +299,8 @@ public class GameScreen implements Screen {
         game.batch.setProjectionMatrix(cam.combined);
 
         game.batch.begin();
+
+        karasu.draw(game.batch, time);
 
         float drawX;
         float scaleX;

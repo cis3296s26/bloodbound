@@ -29,26 +29,28 @@ public class Player extends Sprite {
     // character animations
     public TextureRegion currFrame;
 
-    Texture walkSpriteSheet;
-    Animation<TextureRegion> walk;
+    public Texture walkSpriteSheet;
+    public Animation<TextureRegion> walk;
 
 
-    Texture jumpSpriteSheet;
-    Animation<TextureRegion> jump;
+    public Texture jumpSpriteSheet;
+    public Animation<TextureRegion> jump;
     public boolean jumping = false;
     float jumptime = 0f;
+    public float velocityY = 0f;
+    public float jumpAccel = 700;
+    public float gravity = -1500f;
+    public Texture idleSpriteSheet;
+    public Animation<TextureRegion> idle;
 
-    Texture idleSpriteSheet;
-    Animation<TextureRegion> idle;
+    public Texture sprintSpriteSheet;
+    public Animation<TextureRegion> sprint;
 
-    Texture sprintSpriteSheet;
-    Animation<TextureRegion> sprint;
-
-    float spriteSpeed = 200.0f;
+    public float spriteSpeed = 200.0f;
     float sprintMultiplier = 2.00f;
     public float sprit_size = 200f;
-    Texture attackSpriteSheet;
-    Animation<TextureRegion> attack;
+    public Texture attackSpriteSheet;
+    public Animation<TextureRegion> attack;
     public boolean attacking = false;
     float attackTime = 0f;
     float time = 0;
@@ -56,6 +58,8 @@ public class Player extends Sprite {
     public float x = 100f;
     public float y = 65f;
 
+    public TextureRegion[][] tmp2;
+    public TextureRegion[] idleFrames;
 
 
     public static class Projectile {
@@ -99,23 +103,16 @@ public class Player extends Sprite {
     public ArrayList<Player.Projectile> projectiles = new ArrayList<>();
 
 
-
-
-
-    float velocityY = 0f;
-    float gravity = -1500f;
-    float jumpAccel = 700;
-
-
-    public void sprite_init() {
+    public void idle_init() {
         idleSpriteSheet = new Texture("Player/Idle.png");
-        TextureRegion[][] tmp2 = TextureRegion.split(idleSpriteSheet, 128, 128);
-        TextureRegion[] idleFrames = new TextureRegion[5];
+        tmp2 = TextureRegion.split(idleSpriteSheet, 128, 128);
+        idleFrames = new TextureRegion[5];
         for (int i = 0; i < 5; i++) {
             idleFrames[i] = tmp2[0][i];
         }
         idle = new Animation<>(0.1f, idleFrames);
-
+    }
+    public void walk_init() {
         walkSpriteSheet = new Texture("Player/Walk.png");
         TextureRegion[][] tmp = TextureRegion.split(walkSpriteSheet, 128, 128);
         TextureRegion[] walkFrames = new TextureRegion[6];
@@ -123,7 +120,8 @@ public class Player extends Sprite {
             walkFrames[i] = tmp[0][i];
         }
         walk = new Animation<>(0.1f, walkFrames);
-
+    }
+    public void jump_init() {
         jumpSpriteSheet = new Texture("Player/Jump.png");
         TextureRegion[][] tmp3 = TextureRegion.split(jumpSpriteSheet, 128, 128);
         TextureRegion[] jumpFrames = new TextureRegion[6];
@@ -131,7 +129,8 @@ public class Player extends Sprite {
             jumpFrames[i] = tmp3[0][i];
         }
         jump = new Animation<>(0.075f, jumpFrames);
-
+    }
+    public void sprint_init() {
         sprintSpriteSheet = new Texture("Player/Run.png");
         TextureRegion[][] tmp4 = TextureRegion.split(sprintSpriteSheet, 128, 128);
         TextureRegion[] sprintFrames = new TextureRegion[6];
@@ -139,14 +138,14 @@ public class Player extends Sprite {
             sprintFrames[i] = tmp4[0][i];
         }
         sprint = new Animation<>(0.125f, sprintFrames);
-
+    }
+    public void attack_init() {
         attackSpriteSheet = new Texture("Player/Attack_1.png");
         TextureRegion[][] attackTmp = TextureRegion.split(attackSpriteSheet, 128, 128);
         TextureRegion[] attackFrames = new TextureRegion[6];
         for (int i = 0; i < 6; ++i)
             attackFrames[i] = attackTmp[0][i];
         attack = new Animation<>(0.075f, attackFrames);
-
     }
 
     public void input(float delta) {
