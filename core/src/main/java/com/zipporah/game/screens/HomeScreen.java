@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class HomeScreen implements Screen {
 
@@ -29,6 +31,8 @@ public class HomeScreen implements Screen {
   float quitX = 552;
   float quitY = 60;
 
+  ExtendViewport viewport;
+
   public HomeScreen(ScreenManager game) {
     this.game = game;
   }
@@ -41,12 +45,19 @@ public class HomeScreen implements Screen {
     controlsButton = new Texture("Buttons/ControlsButton.png");
     optionsButton = new Texture("Buttons/OptionsButton.png");
     quitButton = new Texture("Buttons/QuitButton.png");
+
+    viewport = new ExtendViewport(1280, 720);
   }
 
   @Override
   public void render(float delta) {
-    float mouseX = Gdx.input.getX();
-    float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
+
+    viewport.apply();
+    game.batch.setProjectionMatrix(viewport.getCamera().combined);
+
+    Vector2 mousePos = viewport.unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+    float mouseX = mousePos.x;
+    float mouseY = mousePos.y;
 
     game.batch.begin();
     game.batch.draw(pixelLogo, pixelLogoX, pixelLogoY);
@@ -88,6 +99,9 @@ public class HomeScreen implements Screen {
 
   @Override
   public void resize(int width, int height) {
+    if (width <= 0 || height <= 0) return;
+    viewport.update(width, height, true);
+    game.batch.setProjectionMatrix(viewport.getCamera().combined);
   }
 
   @Override
