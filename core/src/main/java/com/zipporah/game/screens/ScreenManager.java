@@ -7,7 +7,6 @@ import com.zipporah.game.entities.Timer;
 public class ScreenManager extends Game{
 
   public SpriteBatch batch;
-
   public Timer timer;
 
   @Override

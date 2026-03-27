@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 
-public class Karasu {
+public class  Karasu {
     // add walk later search up bot logic
     Texture walkSpriteSheet;
     Animation<TextureRegion> walk;
@@ -17,7 +17,7 @@ public class Karasu {
     Texture attackSpriteSheet;
     Animation<TextureRegion> attack;
 
-    float time = 0;
+    public float time = 0;
     float x = 1000;
     float y = 70;
     float spriteSpeed = 150.0f;
