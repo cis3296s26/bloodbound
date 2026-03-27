@@ -20,7 +20,7 @@ public class Timer {
 
   public void draw(SpriteBatch batch) {
       font.draw(batch, String.format("Time: %.1f", elapsedTime), 1100, 700);
-      font.draw(batch, String.format("Kill Count: %1", killCount), 1000, 700);
+      font.draw(batch, String.format("Kill Count: %d", killCount), 1000, 700);
   }
 
   public void dispose() {
