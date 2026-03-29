@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import java.awt.*;
+
 
 public class  Karasu {
     // add walk later search up bot logic
@@ -21,6 +23,10 @@ public class  Karasu {
     float x = 1000;
     float y = 70;
     float spriteSpeed = 150.0f;
+    public float health = 100;
+
+    public static Rectangle innerBoundaries;
+    public float innerXOffset = 110;
 
     // for flip
     boolean facingRight = true;
@@ -62,6 +68,8 @@ public class  Karasu {
             attackFrames[i] = tmp2[0][i];
         }
         attack = new Animation<>(0.1f, attackFrames);
+
+        innerBoundaries = new Rectangle((int) (x + innerXOffset), (int) y, 250, 250);
     }
 
     // follow player sprite
@@ -123,6 +131,7 @@ public class  Karasu {
         if (facingRight) {
             drawX = x;
             scaleX = 1;
+            innerXOffset = 80;
         } else {
             drawX = x + 250; // idk if this is right width check
             scaleX = -1;
@@ -130,6 +139,7 @@ public class  Karasu {
 
         batch.draw(currFrame, drawX, y, 0, 0, 250, 250, scaleX, 1, 0);
 
+        innerBoundaries.setBounds((int) (x + innerXOffset), (int) y, 62, 180);
     }
 
     public void dispose() {

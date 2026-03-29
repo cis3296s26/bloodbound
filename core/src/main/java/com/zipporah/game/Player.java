@@ -73,7 +73,7 @@ public class Player extends Sprite {
         public float y;
         boolean direction = true; // True - right, False - left
         public int scaleX;
-        float damage = 5;
+        float damage = 20;
 
         public Rectangle box;
         float boxXOffset = 5f;
@@ -110,7 +110,7 @@ public class Player extends Sprite {
             lifetime -= delta;
             box.setPosition(this.x + boxXOffset, this.y + boxYOffset);
 
-            if(overlapsCollisions() || overlapsWall() || overlapsLadders())
+            if(overlapsCollisions() || overlapsWall())
                 lifetime -= Integer.MAX_VALUE;
 
 
@@ -131,7 +131,7 @@ public class Player extends Sprite {
         }
 
 
-
+        // Skip ladders for now as you can go throguh the ladders
         private boolean overlapsLadders() {
             for(Rectangle r : GameScreen.ladderRectangles)
                 if(r.overlaps(this.box))

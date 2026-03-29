@@ -346,6 +346,8 @@ public class GameScreen implements Screen {
             shapeRenderer.rect(projectile.box.x, projectile.box.y, projectile.box.width, projectile.box.height);
         }
 
+        shapeRenderer.rect(Karasu.innerBoundaries.x, Karasu.innerBoundaries.y, Karasu.innerBoundaries.width, Karasu.innerBoundaries.height);
+
         shapeRenderer.end();
     }
 
