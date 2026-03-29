@@ -348,6 +348,8 @@ public class GameScreen implements Screen {
         game.timer.draw(game.batch);
         game.batch.end();
 
+        // Test Projectile and Karasu Hitboxes with these
+        /*
         shapeRenderer.setProjectionMatrix(cam.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         for (Player.Projectile projectile : player.projectiles) {
@@ -355,8 +357,8 @@ public class GameScreen implements Screen {
         }
 
         shapeRenderer.rect(Karasu.innerBoundaries.x, Karasu.innerBoundaries.y, Karasu.innerBoundaries.width, Karasu.innerBoundaries.height);
-
         shapeRenderer.end();
+         */
     }
 
 
