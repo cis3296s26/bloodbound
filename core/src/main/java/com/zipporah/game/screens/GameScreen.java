@@ -38,12 +38,12 @@ public class GameScreen implements Screen {
 
 
     // array for all colossion rectangles from tiled map
-    Array<Rectangle> collisionRectangles = new Array<>();
+    public static Array<Rectangle> collisionRectangles = new Array<>();
     // array for all wall collisions
-    Array<Rectangle> wallRectangles = new Array<>();
+    public static Array<Rectangle> wallRectangles = new Array<>();
     float Map_Height = 208f;
     // array for ladders
-    Array<Rectangle> ladderRectangles = new Array<>();
+    public static Array<Rectangle> ladderRectangles = new Array<>();
     // physics
     float gravity = -1500f;
     float hitbox_width = 60f;
@@ -52,6 +52,8 @@ public class GameScreen implements Screen {
     float ladderCenterX = 0f;
     boolean touchingLadder = false;
     Rectangle spriteBox = new Rectangle();
+
+    private final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     Karasu karasu;
 
@@ -338,7 +340,7 @@ public class GameScreen implements Screen {
         game.timer.draw(game.batch);
         game.batch.end();
 
-        ShapeRenderer shapeRenderer = new ShapeRenderer();
+        shapeRenderer.setProjectionMatrix(cam.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         for (Player.Projectile projectile : player.projectiles) {
             shapeRenderer.rect(projectile.box.x, projectile.box.y, projectile.box.width, projectile.box.height);

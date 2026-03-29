@@ -21,6 +21,7 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
+import com.zipporah.game.screens.GameScreen;
 
 
 import java.util.ArrayList;
@@ -67,11 +68,12 @@ public class Player extends Sprite {
         public Animation<TextureRegion> projectileAnimation;
         public float lifetime = 4f;
         public float animationDuration = 0f;
-        float speed = 150f;
+        float speed = 400f;
         public float x;
         public float y;
         boolean direction = true; // True - right, False - left
         public int scaleX;
+        float damage = 5;
 
         public Rectangle box;
         float boxXOffset = 5f;
@@ -85,17 +87,20 @@ public class Player extends Sprite {
             for (int i = 0; i < 3; ++i) projectileFrames[i] = projectileTemp[0][i];
             projectileAnimation = new Animation<>(0.075f, projectileFrames);
 
-            box = new Rectangle(x + boxXOffset, y + boxYOffset, 27f, 10f);
 
             direction = !facing_right;
             if(direction) {
                 scaleX = -1;
                 this.x = x + 64;
+                boxXOffset = -32;
             } else {
                 scaleX = 1;
                 this.x = x + 132;
             }
             this.y = 60 + y;
+
+            box = new Rectangle(this.x + boxXOffset, this.y + boxYOffset, 27f, 10f);
+
         }
 
         public void update(float delta) {
@@ -103,8 +108,37 @@ public class Player extends Sprite {
             if(direction) x -= speed * delta;
             else x += speed * delta;
             lifetime -= delta;
-            box.setPosition(x + boxXOffset, y + boxYOffset);
+            box.setPosition(this.x + boxXOffset, this.y + boxYOffset);
+
+            if(overlapsCollisions() || overlapsWall() || overlapsLadders())
+                lifetime -= Integer.MAX_VALUE;
+
+
         }
+
+        private boolean overlapsCollisions() {
+            for(Rectangle r : GameScreen.collisionRectangles)
+                if(r.overlaps(this.box))
+                    return true;
+            return false;
+        }
+
+        private boolean overlapsWall() {
+            for(Rectangle r : GameScreen.wallRectangles)
+                if(r.overlaps(this.box))
+                    return true;
+            return false;
+        }
+
+
+
+        private boolean overlapsLadders() {
+            for(Rectangle r : GameScreen.ladderRectangles)
+                if(r.overlaps(this.box))
+                    return true;
+            return false;
+        }
+
     }
 
     public ArrayList<Player.Projectile> projectiles = new ArrayList<>();
