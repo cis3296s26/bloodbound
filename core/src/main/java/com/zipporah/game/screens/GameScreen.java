@@ -285,7 +285,15 @@ public class GameScreen implements Screen {
 
         game.batch.setProjectionMatrix(cam.combined);
 
-
+        // Handle Projectile and Enemy Collisions
+        Iterator<Player.Projectile> projectilesIterator = player.projectiles.iterator();
+        while (projectilesIterator.hasNext()) {
+            Player.Projectile projectile = projectilesIterator.next();
+            if(projectile.box.overlaps(Karasu.innerBoundaries)) {
+                Karasu.health -= projectile.damage;
+                projectilesIterator.remove();
+            }
+        }
     }
 
 

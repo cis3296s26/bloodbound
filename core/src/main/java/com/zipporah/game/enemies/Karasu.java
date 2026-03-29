@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 
-import java.awt.*;
 
 
 public class  Karasu {
@@ -23,8 +23,9 @@ public class  Karasu {
     float x = 1000;
     float y = 70;
     float spriteSpeed = 150.0f;
-    public float health = 100;
+    public static float health = 100;
 
+    // Inner Boundaries / HitBox
     public static Rectangle innerBoundaries;
     public float innerXOffset = 110;
 
@@ -69,7 +70,8 @@ public class  Karasu {
         }
         attack = new Animation<>(0.1f, attackFrames);
 
-        innerBoundaries = new Rectangle((int) (x + innerXOffset), (int) y, 250, 250);
+        // Create Karasu's Inner Boundaries
+        innerBoundaries = new Rectangle((int) (x + innerXOffset), (int) y, 62, 180);
     }
 
     // follow player sprite
@@ -139,7 +141,8 @@ public class  Karasu {
 
         batch.draw(currFrame, drawX, y, 0, 0, 250, 250, scaleX, 1, 0);
 
-        innerBoundaries.setBounds((int) (x + innerXOffset), (int) y, 62, 180);
+        // Move Karasu's Inner Boundaries
+        innerBoundaries.setPosition(x + innerXOffset, y);
     }
 
     public void dispose() {
