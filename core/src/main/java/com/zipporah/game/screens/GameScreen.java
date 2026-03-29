@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -336,6 +337,14 @@ public class GameScreen implements Screen {
         game.batch.begin();
         game.timer.draw(game.batch);
         game.batch.end();
+
+        ShapeRenderer shapeRenderer = new ShapeRenderer();
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        for (Player.Projectile projectile : player.projectiles) {
+            shapeRenderer.rect(projectile.box.x, projectile.box.y, projectile.box.width, projectile.box.height);
+        }
+
+        shapeRenderer.end();
     }
 
 

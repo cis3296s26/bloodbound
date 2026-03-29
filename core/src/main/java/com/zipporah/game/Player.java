@@ -67,11 +67,15 @@ public class Player extends Sprite {
         public Animation<TextureRegion> projectileAnimation;
         public float lifetime = 4f;
         public float animationDuration = 0f;
-        float speed = 400f;
+        float speed = 150f;
         public float x;
         public float y;
         boolean direction = true; // True - right, False - left
         public int scaleX;
+
+        public Rectangle box;
+        float boxXOffset = 5f;
+        float boxYOffset = 19f;
 
         // Projectile Animation
         public Projectile(boolean facing_right, float x, float y) {
@@ -80,6 +84,8 @@ public class Player extends Sprite {
             TextureRegion[] projectileFrames = new TextureRegion[3];
             for (int i = 0; i < 3; ++i) projectileFrames[i] = projectileTemp[0][i];
             projectileAnimation = new Animation<>(0.075f, projectileFrames);
+
+            box = new Rectangle(x + boxXOffset, y + boxYOffset, 27f, 10f);
 
             direction = !facing_right;
             if(direction) {
@@ -97,6 +103,7 @@ public class Player extends Sprite {
             if(direction) x -= speed * delta;
             else x += speed * delta;
             lifetime -= delta;
+            box.setPosition(x + boxXOffset, y + boxYOffset);
         }
     }
 
@@ -153,7 +160,6 @@ public class Player extends Sprite {
         currFrame = idle.getKeyFrame(time, true);
         boolean isWalking = false;
         boolean flip = (Gdx.input.isKeyPressed(Input.Keys.A)|| Gdx.input.isKeyPressed(Input.Keys.LEFT));
-//        delta = Gdx.graphics.getDeltaTime();
         float spriteSpeedSprint;
 
         // Movement
