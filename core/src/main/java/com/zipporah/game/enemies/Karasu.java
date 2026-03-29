@@ -34,31 +34,31 @@ public class  Karasu {
 
     public void create(){
         // idle anim
-        idleSpriteSheet = new Texture("Skeleton/Idle.png");
+        idleSpriteSheet = new Texture("Karasu_tengu/Idle_u.png");
 
         TextureRegion[][] tmp = TextureRegion.split(idleSpriteSheet, 128, 128);
-        TextureRegion[] idleFrames = new TextureRegion[7];
-        for (int i = 0; i < 7; i++) {
+        TextureRegion[] idleFrames = new TextureRegion[6];
+        for (int i = 0; i < 6; i++) {
             idleFrames[i] = tmp[0][i];
         }
         idle = new Animation<>(0.1f, idleFrames);
 
         // walk anim
-        walkSpriteSheet = new Texture("Skeleton/Walk.png");
+        walkSpriteSheet = new Texture("Karasu_tengu/Walk_u.png");
 
         TextureRegion[][] tmp1 = TextureRegion.split(walkSpriteSheet, 128, 128);
-        TextureRegion[] walkFrames = new TextureRegion[7];
-        for (int i = 0; i < 7; i++) {
+        TextureRegion[] walkFrames = new TextureRegion[8];
+        for (int i = 0; i < 8; i++) {
             walkFrames[i] = tmp1[0][i];
         }
         walk = new Animation<>(0.1f, walkFrames);
 
         // attack
-        attackSpriteSheet = new Texture("Skeleton/Attack_1.png");
+        attackSpriteSheet = new Texture("Karasu_tengu/Attack_1_u.png");
 
         TextureRegion[][] tmp2 = TextureRegion.split(attackSpriteSheet, 128, 128);
-        TextureRegion[] attackFrames = new TextureRegion[4];
-        for (int i = 0; i < 4; i++) {
+        TextureRegion[] attackFrames = new TextureRegion[6];
+        for (int i = 0; i < 6; i++) {
             attackFrames[i] = tmp2[0][i];
         }
         attack = new Animation<>(0.1f, attackFrames);

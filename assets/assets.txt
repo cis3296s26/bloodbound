@@ -4,16 +4,16 @@ Buttons/OptionsButton.png
 Buttons/QuitButton.png
 Buttons/RankingsButton.png
 Buttons/StartButton.png
-Karasu_tengu/Attack_1.png
-Karasu_tengu/Attack_2.png
-Karasu_tengu/Attack_3.png
-Karasu_tengu/Dead.png
-Karasu_tengu/Hurt.png
-Karasu_tengu/Idle.png
-Karasu_tengu/Idle_2.png
-Karasu_tengu/Jump.png
-Karasu_tengu/Run.png
-Karasu_tengu/Walk.png
+Karasu_tengu/Attack_1_u.png
+Karasu_tengu/Attack_2_u.png
+Karasu_tengu/Attack_3_u.png
+Karasu_tengu/Dead_u.png
+Karasu_tengu/Hurt_u.png
+Karasu_tengu/Idle_2_u.png
+Karasu_tengu/Idle_u.png
+Karasu_tengu/Jump_u.png
+Karasu_tengu/Run_u.png
+Karasu_tengu/Walk_u.png
 Logos/PixelLogo.png
 Maps/Battleground2.png
 Maps/Dungeon Tile Set.png
