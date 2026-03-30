@@ -26,6 +26,9 @@ public class StorePlayerData {
 
   private void readRuns(String path, ArrayList<GameRun> target) {
     FileHandle file = Gdx.files.local(path);
+    if (!file.exists()) {
+      file.writeString("[]", false);
+    }
     String fileRaw = file.readString();
     if (fileRaw == null || fileRaw.trim().isEmpty()) {
       return;
@@ -43,6 +46,14 @@ public class StorePlayerData {
 
   private void writeRuns(String path, ArrayList<GameRun> runs) {
     Gdx.files.local(path).writeString(json.prettyPrint(runs), false);
+  }
+
+  public ArrayList<GameRun> getPointsRuns() {
+    return pointsRuns;
+  }
+
+  public ArrayList<GameRun> getSpeedRuns() {
+    return speedRuns;
   }
 
   private void sortPointsRuns() {
