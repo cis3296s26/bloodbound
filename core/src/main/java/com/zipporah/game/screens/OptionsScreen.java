@@ -1,6 +1,7 @@
 package com.zipporah.game.screens;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class OptionsScreen implements Screen{
@@ -25,6 +26,7 @@ public class OptionsScreen implements Screen{
 
   @Override
   public void render(float delta) {
+    ScreenUtils.clear(0f, 0f, 0f, 1f);
     viewport.apply();
     game.batch.setProjectionMatrix(viewport.getCamera().combined);
   }

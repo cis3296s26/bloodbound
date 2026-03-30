@@ -1,15 +1,21 @@
 package com.zipporah.game.screens;
 
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import java.util.List;
 
-public class RankingsScreen implements Screen{
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.zipporah.game.entities.GameRun;
+
+public class RankingsScreen implements Screen {
 
   private final ScreenManager game;
 
   ExtendViewport viewport;
-  
-  public RankingsScreen(ScreenManager game){
+  BitmapFont font;
+
+  public RankingsScreen(ScreenManager game) {
     this.game = game;
   }
 
@@ -20,18 +26,54 @@ public class RankingsScreen implements Screen{
     // Sort by points first then speed (fastest overall run)
     // Save top five runs of each
     viewport = new ExtendViewport(1280, 720);
+    font = new BitmapFont();
     game.playerData.load();
   }
 
   @Override
   public void render(float delta) {
+    ScreenUtils.clear(0f, 0f, 0f, 1f);
     viewport.apply();
     game.batch.setProjectionMatrix(viewport.getCamera().combined);
+
+    List<GameRun> pointsRuns = game.playerData.getPointsRuns();
+    List<GameRun> speedRuns = game.playerData.getSpeedRuns();
+
+    game.batch.begin();
+
+    font.draw(game.batch, "Player Stats", 560, 690);
+    font.draw(game.batch, "Best Run (Overall)", 220, 630);
+    font.draw(game.batch, "Fastest Run", 760, 630);
+
+    float pointsY = 580;
+    if (pointsRuns.isEmpty()) {
+      font.draw(game.batch, "No runs saved yet", 120, pointsY);
+    } else {
+      for (int i = 0; i < pointsRuns.size() && i < 10; i++) {
+        GameRun run = pointsRuns.get(i);
+        font.draw(game.batch, (i + 1) + ". " + run.points + " pts  " + run.elapsedTime + " s", 120, pointsY);
+        pointsY -= 35;
+      }
+    }
+
+    float speedY = 580;
+    if (speedRuns.isEmpty()) {
+      font.draw(game.batch, "No runs saved yet", 660, speedY);
+    } else {
+      for (int i = 0; i < speedRuns.size() && i < 10; i++) {
+        GameRun run = speedRuns.get(i);
+        font.draw(game.batch, (i + 1) + ". " + run.elapsedTime + " s  " + run.points + " pts", 660, speedY);
+        speedY -= 35;
+      }
+    }
+
+    game.batch.end();
   }
 
   @Override
   public void resize(int width, int height) {
-    if (width <= 0 || height <= 0) return;
+    if (width <= 0 || height <= 0)
+      return;
     viewport.update(width, height, true);
     game.batch.setProjectionMatrix(viewport.getCamera().combined);
   }
@@ -50,6 +92,6 @@ public class RankingsScreen implements Screen{
 
   @Override
   public void dispose() {
+    font.dispose();
   }
-  
 }
