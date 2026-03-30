@@ -2,6 +2,8 @@ package com.zipporah.game.screens;
 
 import java.util.List;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -21,10 +23,6 @@ public class RankingsScreen implements Screen {
 
   @Override
   public void show() {
-    // Runs
-    // Sort by fastest run
-    // Sort by points first then speed (fastest overall run)
-    // Save top five runs of each
     viewport = new ExtendViewport(1280, 720);
     font = new BitmapFont();
     game.playerData.load();
@@ -32,7 +30,15 @@ public class RankingsScreen implements Screen {
 
   @Override
   public void render(float delta) {
+    // Refresh screen
     ScreenUtils.clear(0f, 0f, 0f, 1f);
+
+    // Back to home
+    if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+      game.setScreen(new HomeScreen(game));
+      return;
+    }
+
     viewport.apply();
     game.batch.setProjectionMatrix(viewport.getCamera().combined);
 
@@ -41,10 +47,13 @@ public class RankingsScreen implements Screen {
 
     game.batch.begin();
 
+    font.draw(game.batch, "Press Esc For Back",50, 690);
+
     font.draw(game.batch, "Player Stats", 560, 690);
     font.draw(game.batch, "Best Run (Overall)", 220, 630);
     font.draw(game.batch, "Fastest Run", 760, 630);
 
+    // Pull Best Runs
     float pointsY = 580;
     if (pointsRuns.isEmpty()) {
       font.draw(game.batch, "No runs saved yet", 120, pointsY);
@@ -56,6 +65,7 @@ public class RankingsScreen implements Screen {
       }
     }
 
+    // Pull Speed Runs
     float speedY = 580;
     if (speedRuns.isEmpty()) {
       font.draw(game.batch, "No runs saved yet", 660, speedY);
