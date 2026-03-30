@@ -15,9 +15,11 @@ public class RankingsScreen implements Screen{
 
   @Override
   public void show() {
-    // leaderboard to be added
-    // timer to be added
-
+    // Runs
+    // Sort by fastest run
+    // Sort by points first then speed (fastest overall run)
+    // Save top five runs of each
+    
     viewport = new ExtendViewport(1280, 720);
   }
 
