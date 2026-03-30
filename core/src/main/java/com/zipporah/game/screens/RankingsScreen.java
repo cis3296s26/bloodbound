@@ -19,8 +19,8 @@ public class RankingsScreen implements Screen{
     // Sort by fastest run
     // Sort by points first then speed (fastest overall run)
     // Save top five runs of each
-    
     viewport = new ExtendViewport(1280, 720);
+    game.playerData.load();
   }
 
   @Override
