@@ -21,6 +21,7 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
+import com.zipporah.game.screens.GameScreen;
 
 
 import java.util.ArrayList;
@@ -72,6 +73,11 @@ public class Player extends Sprite {
         public float y;
         boolean direction = true; // True - right, False - left
         public int scaleX;
+        public float damage = 20;
+
+        public Rectangle box;
+        float boxXOffset = 5f;
+        float boxYOffset = 19f;
 
         // Projectile Animation
         public Projectile(boolean facing_right, float x, float y) {
@@ -81,15 +87,20 @@ public class Player extends Sprite {
             for (int i = 0; i < 3; ++i) projectileFrames[i] = projectileTemp[0][i];
             projectileAnimation = new Animation<>(0.075f, projectileFrames);
 
+
             direction = !facing_right;
             if(direction) {
                 scaleX = -1;
                 this.x = x + 64;
+                boxXOffset = -32;
             } else {
                 scaleX = 1;
                 this.x = x + 132;
             }
             this.y = 60 + y;
+
+            box = new Rectangle(this.x + boxXOffset, this.y + boxYOffset, 27f, 10f);
+
         }
 
         public void update(float delta) {
@@ -97,6 +108,24 @@ public class Player extends Sprite {
             if(direction) x -= speed * delta;
             else x += speed * delta;
             lifetime -= delta;
+            box.setPosition(this.x + boxXOffset, this.y + boxYOffset);
+
+            if(overlapsCollisions() || overlapsWall())
+                lifetime -= Integer.MAX_VALUE;
+        }
+
+        private boolean overlapsCollisions() {
+            for(Rectangle r : GameScreen.collisionRectangles)
+                if(r.overlaps(this.box))
+                    return true;
+            return false;
+        }
+
+        private boolean overlapsWall() {
+            for(Rectangle r : GameScreen.wallRectangles)
+                if(r.overlaps(this.box))
+                    return true;
+            return false;
         }
     }
 
@@ -153,7 +182,6 @@ public class Player extends Sprite {
         currFrame = idle.getKeyFrame(time, true);
         boolean isWalking = false;
         boolean flip = (Gdx.input.isKeyPressed(Input.Keys.A)|| Gdx.input.isKeyPressed(Input.Keys.LEFT));
-//        delta = Gdx.graphics.getDeltaTime();
         float spriteSpeedSprint;
 
         // Movement

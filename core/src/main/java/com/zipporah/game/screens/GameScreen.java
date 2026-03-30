@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -37,12 +38,12 @@ public class GameScreen implements Screen {
 
 
     // array for all colossion rectangles from tiled map
-    Array<Rectangle> collisionRectangles = new Array<>();
+    public static Array<Rectangle> collisionRectangles = new Array<>();
     // array for all wall collisions
-    Array<Rectangle> wallRectangles = new Array<>();
+    public static Array<Rectangle> wallRectangles = new Array<>();
     float Map_Height = 208f;
     // array for ladders
-    Array<Rectangle> ladderRectangles = new Array<>();
+    public static Array<Rectangle> ladderRectangles = new Array<>();
     // physics
     float gravity = -1500f;
     float hitbox_width = 60f;
@@ -51,6 +52,8 @@ public class GameScreen implements Screen {
     float ladderCenterX = 0f;
     boolean touchingLadder = false;
     Rectangle spriteBox = new Rectangle();
+
+    private final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     Karasu karasu;
 
@@ -282,7 +285,15 @@ public class GameScreen implements Screen {
 
         game.batch.setProjectionMatrix(cam.combined);
 
-
+        // Handle Projectile and Enemy Collisions
+        Iterator<Player.Projectile> projectilesIterator = player.projectiles.iterator();
+        while (projectilesIterator.hasNext()) {
+            Player.Projectile projectile = projectilesIterator.next();
+            if(projectile.box.overlaps(Karasu.innerBoundaries)) {
+                Karasu.health -= projectile.damage;
+                projectilesIterator.remove();
+            }
+        }
     }
 
 
@@ -336,6 +347,18 @@ public class GameScreen implements Screen {
         game.batch.begin();
         game.timer.draw(game.batch);
         game.batch.end();
+
+        // Test Projectile and Karasu Hitboxes with these
+        /*
+        shapeRenderer.setProjectionMatrix(cam.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        for (Player.Projectile projectile : player.projectiles) {
+            shapeRenderer.rect(projectile.box.x, projectile.box.y, projectile.box.width, projectile.box.height);
+        }
+
+        shapeRenderer.rect(Karasu.innerBoundaries.x, Karasu.innerBoundaries.y, Karasu.innerBoundaries.width, Karasu.innerBoundaries.height);
+        shapeRenderer.end();
+         */
     }
 
 

@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
+
 
 
 public class  Karasu {
@@ -21,6 +23,11 @@ public class  Karasu {
     float x = 1000;
     float y = 70;
     float spriteSpeed = 150.0f;
+    public static float health = 100;
+
+    // Inner Boundaries / HitBox
+    public static Rectangle innerBoundaries;
+    public float innerXOffset = 110;
 
     // for flip
     boolean facingRight = true;
@@ -34,34 +41,37 @@ public class  Karasu {
 
     public void create(){
         // idle anim
-        idleSpriteSheet = new Texture("Skeleton/Idle.png");
+        idleSpriteSheet = new Texture("Karasu_tengu/Idle_u.png");
 
         TextureRegion[][] tmp = TextureRegion.split(idleSpriteSheet, 128, 128);
-        TextureRegion[] idleFrames = new TextureRegion[7];
-        for (int i = 0; i < 7; i++) {
+        TextureRegion[] idleFrames = new TextureRegion[6];
+        for (int i = 0; i < 6; i++) {
             idleFrames[i] = tmp[0][i];
         }
         idle = new Animation<>(0.1f, idleFrames);
 
         // walk anim
-        walkSpriteSheet = new Texture("Skeleton/Walk.png");
+        walkSpriteSheet = new Texture("Karasu_tengu/Walk_u.png");
 
         TextureRegion[][] tmp1 = TextureRegion.split(walkSpriteSheet, 128, 128);
-        TextureRegion[] walkFrames = new TextureRegion[7];
-        for (int i = 0; i < 7; i++) {
+        TextureRegion[] walkFrames = new TextureRegion[8];
+        for (int i = 0; i < 8; i++) {
             walkFrames[i] = tmp1[0][i];
         }
         walk = new Animation<>(0.1f, walkFrames);
 
         // attack
-        attackSpriteSheet = new Texture("Skeleton/Attack_1.png");
+        attackSpriteSheet = new Texture("Karasu_tengu/Attack_1_u.png");
 
         TextureRegion[][] tmp2 = TextureRegion.split(attackSpriteSheet, 128, 128);
-        TextureRegion[] attackFrames = new TextureRegion[4];
-        for (int i = 0; i < 4; i++) {
+        TextureRegion[] attackFrames = new TextureRegion[6];
+        for (int i = 0; i < 6; i++) {
             attackFrames[i] = tmp2[0][i];
         }
         attack = new Animation<>(0.1f, attackFrames);
+
+        // Create Karasu's Inner Boundaries
+        innerBoundaries = new Rectangle((int) (x + innerXOffset), (int) y, 62, 180);
     }
 
     // follow player sprite
@@ -123,6 +133,7 @@ public class  Karasu {
         if (facingRight) {
             drawX = x;
             scaleX = 1;
+            innerXOffset = 80;
         } else {
             drawX = x + 250; // idk if this is right width check
             scaleX = -1;
@@ -130,6 +141,8 @@ public class  Karasu {
 
         batch.draw(currFrame, drawX, y, 0, 0, 250, 250, scaleX, 1, 0);
 
+        // Move Karasu's Inner Boundaries
+        innerBoundaries.setPosition(x + innerXOffset, y);
     }
 
     public void dispose() {
