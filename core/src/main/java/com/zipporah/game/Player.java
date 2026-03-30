@@ -33,6 +33,8 @@ public class Player extends Sprite {
     public Texture walkSpriteSheet;
     public Animation<TextureRegion> walk;
 
+    public Texture hpForeground;
+    public Texture hpBackground;
 
     public Texture jumpSpriteSheet;
     public Animation<TextureRegion> jump;
@@ -250,5 +252,9 @@ public class Player extends Sprite {
             // Set projectile in motion
             projectiles.add(new Player.Projectile(facing_right, x, y));
         }
+    }
+
+    public void drawHealth() {
+
     }
 }
