@@ -192,6 +192,9 @@ public class Player extends Sprite {
 
     public void input(float delta) {
         // default frame idle
+        if(isDead){
+            return;
+        }
         currFrame = idle.getKeyFrame(time, true);
         boolean isWalking = false;
         boolean flip = (Gdx.input.isKeyPressed(Input.Keys.A)|| Gdx.input.isKeyPressed(Input.Keys.LEFT));
