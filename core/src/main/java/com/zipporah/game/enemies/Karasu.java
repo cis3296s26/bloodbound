@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-
+import com.zipporah.game.screens.GameScreen;
 
 
 public class  Karasu {
@@ -20,8 +20,8 @@ public class  Karasu {
     Animation<TextureRegion> attack;
 
     public float time = 0;
-    float x = 1000;
-    float y = 70;
+    public float x = 1000;
+    public float y = 70;
     float spriteSpeed = 150.0f;
     public static float health = 100;
 
@@ -38,6 +38,16 @@ public class  Karasu {
     State currState = State.idle;
     float stateTime = 0;
 
+    // add gravity
+    public float velocityY = 0f;
+    public float gravity = -1500f;
+    public boolean onGround = false;
+
+    // hitbox idk if these sizes are right check later
+    public float width = 150f;
+    public float height = 150f;
+
+    public Rectangle enemyBox = new Rectangle();
 
     public void create(){
         // idle anim
@@ -76,11 +86,17 @@ public class  Karasu {
 
     // follow player sprite
     public void botLogic(float playerX, float playerY, float delta) {
+
+        // gravity
+        // velocityY += gravity* delta;
+
+
         stateTime += delta;
 
         // find if player is to the right or left
         float dx = playerX - x;
         float dy = playerY - y;
+
         // distance take pythagorean bc player can be on a platform
         float distance = (float)Math.sqrt(dx * dx + dy * dy);
 
@@ -94,7 +110,7 @@ public class  Karasu {
             float dirY = dy / distance;
 
             x += dirX * spriteSpeed * delta;
-            y += dirY * spriteSpeed * delta;
+            // y += dirY * spriteSpeed * delta;
         }
         else {
             currState = State.attack;
@@ -106,6 +122,9 @@ public class  Karasu {
         TextureRegion currFrame;
         float drawX;
         float scaleX;
+
+        // hit box
+        enemyBox.set(x, y, width, height);
 
         // check if the logic makes sense
         switch (currState){
@@ -144,6 +163,7 @@ public class  Karasu {
         // Move Karasu's Inner Boundaries
         innerBoundaries.setPosition(x + innerXOffset, y);
     }
+
 
     public void dispose() {
 

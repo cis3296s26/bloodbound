@@ -224,6 +224,10 @@ public class GameScreen implements Screen {
             player.y += player.velocityY * delta;
         }
 
+        // karasu grav
+        karasu.velocityY += gravity * delta;
+        karasu.y += karasu.velocityY * delta;
+
         // change players hitbox with the position due to gravity
         float changedHitbox = (player.sprit_size - hitbox_width) / 2f;
         spriteBox.set(player.x + changedHitbox, player.y, hitbox_width, hitbox_height);
@@ -294,6 +298,18 @@ public class GameScreen implements Screen {
                     player.isDead = true;
                     player.velocityY = 0;
                 }
+            }
+        }
+
+        // bot (for loop for bot floor collision
+        // Karasu floor collision
+        for (Rectangle rectangle : collisionRectangles) {
+            if (karasu.enemyBox.overlaps(rectangle) && karasu.velocityY <= 0) {
+                karasu.y = rectangle.y + rectangle.height;
+                karasu.velocityY = 0;
+                karasu.onGround = true;
+
+                karasu.enemyBox.set(karasu.x, karasu.y, karasu.width, karasu.height);
             }
         }
 
