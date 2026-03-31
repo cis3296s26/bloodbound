@@ -181,7 +181,7 @@ public class Player extends Sprite {
         attack = new Animation<>(0.075f, attackFrames);
     }
     public void dead_init() {
-        deadSpriteSheet = new Texture("Player/Dead_1.png");
+        deadSpriteSheet = new Texture("Player/Dead.png");
         TextureRegion[][] deadTmp = TextureRegion.split(deadSpriteSheet, 128, 128);
         TextureRegion[] deadFrames = new TextureRegion[5];
         for (int i = 0; i < 5; i++){

@@ -204,6 +204,15 @@ public class GameScreen implements Screen {
         player.time += Gdx.graphics.getDeltaTime();
         game.timer.update();
 
+        // if the player is daed go to the homescreen
+        if(player.isDead){
+            boolean animationDone = player.updateSpriteDead(delta);
+            if (animationDone) {
+                game.setScreen(new HomeScreen(game));
+            }
+            return;
+        }
+
 
         if (onLadder) {
             // on ladder, disable gravity and lock x
@@ -276,6 +285,16 @@ public class GameScreen implements Screen {
         // if not touching ladder get off
         if (!touchingLadder) {
             onLadder = false;
+        }
+
+        // spike collision detection, set death to true
+        if(!player.isDead){
+            for(int i = 0; i < spikeRectangles.size; i++){
+                if (spriteBox.overlaps(spikeRectangles.get(i))) {
+                    player.isDead = true;
+                    player.velocityY = 0;
+                }
+            }
         }
 
 
