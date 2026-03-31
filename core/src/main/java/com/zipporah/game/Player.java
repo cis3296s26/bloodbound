@@ -47,6 +47,10 @@ public class Player extends Sprite {
     public float gravity = -1500f;
     public Texture idleSpriteSheet;
     public Animation<TextureRegion> idle;
+    public Texture deadSpriteSheet;
+    public Animation<TextureRegion> dead;
+    public boolean isDead = false;
+    float timeDead = 0f;
 
     public Texture sprintSpriteSheet;
     public Animation<TextureRegion> sprint;
@@ -181,9 +185,21 @@ public class Player extends Sprite {
             attackFrames[i] = attackTmp[0][i];
         attack = new Animation<>(0.075f, attackFrames);
     }
+    public void dead_init() {
+        deadSpriteSheet = new Texture("Player/Dead.png");
+        TextureRegion[][] deadTmp = TextureRegion.split(deadSpriteSheet, 128, 128);
+        TextureRegion[] deadFrames = new TextureRegion[5];
+        for (int i = 0; i < 5; i++){
+            deadFrames[i] = deadTmp[0][i];
+        }
+        dead = new Animation<>(0.15f, deadFrames);
+    }
 
     public void input(float delta) {
         // default frame idle
+        if(isDead){
+            return;
+        }
         currFrame = idle.getKeyFrame(time, true);
         boolean isWalking = false;
         boolean flip = (Gdx.input.isKeyPressed(Input.Keys.A)|| Gdx.input.isKeyPressed(Input.Keys.LEFT));
@@ -258,4 +274,10 @@ public class Player extends Sprite {
     }
 
 
+    public boolean updateSpriteDead(float delta) {
+        timeDead += delta;
+        currFrame = dead.getKeyFrame(timeDead, false);
+        // returns when animation is done so i can know when do switch from gamescreen to homescreen
+        return dead.isAnimationFinished(timeDead);
+    }
 }
