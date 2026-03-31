@@ -384,6 +384,8 @@ public class GameScreen implements Screen {
 
         game.batch.begin();
         game.timer.draw(game.batch);
+        game.batch.draw(player.hpForeground1, 10, 700);
+        //game.batch.draw(player.hpBackground1, 20, 20);
         game.batch.end();
 
         // Test Projectile and Karasu Hitboxes with these
