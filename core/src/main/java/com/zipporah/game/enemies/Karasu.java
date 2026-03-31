@@ -7,8 +7,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
 
-
 public class  Karasu {
+    TextureRegion currFrame;
+
     // add walk later search up bot logic
     Texture walkSpriteSheet;
     Animation<TextureRegion> walk;
@@ -19,11 +20,15 @@ public class  Karasu {
     Texture attackSpriteSheet;
     Animation<TextureRegion> attack;
 
+    Texture deathSpriteSheet;
+    Animation<TextureRegion> death;
+
     public float time = 0;
     float x = 1000;
     float y = 70;
     float spriteSpeed = 150.0f;
     public static float health = 100;
+    boolean removed = false;
 
     // Inner Boundaries / HitBox
     public static Rectangle innerBoundaries;
@@ -33,7 +38,7 @@ public class  Karasu {
     boolean facingRight = true;
 
     // variables for bot states. i need idle, walk and attack
-    enum State {idle, walk, attack}
+    enum State {idle, walk, attack, death}
 
     State currState = State.idle;
     float stateTime = 0;
@@ -70,13 +75,31 @@ public class  Karasu {
         }
         attack = new Animation<>(0.1f, attackFrames);
 
+        // death
+        deathSpriteSheet = new Texture("Karasu_tengu/Dead_U.png");
+
+        TextureRegion[][] tmp3 = TextureRegion.split(deathSpriteSheet, 128, 128);
+        TextureRegion[] deathFrames = new TextureRegion[6];
+        for (int i = 0; i < 6; i++) {
+            deathFrames[i] = tmp3[0][i];
+        }
+        death = new Animation<>(0.2f, deathFrames);
+
         // Create Karasu's Inner Boundaries
         innerBoundaries = new Rectangle((int) (x + innerXOffset), (int) y, 62, 180);
     }
 
     // follow player sprite
     public void botLogic(float playerX, float playerY, float delta) {
-        stateTime += delta;
+        if(removed) return;
+
+        if (health <= 0) {
+            if (currState != State.death) {
+                currState = State.death;
+                stateTime = 0;
+            }
+            return;
+        }
 
         // find if player is to the right or left
         float dx = playerX - x;
@@ -102,8 +125,9 @@ public class  Karasu {
 
     }
 
-    public void draw(SpriteBatch batch, float time){
-        TextureRegion currFrame;
+    public void draw(SpriteBatch batch, float time, float delta){
+        if (removed) return;
+        stateTime += delta;
         float drawX;
         float scaleX;
 
@@ -119,6 +143,12 @@ public class  Karasu {
 
             case attack:
                 currFrame = attack.getKeyFrame(stateTime, true);
+                break;
+
+            case death:
+                currFrame = death.getKeyFrame(stateTime, false);
+                updateEnemyDeath(delta);
+                if (removed) return;
                 break;
 
             default:
@@ -145,7 +175,22 @@ public class  Karasu {
         innerBoundaries.setPosition(x + innerXOffset, y);
     }
 
-    public void dispose() {
+    private void updateEnemyDeath(float delta) {
+        currFrame = death.getKeyFrame(stateTime, false);
+        if (death.isAnimationFinished(stateTime)) {
+            removed = true;
+            dispose();
+        }
+    }
 
+    public void dispose() {
+        if (idleSpriteSheet != null) idleSpriteSheet.dispose();
+        if (walkSpriteSheet != null) walkSpriteSheet.dispose();
+        if (attackSpriteSheet != null) attackSpriteSheet.dispose();
+        if (deathSpriteSheet != null) deathSpriteSheet.dispose();
+    }
+
+    public boolean isRemoved() {
+        return removed;
     }
 }
