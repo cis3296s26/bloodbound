@@ -43,6 +43,10 @@ public class Player extends Sprite {
     public float gravity = -1500f;
     public Texture idleSpriteSheet;
     public Animation<TextureRegion> idle;
+    public Texture deadSpriteSheet;
+    public Animation<TextureRegion> dead;
+    public boolean isDead = false;
+    float timeDead = 0f;
 
     public Texture sprintSpriteSheet;
     public Animation<TextureRegion> sprint;
@@ -175,6 +179,15 @@ public class Player extends Sprite {
         for (int i = 0; i < 6; ++i)
             attackFrames[i] = attackTmp[0][i];
         attack = new Animation<>(0.075f, attackFrames);
+    }
+    public void dead_init() {
+        deadSpriteSheet = new Texture("Player/Dead_1.png");
+        TextureRegion[][] deadTmp = TextureRegion.split(deadSpriteSheet, 128, 128);
+        TextureRegion[] deadFrames = new TextureRegion[5];
+        for (int i = 0; i < 5; i++){
+            deadFrames[i] = deadTmp[0][i];
+        }
+        dead = new Animation<>(0.15f, deadFrames);
     }
 
     public void input(float delta) {
