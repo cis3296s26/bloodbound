@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -33,8 +34,9 @@ public class Player extends Sprite {
     public Texture walkSpriteSheet;
     public Animation<TextureRegion> walk;
 
-    public Texture hpForeground;
-    public Texture hpBackground;
+    public Texture hpForeground1 = new Texture("Player/hp/HealthBar3.png");
+    public Texture hpBackground1  = new Texture("Player/hp/HealthBar7.png");
+
 
     public Texture jumpSpriteSheet;
     public Animation<TextureRegion> jump;
@@ -65,6 +67,7 @@ public class Player extends Sprite {
     public TextureRegion[] idleFrames;
 
 
+    public final float HP = 100;
     public static class Projectile {
         Texture projectileSpriteSheet;
         public Animation<TextureRegion> projectileAnimation;
@@ -254,7 +257,5 @@ public class Player extends Sprite {
         }
     }
 
-    public void drawHealth() {
 
-    }
 }

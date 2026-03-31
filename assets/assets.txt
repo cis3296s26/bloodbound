@@ -17,6 +17,7 @@ Karasu_tengu/Walk_u.png
 Logos/PixelLogo.png
 Maps/Battleground2.png
 Maps/Dungeon Tile Set.png
+Other_objects.png
 Player/Attack_1.png
 Player/Attack_2.png
 Player/Attack_3.png
@@ -31,6 +32,8 @@ Player/Idle.png
 Player/Jump.png
 Player/Run.png
 Player/Walk.png
+Player/hp/HealthBar3.png
+Player/hp/HealthBar7.png
 Skeleton/Attack_1.png
 Skeleton/Attack_2.png
 Skeleton/Dead.png
@@ -42,6 +45,9 @@ Skeleton/Run+attack.png
 Skeleton/Run.png
 Skeleton/Walk.png
 level_1.tmx
+runs_by_points.json
+runs_by_speed.json
+sounds/gametheme.mp3
+sounds/jump.mp3
+sounds/walk.mp3
 test2.tmx
-Player/hp/HealthBar3.png
-Player/hp/HealthBar7.png
