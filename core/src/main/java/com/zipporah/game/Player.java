@@ -264,4 +264,11 @@ public class Player extends Sprite {
             projectiles.add(new Player.Projectile(facing_right, x, y));
         }
     }
+
+    public boolean updateSpriteDead(float delta) {
+        timeDead += delta;
+        currFrame = dead.getKeyFrame(timeDead, false);
+        // returns when animation is done so i can know when do switch from gamescreen to homescreen
+        return dead.isAnimationFinished(timeDead);
+    }
 }

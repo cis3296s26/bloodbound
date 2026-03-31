@@ -44,6 +44,8 @@ public class GameScreen implements Screen {
     float Map_Height = 208f;
     // array for ladders
     public static Array<Rectangle> ladderRectangles = new Array<>();
+    // array for spikes
+    public static Array<Rectangle> spikeRectangles = new Array<>();
     // physics
     float gravity = -1500f;
     float hitbox_width = 60f;
@@ -104,6 +106,21 @@ public class GameScreen implements Screen {
         }
     }
 
+    private void getSpikeObjects() {
+        MapLayer layer = map.getLayers().get("spike");
+        for (MapObject obj : layer.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                spikeRectangles.add(new Rectangle(
+                        r.x     * scale,
+                        r.y     * scale,
+                        r.width  * scale,
+                        r.height * scale
+                ));
+            }
+        }
+    }
+
     public GameScreen(ScreenManager game) {
         this.game = game;
     }
@@ -121,6 +138,7 @@ public class GameScreen implements Screen {
         getCollisionObject();
         getWallObjects();
         getLadderObjects();
+        getSpikeObjects();
 
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
         cam.position.set(640, 360, 0);
@@ -132,6 +150,7 @@ public class GameScreen implements Screen {
         player.jump_init();
         player.sprint_init();
         player.attack_init();
+        player.dead_init();
 
         karasu = new Karasu();
         karasu.create();
