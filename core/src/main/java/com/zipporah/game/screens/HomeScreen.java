@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class HomeScreen implements Screen {
@@ -51,7 +52,7 @@ public class HomeScreen implements Screen {
 
   @Override
   public void render(float delta) {
-
+    ScreenUtils.clear(0f, 0f, 0f, 1f);
     viewport.apply();
     game.batch.setProjectionMatrix(viewport.getCamera().combined);
 
@@ -80,14 +81,13 @@ public class HomeScreen implements Screen {
         game.setScreen(new GameScreen(game));
       }
       if(rankingsHovering){
-
-        // game.setScreen(new RankingsScreen(game));
+        game.setScreen(new RankingsScreen(game));
       }
       if(controlsHovering){
-        // game.setScreen(new ControlsScreen(game));
+        game.setScreen(new ControlsScreen(game));
       }
       if(optionsHovering){
-        //  game.setScreen(new OptionsScreen(game));
+        game.setScreen(new OptionsScreen(game));
       }
       if(quitHovering){
         Gdx.app.exit();
