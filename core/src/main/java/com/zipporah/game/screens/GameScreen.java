@@ -310,7 +310,9 @@ public class GameScreen implements Screen {
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
 
 
-        karasu.botLogic(player.x, player.y, delta);
+        if (karasu != null && !karasu.isRemoved()) {
+            karasu.botLogic(player.x, player.y, delta);
+        }
 
 
         float mapWorldWidth  = 240 * 16 * scale;
@@ -333,12 +335,14 @@ public class GameScreen implements Screen {
         game.batch.setProjectionMatrix(cam.combined);
 
         // Handle Projectile and Enemy Collisions
-        Iterator<Player.Projectile> projectilesIterator = player.projectiles.iterator();
-        while (projectilesIterator.hasNext()) {
-            Player.Projectile projectile = projectilesIterator.next();
-            if(projectile.box.overlaps(Karasu.innerBoundaries)) {
-                Karasu.health -= projectile.damage;
-                projectilesIterator.remove();
+        if (karasu != null && !karasu.isRemoved()) {
+            Iterator<Player.Projectile> projectilesIterator = player.projectiles.iterator();
+            while (projectilesIterator.hasNext()) {
+                Player.Projectile projectile = projectilesIterator.next();
+                if (projectile.box.overlaps(Karasu.innerBoundaries)) {
+                    Karasu.health -= projectile.damage;
+                    projectilesIterator.remove();
+                }
             }
         }
     }
@@ -358,7 +362,9 @@ public class GameScreen implements Screen {
 
         game.batch.begin();
 
-        karasu.draw(game.batch, karasu.time);
+        if (karasu != null && !karasu.isRemoved()) {
+            karasu.draw(game.batch, karasu.time, delta);
+        }
 
         float drawX;
         float scaleX;
@@ -394,6 +400,8 @@ public class GameScreen implements Screen {
 
         game.batch.begin();
         game.timer.draw(game.batch);
+        game.batch.draw(player.hpForeground1, 10, 700);
+        //game.batch.draw(player.hpBackground1, 20, 20);
         game.batch.end();
 
         // Test Projectile and Karasu Hitboxes with these
