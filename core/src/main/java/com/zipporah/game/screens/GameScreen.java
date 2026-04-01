@@ -224,6 +224,10 @@ public class GameScreen implements Screen {
             player.y += player.velocityY * delta;
         }
 
+        // karasu grav
+        // karasu.velocityY += gravity * delta;
+        // karasu.y += karasu.velocityY * delta;
+
         // change players hitbox with the position due to gravity
         float changedHitbox = (player.sprit_size - hitbox_width) / 2f;
         spriteBox.set(player.x + changedHitbox, player.y, hitbox_width, hitbox_height);
@@ -296,6 +300,11 @@ public class GameScreen implements Screen {
                 }
             }
         }
+
+        // bot (for loop for bot floor collision
+        // Karasu floor collision (TEST)
+        // System.out.println("Karasu Y: " + karasu.y);
+
 
 
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
@@ -381,6 +390,7 @@ public class GameScreen implements Screen {
             }
         }
 
+
         game.batch.draw(player.currFrame, drawX, player.y, 0, 0, player.sprit_size, player.sprit_size, scaleX, 1, 0);
 
         game.batch.end();
@@ -395,16 +405,18 @@ public class GameScreen implements Screen {
         game.batch.end();
 
         // Test Projectile and Karasu Hitboxes with these
-        /*
-        shapeRenderer.setProjectionMatrix(cam.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        for (Player.Projectile projectile : player.projectiles) {
-            shapeRenderer.rect(projectile.box.x, projectile.box.y, projectile.box.width, projectile.box.height);
-        }
+// TEST
+//        shapeRenderer.setProjectionMatrix(cam.combined);
+//        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+//        for (Player.Projectile projectile : player.projectiles) {
+//            shapeRenderer.rect(projectile.box.x, projectile.box.y, projectile.box.width, projectile.box.height);
+//        }
+//        // testing karasu
+//        shapeRenderer.rect(karasu.ground.x, karasu.ground.y, 10, 10);
+//
+//        shapeRenderer.rect(Karasu.innerBoundaries.x, Karasu.innerBoundaries.y, Karasu.innerBoundaries.width, Karasu.innerBoundaries.height);
+//        shapeRenderer.end();
 
-        shapeRenderer.rect(Karasu.innerBoundaries.x, Karasu.innerBoundaries.y, Karasu.innerBoundaries.width, Karasu.innerBoundaries.height);
-        shapeRenderer.end();
-         */
     }
 
 

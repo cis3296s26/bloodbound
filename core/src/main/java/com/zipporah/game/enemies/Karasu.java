@@ -5,7 +5,8 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-
+import com.badlogic.gdx.utils.Array;
+import com.zipporah.game.screens.GameScreen;
 
 public class  Karasu {
     TextureRegion currFrame;
@@ -24,8 +25,8 @@ public class  Karasu {
     Animation<TextureRegion> death;
 
     public float time = 0;
-    float x = 1000;
-    float y = 70;
+    public float x = 1750;
+    public float y = 250;
     float spriteSpeed = 150.0f;
     public static float health = 100;
     boolean removed = false;
@@ -43,6 +44,20 @@ public class  Karasu {
     State currState = State.idle;
     float stateTime = 0;
 
+    // add gravity
+    public float velocityY = 0f;
+    public float gravity = -1500f;
+    public boolean onGround = false;
+
+    // hitbox idk if these sizes are right check later
+    public float width = 80f;
+    public float height = 110f; // had to shrink bc he as hitting ceiling
+
+    public Rectangle enemyBox = new Rectangle();
+
+    // check for ground
+    public Rectangle ground = new Rectangle();
+    float groundAhead = 10f;
 
     public void create(){
         removed = false;
@@ -103,28 +118,70 @@ public class  Karasu {
             return;
         }
 
-        // find if player is to the right or left
         float dx = playerX - x;
         float dy = playerY - y;
-        // distance take pythagorean bc player can be on a platform
-        float distance = (float)Math.sqrt(dx * dx + dy * dy);
-
+        float distance = (float) Math.sqrt(dx * dx + dy * dy);
         facingRight = dx > 0;
+        float dirX = facingRight ? 1 : -1;
+
+        velocityY += gravity * delta;
+        y += velocityY * delta;
+
+        enemyBox.set(x + 10, y, width, height);
+        onGround = false;
+
+
+//        // find if player is to the right or left
+//        float dx = playerX - x;
+//        float dy = playerY - y;
+//
+//        // distance take pythagorean bc player can be on a platform
+//        float distance = (float)Math.sqrt(dx * dx + dy * dy);
+//
+//        facingRight = dx > 0;
+//
+//        // walk down stairs (gravity for y coordinate
+//
+//        onGround = false;
+//
+//        velocityY += gravity * delta;
+//        y += velocityY * delta;
+//
+//        // hit box
+//        onGround = false;
+//        enemyBox.set(x + 10, y, width, height);
+
+        for (Rectangle rect : GameScreen.collisionRectangles) {
+            if (enemyBox.overlaps(rect)) {
+                float enemyFeetY = y;
+                float platformTopY = rect.y + rect.height;
+
+                if (velocityY <= 0 && enemyFeetY >= platformTopY - 20) {
+                    y = platformTopY;
+                    velocityY = 0;
+                    onGround = true;
+                    enemyBox.set(x + 10, y, width, height);
+                    break;
+                }
+            }
+        }
 
         // if far close the distance and once closee attack
         if (distance > 150f) {
-            currState = State.walk;
-
-            float dirX = dx / distance;
-            float dirY = dy / distance;
-
-            x += dirX * spriteSpeed * delta;
-            y += dirY * spriteSpeed * delta;
+            if (groundAhead(GameScreen.collisionRectangles) || !onGround) {
+                currState = State.walk;
+                x += dirX * spriteSpeed * delta;
+            } else {
+                currState = State.idle;
+            }
         }
-        else {
+        else if (distance < 150f) {
             currState = State.attack;
         }
-
+        else {
+            currState = State.idle;
+        }
+        innerBoundaries.setPosition(x + innerXOffset, y);
     }
 
     public void draw(SpriteBatch batch, float time, float delta){
@@ -132,6 +189,7 @@ public class  Karasu {
         stateTime += delta;
         float drawX;
         float scaleX;
+
 
         // check if the logic makes sense
         switch (currState){
@@ -176,6 +234,30 @@ public class  Karasu {
         // Move Karasu's Inner Boundaries
         innerBoundaries.setPosition(x + innerXOffset, y);
     }
+
+    // ground ahead?
+    private boolean groundAhead(Array<Rectangle> floor) {
+        float groundX;
+
+        if (facingRight) {
+            groundX = x + width + 5;
+        } else {
+            groundX = x - 25;
+        }
+
+        // idk if right check later
+        float groundY = y - 100;
+
+        ground.set(groundX, groundY, 20, 40);
+
+        for (Rectangle rect : floor) {
+            if (ground.overlaps(rect)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     private void updateEnemyDeath(float delta) {
         currFrame = death.getKeyFrame(stateTime, false);
