@@ -45,6 +45,8 @@ public class  Karasu {
 
 
     public void create(){
+        removed = false;
+        health = 100;
         // idle anim
         idleSpriteSheet = new Texture("Karasu_tengu/Idle_u.png");
 
