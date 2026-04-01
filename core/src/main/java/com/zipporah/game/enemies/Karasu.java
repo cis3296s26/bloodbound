@@ -21,7 +21,7 @@ public class  Karasu {
     Animation<TextureRegion> attack;
 
     public float time = 0;
-    public float x = 1250;
+    public float x = 1750;
     public float y = 250;
     float spriteSpeed = 150.0f;
     public static float health = 100;
@@ -131,7 +131,7 @@ public class  Karasu {
                 float enemyFeetY = y;
                 float platformTopY = rect.y + rect.height;
 
-                if (velocityY <= 0 && enemyFeetY >= platformTopY - 15) {
+                if (velocityY <= 0 && enemyFeetY >= platformTopY - 20) {
                     y = platformTopY;
                     velocityY = 0;
                     onGround = true;
