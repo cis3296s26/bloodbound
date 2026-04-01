@@ -14,6 +14,11 @@ Unpack the .dmg file and drag the .app file (game) to your desktop.
 ### **Windows:**
 - Download "release.1.zip", extract and run the .exe file.
 
+### **Else** 
+- Clone the repository and run these following commands:
+- chmod +x gradlew
+- ./gradlew lwjgl3:run
+
 ### Quick Links:
 - Download Windows Game Version: https://tinyurl.com/bbound2
 
