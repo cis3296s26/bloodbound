@@ -225,8 +225,8 @@ public class GameScreen implements Screen {
         }
 
         // karasu grav
-        karasu.velocityY += gravity * delta;
-        karasu.y += karasu.velocityY * delta;
+        // karasu.velocityY += gravity * delta;
+        // karasu.y += karasu.velocityY * delta;
 
         // change players hitbox with the position due to gravity
         float changedHitbox = (player.sprit_size - hitbox_width) / 2f;
@@ -302,16 +302,9 @@ public class GameScreen implements Screen {
         }
 
         // bot (for loop for bot floor collision
-        // Karasu floor collision
-        for (Rectangle rectangle : collisionRectangles) {
-            if (karasu.enemyBox.overlaps(rectangle) && karasu.velocityY <= 0) {
-                karasu.y = rectangle.y + rectangle.height;
-                karasu.velocityY = 0;
-                karasu.onGround = true;
+        // Karasu floor collision (TEST)
+        // System.out.println("Karasu Y: " + karasu.y);
 
-                karasu.enemyBox.set(karasu.x, karasu.y, karasu.width, karasu.height);
-            }
-        }
 
 
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
@@ -391,6 +384,7 @@ public class GameScreen implements Screen {
             }
         }
 
+
         game.batch.draw(player.currFrame, drawX, player.y, 0, 0, player.sprit_size, player.sprit_size, scaleX, 1, 0);
 
         game.batch.end();
@@ -403,16 +397,18 @@ public class GameScreen implements Screen {
         game.batch.end();
 
         // Test Projectile and Karasu Hitboxes with these
-        /*
-        shapeRenderer.setProjectionMatrix(cam.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        for (Player.Projectile projectile : player.projectiles) {
-            shapeRenderer.rect(projectile.box.x, projectile.box.y, projectile.box.width, projectile.box.height);
-        }
+// TEST
+//        shapeRenderer.setProjectionMatrix(cam.combined);
+//        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+//        for (Player.Projectile projectile : player.projectiles) {
+//            shapeRenderer.rect(projectile.box.x, projectile.box.y, projectile.box.width, projectile.box.height);
+//        }
+//        // testing karasu
+//        shapeRenderer.rect(karasu.ground.x, karasu.ground.y, 10, 10);
+//
+//        shapeRenderer.rect(Karasu.innerBoundaries.x, Karasu.innerBoundaries.y, Karasu.innerBoundaries.width, Karasu.innerBoundaries.height);
+//        shapeRenderer.end();
 
-        shapeRenderer.rect(Karasu.innerBoundaries.x, Karasu.innerBoundaries.y, Karasu.innerBoundaries.width, Karasu.innerBoundaries.height);
-        shapeRenderer.end();
-         */
     }
 
 
