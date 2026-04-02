@@ -54,6 +54,11 @@ public class GameScreen implements Screen {
     Texture closeChestTexture;
     Vector2 chest1Position = new Vector2();
     Vector2 chest2Position = new Vector2();
+    boolean chest1Open = false;
+    boolean chest2Open = false;
+    boolean haveChest1key = false;
+    boolean haveChest2key = false;
+    float chestInteractionRange = 150f;
 
     // physics
     float gravity = -1500f;
@@ -229,6 +234,27 @@ public class GameScreen implements Screen {
                 onLadder = false;
             }
         }
+
+        // chest interaction
+        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+            // chest 1
+            if (!chest1Open) {
+                float dist1 = Vector2.dst(player.x, player.y, chest1Position.x, chest1Position.y);
+                if (dist1 < chestInteractionRange) {
+                    chest1Open = true;
+                    haveChest1key = true;
+                }
+            }
+
+            // chest 2
+            if (!chest2Open) {
+                float dist2 = Vector2.dst(player.x, player.y, chest2Position.x, chest2Position.y);
+                if (dist2 < chestInteractionRange) {
+                    chest2Open = true;
+                    haveChest2key = true;
+                }
+            }
+        }
     }
 
     private void logic(float delta) {
@@ -396,8 +422,8 @@ public class GameScreen implements Screen {
         // draw chests
         float chestWidth = 16 * scale;
         float chestHeight = 32 * scale;
-        game.batch.draw(closeChestTexture, chest1Position.x, chest1Position.y, chestWidth, chestHeight);
-        game.batch.draw(closeChestTexture, chest2Position.x, chest2Position.y, chestWidth, chestHeight);
+        game.batch.draw(chest1Open ? openChestTexture : closeChestTexture, chest1Position.x, chest1Position.y, chestWidth, chestHeight);
+        game.batch.draw(chest2Open ? openChestTexture : closeChestTexture, chest2Position.x, chest2Position.y, chestWidth, chestHeight);
 
 
 
