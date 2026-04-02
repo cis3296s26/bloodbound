@@ -45,23 +45,29 @@ public class Player extends Sprite {
     public float gravity = -1500f;
     public Texture idleSpriteSheet;
     public Animation<TextureRegion> idle;
+
     public Texture deadSpriteSheet;
     public Animation<TextureRegion> dead;
     public boolean isDead = false;
     float timeDead = 0f;
+
     public Texture hurtSpriteSheet;
     public Animation<TextureRegion> hurt;
+    public boolean isHurt = false;
+    float timeHurt = 0f;
 
     public Texture sprintSpriteSheet;
     public Animation<TextureRegion> sprint;
-
     public float spriteSpeed = 200.0f;
     float sprintMultiplier = 2.00f;
+
     public float sprit_size = 200f;
+
     public Texture attackSpriteSheet;
     public Animation<TextureRegion> attack;
     public boolean attacking = false;
     float attackTime = 0f;
+
     public float time = 0;
     public boolean facing_right = true;
     public float x = 100f;
@@ -198,7 +204,7 @@ public class Player extends Sprite {
         for (int i = 0; i < 5; i++) {
             hurtFrames[i] = hurtTmp[0][i];
         }
-        dead = new Animation<>(0.15f, hurtFrames);
+        hurt = new Animation<>(0.15f, hurtFrames);
     }
 
     public void dead_init() {
@@ -214,6 +220,13 @@ public class Player extends Sprite {
     public void input(float delta) {
         // default frame idle
         if (isDead) {
+            return;
+        }
+        if (isHurt) {
+            if (updateSpriteHurt(delta)) {
+                isHurt = false;
+                timeHurt = 0f;
+            }
             return;
         }
         currFrame = idle.getKeyFrame(time, true);
@@ -293,5 +306,11 @@ public class Player extends Sprite {
         // returns when animation is done so i can know when do switch from gamescreen
         // to homescreen
         return dead.isAnimationFinished(timeDead);
+    }
+
+    public boolean updateSpriteHurt(float delta) {
+        timeHurt += delta;
+        currFrame = hurt.getKeyFrame(timeHurt, false);
+        return hurt.isAnimationFinished(timeHurt);
     }
 }

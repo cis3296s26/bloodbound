@@ -48,6 +48,8 @@ public class GameScreen implements Screen {
     public static Array<Rectangle> ladderRectangles = new Array<>();
     // array for spikes
     public static Array<Rectangle> spikeRectangles = new Array<>();
+    // array for enemys
+    public static Array<Rectangle> enemyRectangles = new Array<>();
 
     // chests
     Texture openChestTexture;
@@ -346,6 +348,13 @@ public class GameScreen implements Screen {
         // if not touching ladder get off
         if (!touchingLadder) {
             onLadder = false;
+        }
+
+        // enemy collision detection
+        if(!player.isDead){
+            for(int i = 0; i < enemyRectangles.size; i++){
+                
+            }
         }
 
         // spike collision detection, set death to true
