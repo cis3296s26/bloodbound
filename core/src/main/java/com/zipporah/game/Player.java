@@ -55,6 +55,7 @@ public class Player extends Sprite {
     public Animation<TextureRegion> hurt;
     public boolean isHurt = false;
     float timeHurt = 0f;
+    float hurtCooldown = 0f;
 
     public Texture sprintSpriteSheet;
     public Animation<TextureRegion> sprint;
@@ -200,8 +201,8 @@ public class Player extends Sprite {
     public void hurt_init() {
         hurtSpriteSheet = new Texture("Player/Hurt.png");
         TextureRegion[][] hurtTmp = TextureRegion.split(hurtSpriteSheet, 128, 128);
-        TextureRegion[] hurtFrames = new TextureRegion[5];
-        for (int i = 0; i < 5; i++) {
+        TextureRegion[] hurtFrames = new TextureRegion[hurtTmp[0].length];
+        for (int i = 0; i < hurtTmp[0].length; i++) {
             hurtFrames[i] = hurtTmp[0][i];
         }
         hurt = new Animation<>(0.15f, hurtFrames);

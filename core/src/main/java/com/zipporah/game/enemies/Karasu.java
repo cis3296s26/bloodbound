@@ -6,9 +6,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
+import com.zipporah.game.Enemy;
 import com.zipporah.game.screens.GameScreen;
 
-public class  Karasu {
+public class  Karasu extends Enemy{
     TextureRegion currFrame;
 
     // add walk later search up bot logic
@@ -29,7 +30,6 @@ public class  Karasu {
     public float y = 250;
     float spriteSpeed = 150.0f;
     public static float health = 100;
-    boolean removed = false;
 
     // Inner Boundaries / HitBox
     public static Rectangle innerBoundaries;
@@ -276,5 +276,10 @@ public class  Karasu {
 
     public boolean isRemoved() {
         return removed;
+    }
+
+    // Change this once it is implemented in the shared enemy class
+    public boolean isAttacking() {
+        return currState == State.attack;
     }
 }
