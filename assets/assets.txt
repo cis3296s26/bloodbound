@@ -17,6 +17,8 @@ Karasu_tengu/Walk_u.png
 Logos/PixelLogo.png
 Maps/Battleground2.png
 Maps/Dungeon Tile Set.png
+Maps/chest_closed.png
+Maps/chest_open.png
 Player/Attack_1.png
 Player/Attack_2.png
 Player/Attack_3.png

@@ -24,6 +24,8 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 
 public class GameScreen implements Screen {
 
@@ -46,6 +48,13 @@ public class GameScreen implements Screen {
     public static Array<Rectangle> ladderRectangles = new Array<>();
     // array for spikes
     public static Array<Rectangle> spikeRectangles = new Array<>();
+
+    // chests
+    Texture openChestTexture;
+    Texture closeChestTexture;
+    Vector2 chest1Position = new Vector2();
+    Vector2 chest2Position = new Vector2();
+
     // physics
     float gravity = -1500f;
     float hitbox_width = 60f;
@@ -121,6 +130,24 @@ public class GameScreen implements Screen {
         }
     }
 
+    private void getChestObjects() {
+        MapLayer layer1 = map.getLayers().get("chest1");
+            for (MapObject obj : layer1.getObjects()) {
+                if (obj instanceof RectangleMapObject) {
+                    Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                    chest1Position.set(r.x * scale, r.y * scale);
+                }
+            }
+
+        MapLayer layer2 = map.getLayers().get("chest2");
+            for (MapObject obj : layer2.getObjects()) {
+                if (obj instanceof RectangleMapObject) {
+                    Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                    chest2Position.set(r.x * scale, r.y * scale);
+                }
+            }
+    }
+
     public GameScreen(ScreenManager game) {
         this.game = game;
     }
@@ -139,6 +166,10 @@ public class GameScreen implements Screen {
         getWallObjects();
         getLadderObjects();
         getSpikeObjects();
+        getChestObjects();
+
+        closeChestTexture = new Texture(Gdx.files.internal("Maps/chest_closed.png"));
+        openChestTexture = new Texture(Gdx.files.internal("Maps/chest_open.png"));
 
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
         cam.position.set(640, 360, 0);
@@ -361,6 +392,14 @@ public class GameScreen implements Screen {
         game.batch.setProjectionMatrix(cam.combined);
 
         game.batch.begin();
+
+        // draw chests
+        float chestWidth = 16 * scale;
+        float chestHeight = 32 * scale;
+        game.batch.draw(closeChestTexture, chest1Position.x, chest1Position.y, chestWidth, chestHeight);
+        game.batch.draw(closeChestTexture, chest2Position.x, chest2Position.y, chestWidth, chestHeight);
+
+
 
         if (karasu != null && !karasu.isRemoved()) {
             karasu.draw(game.batch, karasu.time, delta);
