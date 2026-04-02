@@ -33,6 +33,8 @@ public class GameScreen implements Screen {
     TiledMap map;
     OrthogonalTiledMapRenderer renderer;
     float scale = 4f;
+    float hp_w_scale = 300f;
+    float hp_h_scale = 18f;
     ExtendViewport viewport;
     FitViewport viewportHUD;
 
@@ -400,8 +402,8 @@ public class GameScreen implements Screen {
 
         game.batch.begin();
         game.timer.draw(game.batch);
-        game.batch.draw(player.hpForeground1, 10, 700);
-        //game.batch.draw(player.hpBackground1, 20, 20);
+        game.batch.draw(player.hpForeground1, 10, 700, hp_w_scale, hp_h_scale);
+        game.batch.draw(player.hpBackground1, 20, 20, hp_w_scale, hp_h_scale);
         game.batch.end();
 
         // Test Projectile and Karasu Hitboxes with these

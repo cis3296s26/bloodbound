@@ -34,8 +34,14 @@ public class Player extends Sprite {
     public Texture walkSpriteSheet;
     public Animation<TextureRegion> walk;
 
-    public Texture hpForeground1 = new Texture("Player/hp/HealthBar3.png");
-    public Texture hpBackground1  = new Texture("Player/hp/HealthBar7.png");
+    public Texture hpForeground1 = new Texture("Player/hp/hpforeground.png");
+    public Texture hpBackground1  = new Texture("Player/hp/hpbackground.png");
+
+
+    float max_hp = 100;
+    float curr_hp;
+    float hp_percent = curr_hp / max_hp;
+    public float bar_width = hpForeground1.getWidth();
 
 
     public Texture jumpSpriteSheet;
