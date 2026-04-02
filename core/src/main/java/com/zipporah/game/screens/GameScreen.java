@@ -349,8 +349,10 @@ public class GameScreen implements Screen {
 
         // enemy collision detection
         if (!player.isDead && karasu != null && !karasu.isRemoved()) {
-            if (karasu.isAttacking() && spriteBox.overlaps(karasu.enemyBox) && !player.isHurt) {
+            if (karasu.isAttacking() && spriteBox.overlaps(karasu.enemyBox) && !player.isHurt
+                    && player.hurtCooldown <= 0f) {
                 player.isHurt = true;
+                player.hurtCooldown = 1.0f;
             }
         }
 

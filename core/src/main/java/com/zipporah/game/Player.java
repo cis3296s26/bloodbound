@@ -55,7 +55,7 @@ public class Player extends Sprite {
     public Animation<TextureRegion> hurt;
     public boolean isHurt = false;
     float timeHurt = 0f;
-    float hurtCooldown = 0f;
+    public float hurtCooldown = 0f;
 
     public Texture sprintSpriteSheet;
     public Animation<TextureRegion> sprint;
@@ -220,6 +220,9 @@ public class Player extends Sprite {
 
     public void input(float delta) {
         // default frame idle
+        if (hurtCooldown > 0f) {
+            hurtCooldown -= delta;
+        }
         if (isDead) {
             return;
         }
