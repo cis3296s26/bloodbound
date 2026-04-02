@@ -353,6 +353,15 @@ public class GameScreen implements Screen {
                     && player.hurtCooldown <= 0f) {
                 player.isHurt = true;
                 player.hurtCooldown = 1.0f;
+
+                float knockback = 40f;
+                if (player.x < karasu.x) {
+                    player.x -= knockback;
+                } else {
+                    player.x += knockback;
+                }
+
+                player.velocityY = 250f;
             }
         }
 
