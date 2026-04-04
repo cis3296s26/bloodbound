@@ -396,8 +396,8 @@ public class GameScreen implements Screen {
             Iterator<Player.Projectile> projectilesIterator = player.projectiles.iterator();
             while (projectilesIterator.hasNext()) {
                 Player.Projectile projectile = projectilesIterator.next();
-                if (projectile.box.overlaps(Karasu.innerBoundaries)) {
-                    Karasu.health -= projectile.damage;
+                if (projectile.box.overlaps(karasu.innerBoundaries)) {
+                    karasu.health -= projectile.damage;
                     projectilesIterator.remove();
                 }
             }
@@ -471,16 +471,16 @@ public class GameScreen implements Screen {
 
         // Test Projectile and Karasu Hitboxes with these
 // TEST
-//        shapeRenderer.setProjectionMatrix(cam.combined);
-//        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-//        for (Player.Projectile projectile : player.projectiles) {
-//            shapeRenderer.rect(projectile.box.x, projectile.box.y, projectile.box.width, projectile.box.height);
-//        }
-//        // testing karasu
-//        shapeRenderer.rect(karasu.ground.x, karasu.ground.y, 10, 10);
-//
-//        shapeRenderer.rect(Karasu.innerBoundaries.x, Karasu.innerBoundaries.y, Karasu.innerBoundaries.width, Karasu.innerBoundaries.height);
-//        shapeRenderer.end();
+        shapeRenderer.setProjectionMatrix(cam.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        for (Player.Projectile projectile : player.projectiles) {
+            shapeRenderer.rect(projectile.box.x, projectile.box.y, projectile.box.width, projectile.box.height);
+        }
+        // testing karasu
+        shapeRenderer.rect(karasu.ground.x, karasu.ground.y, 10, 10);
+
+        shapeRenderer.rect(karasu.innerBoundaries.x, karasu.innerBoundaries.y, karasu.innerBoundaries.width, karasu.innerBoundaries.height);
+        shapeRenderer.end();
 
     }
 
