@@ -3,6 +3,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.zipporah.game.Enemy;
 
 public class Karasu extends Enemy {
+    @Override
     public void create() {
         super.create("Karasu", new int[] {6, 8, 6, 6});
 

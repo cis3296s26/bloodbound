@@ -74,6 +74,8 @@ public class Enemy {
         return new AnimationBundle(spriteSheet, animation);
     }
 
+    public void create() {}
+
     public void create(String path, int[] frameCount){
         removed = false;
         health = 100;
