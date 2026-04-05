@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -22,10 +21,9 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
-import java.util.ArrayList;
 import java.util.Iterator;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.zipporah.game.enemies.Skeleton;
 
 public class GameScreen implements Screen {
 
@@ -72,6 +70,7 @@ public class GameScreen implements Screen {
     private final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     Karasu karasu;
+    Skeleton skeleton;
 
     private void getCollisionObject(){
         MapLayer layer = map.getLayers().get("collision");
@@ -191,6 +190,9 @@ public class GameScreen implements Screen {
         karasu = new Karasu();
         karasu.create();
 
+        skeleton = new Skeleton();
+        skeleton.create();
+
     }
 
     @Override
@@ -281,10 +283,6 @@ public class GameScreen implements Screen {
             player.y += player.velocityY * delta;
         }
 
-        // karasu grav
-        // karasu.velocityY += gravity * delta;
-        // karasu.y += karasu.velocityY * delta;
-
         // change players hitbox with the position due to gravity
         float changedHitbox = (player.sprit_size - hitbox_width) / 2f;
         spriteBox.set(player.x + changedHitbox, player.y, hitbox_width, hitbox_height);
@@ -358,10 +356,6 @@ public class GameScreen implements Screen {
             }
         }
 
-        // bot (for loop for bot floor collision
-        // Karasu floor collision (TEST)
-        // System.out.println("Karasu Y: " + karasu.y);
-
 
 
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
@@ -369,6 +363,10 @@ public class GameScreen implements Screen {
 
         if (karasu != null && !karasu.isRemoved()) {
             karasu.botLogic(player.x, player.y, delta);
+        }
+
+        if (skeleton != null && !skeleton.isRemoved()) {
+            skeleton.botLogic(player.x, player.y, delta);
         }
 
 
@@ -429,6 +427,10 @@ public class GameScreen implements Screen {
 
         if (karasu != null && !karasu.isRemoved()) {
             karasu.draw(game.batch, karasu.time, delta);
+        }
+
+        if (skeleton != null && !skeleton.isRemoved()) {
+            skeleton.draw(game.batch, skeleton.time, delta);
         }
 
         float drawX;

@@ -26,7 +26,7 @@ public class Enemy {
 
     AnimationBundle walk, idle, attack, death;
     String path;
-    int[] frameCount;
+    int[] frameCount;   // 0 - idle, 1 - walk, 2 - attack, 3 - dead
     public int size = 128;
 
     // States
@@ -78,7 +78,7 @@ public class Enemy {
         removed = false;
         health = 100;
         this.path = path;
-        this.frameCount = frameCount;
+        this.frameCount = frameCount; // 0 - idle, 1 - walk, 2 - attack, 3 - dead
         innerXOffset = innerXOffsetFacingLeft;
 
         // Load Animations
