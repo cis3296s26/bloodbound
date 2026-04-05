@@ -152,7 +152,26 @@ public class Enemy {
 
         // Set direction
         float dx = playerX - x;
-        facingRight = dx > 0;
+        float dy = playerY - y;
+        float distance = (float) Math.sqrt(dx * dx + dy * dy);
+
+        // Don't move and switch animation if near the player or can't move ahead
+        float attackRange = 80f;
+        float attackVerticalRange = 80f;
+        float stopRange = 80f;
+        float faceDeadzone = 40f;
+
+        if (Math.abs(dx) <= stopRange) {
+            if (Math.abs(dx) <= attackRange && Math.abs(dy) <= attackVerticalRange) {
+                facingRight = dx > 0;
+                innerXOffset = facingRight ? innerXOffsetFacingRight : innerXOffsetFacingLeft;
+                if (currState != State.attack) stateTime = 0;
+                currState = State.attack;
+            } else currState = State.idle;
+            return;
+        }
+
+        if (Math.abs(dx) > faceDeadzone) facingRight = dx > 0;
         float dirX = facingRight ? 1f : -1f;
         innerXOffset = facingRight ? innerXOffsetFacingRight : innerXOffsetFacingLeft;
 
@@ -161,6 +180,7 @@ public class Enemy {
 
     /// !!! AI GENERATED LOGIC <- USE TEMPORARY AND REPLACE OR ACKNOWLEDGE IN REPORT / ASK PROFESSOR !!!
     private void move(float dirX, float delta) {
+        currState = State.walk;
         float stepX = speed * delta * dirX;
         float hitboxW = innerBoundaries.width;
         float hitboxH = innerBoundaries.height;
@@ -169,8 +189,6 @@ public class Enemy {
         onGround = false;
         velocityY += gravity * delta;
         float newY = y + velocityY * delta;
-
-        Rectangle body = new Rectangle(hitboxX, newY, hitboxW, hitboxH);
 
         // ceiling collision (use a thin head slice)
         if (velocityY > 0f) {
@@ -232,7 +250,10 @@ public class Enemy {
                     }
                 }
             }
-            if (!hasGroundAhead) return;
+            if (!hasGroundAhead) {
+                currState = State.idle;
+                return;
+            }
         }
 
         Rectangle newPosition = new Rectangle(innerBoundaries);
@@ -241,7 +262,6 @@ public class Enemy {
         for (Rectangle rectangle : wallRectangles)
             if (newPosition.overlaps(rectangle))
                 return;
-
 
         x += stepX;
         innerBoundaries.setPosition(x + innerXOffset, y);

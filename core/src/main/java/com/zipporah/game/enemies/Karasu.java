@@ -9,7 +9,7 @@ public class Karasu extends Enemy {
         // Spawn Location
         super.x = 1750;
         super.y = 50;
-        super.size = 200;
+        super.size = 180;
 
         // HitBox
         super.innerXOffsetFacingRight = 60f;
