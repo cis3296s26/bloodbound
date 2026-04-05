@@ -4,8 +4,9 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.Array;
-import com.zipporah.game.screens.GameScreen;
+
+import static com.zipporah.game.screens.GameScreen.collisionRectangles;
+import static com.zipporah.game.screens.GameScreen.wallRectangles;
 
 public class Enemy {
 
@@ -22,7 +23,7 @@ public class Enemy {
             this.animation = animation;
         }
     }
-    
+
     AnimationBundle walk, idle, attack, death;
     String path;
     int[] frameCount;
@@ -52,47 +53,15 @@ public class Enemy {
     public float y;
 
     // Characteristics
-    float speed = 100.0f;
+    float speed = 150.0f;
     public float health = 100;
 
     // Disposal
     boolean removed = false;
 
-
-
-
-
-
-
-    /////// //////////// /// //// // // / // / //
-
-
-
-
-
-
-
-
-    // hitbox idk if these sizes are right check later
-//    public float width = 80f;
-//    public float height = 110f;
-//    public Rectangle enemyBox = new Rectangle();
-
     // check for ground
     public Rectangle ground = new Rectangle();
     float groundAhead = 10f;
-
-
-
-
-
-
-
-
-
-
-
-
 
     // Load Animations
     private AnimationBundle loadAnimation(String pictureName, int frames, float frameDuration) {
@@ -169,13 +138,6 @@ public class Enemy {
         }
     }
 
-
-
-
-
-
-
-
     // follow player sprite
     public void botLogic(float playerX, float playerY, float delta) {
         if(removed) return;
@@ -188,87 +150,102 @@ public class Enemy {
             return;
         }
 
-
-
-
+        // Set direction
         float dx = playerX - x;
-        float dy = playerY - y;
-        float distance = (float) Math.sqrt(dx * dx + dy * dy);
-
         facingRight = dx > 0;
         float dirX = facingRight ? 1f : -1f;
+        innerXOffset = facingRight ? innerXOffsetFacingRight : innerXOffsetFacingLeft;
 
-        velocityY += gravity * delta;
-        y += velocityY * delta;
+        move(dirX, delta);
+    }
+
+    /// !!! AI GENERATED LOGIC <- USE TEMPORARY AND REPLACE OR ACKNOWLEDGE IN REPORT / ASK PROFESSOR !!!
+    private void move(float dirX, float delta) {
+        float stepX = speed * delta * dirX;
+        float hitboxW = innerBoundaries.width;
+        float hitboxH = innerBoundaries.height;
+        float hitboxX = x + innerXOffset;
 
         onGround = false;
-        innerBoundaries.setPosition(x + innerXOffset, y);
+        velocityY += gravity * delta;
+        float newY = y + velocityY * delta;
 
+        Rectangle body = new Rectangle(hitboxX, newY, hitboxW, hitboxH);
 
-        for (Rectangle rect : GameScreen.collisionRectangles) {
-            if (innerBoundaries.overlaps(rect)) {
-                float enemyFeetY = y;
-                float platformTopY = rect.y + rect.height;
-
-                if (velocityY <= 0 && enemyFeetY >= platformTopY - 20) {
-                    y = platformTopY;
-                    velocityY = 0;
-                    onGround = true;
-                    innerBoundaries.setPosition(x + innerXOffset, y);
-                    break;
+        // ceiling collision (use a thin head slice)
+        if (velocityY > 0f) {
+            float lowestCeiling = Float.POSITIVE_INFINITY;
+            float headHeight = 2f;
+            float headWidth = Math.min(10f, hitboxW);
+            float headX = hitboxX + (hitboxW - headWidth) / 2f;
+            Rectangle head = new Rectangle(headX, newY + hitboxH - headHeight, headWidth, headHeight);
+            for (Rectangle rectangle : collisionRectangles) {
+                if (head.overlaps(rectangle)) {
+                    float rectBottom = rectangle.y;
+                    if (rectBottom < lowestCeiling)
+                        lowestCeiling = rectBottom;
                 }
             }
-        }
-
-        // if far close the distance and once close attack
-        if (distance > 150f) {
-            if (groundAhead(GameScreen.collisionRectangles) || !onGround) {
-                currState = State.walk;
-                x += dirX * speed * delta;
-            } else {
-                currState = State.idle;
+            if (lowestCeiling != Float.POSITIVE_INFINITY) {
+                newY = lowestCeiling - hitboxH;
+                velocityY = 0f;
             }
         }
-        else if (distance < 150f) {
-            currState = State.attack;
+
+        // floor collision (use a thin centered feet slice to avoid stair popping)
+        if (velocityY <= 0f) {
+            float highestFloor = Float.NEGATIVE_INFINITY;
+            float feetHeight = 2f;
+            float feetWidth = Math.min(10f, hitboxW);
+            float feetX = hitboxX + (hitboxW - feetWidth) / 2f;
+            Rectangle feet = new Rectangle(feetX, newY, feetWidth, feetHeight);
+            for (Rectangle rectangle : collisionRectangles) {
+                if (feet.overlaps(rectangle)) {
+                    float top = rectangle.y + rectangle.height;
+                    if (top > highestFloor)
+                        highestFloor = top;
+                }
+            }
+            if (highestFloor != Float.NEGATIVE_INFINITY) {
+                newY = highestFloor;
+                velocityY = 0f;
+                onGround = true;
+            }
         }
-        else {
-            currState = State.idle;
+
+        y = newY;
+        innerBoundaries.setPosition(hitboxX, y);
+
+        if (onGround) {
+            float footX = facingRight
+                    ? innerBoundaries.x + innerBoundaries.width + groundAhead
+                    : innerBoundaries.x - groundAhead;
+            float maxStepDown = 80f;
+            float maxStepUp = 30f;
+            boolean hasGroundAhead = false;
+            for (Rectangle rectangle : collisionRectangles) {
+                if (footX >= rectangle.x && footX <= rectangle.x + rectangle.width) {
+                    float top = rectangle.y + rectangle.height;
+                    if (top >= y - maxStepDown && top <= y + maxStepUp) {
+                        hasGroundAhead = true;
+                        break;
+                    }
+                }
+            }
+            if (!hasGroundAhead) return;
         }
 
+        Rectangle newPosition = new Rectangle(innerBoundaries);
+        newPosition.setPosition(hitboxX + stepX, y);
+
+        for (Rectangle rectangle : wallRectangles)
+            if (newPosition.overlaps(rectangle))
+                return;
 
 
+        x += stepX;
         innerBoundaries.setPosition(x + innerXOffset, y);
     }
-
-
-    // ground ahead?
-    private boolean groundAhead(Array<Rectangle> floor) {
-        float groundX;
-
-        if (facingRight) {
-            groundX = x + innerBoundaries.width + 5;
-        } else {
-            groundX = x - 25;
-        }
-
-        // idk if right check later
-        float groundY = y - 100;
-
-        ground.set(groundX, groundY, 20, 40);
-
-        for (Rectangle rect : floor) {
-            if (ground.overlaps(rect)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-
-
-
 
     public void dispose() {
         if (idle != null) idle.texture.dispose();
@@ -280,4 +257,5 @@ public class Enemy {
     public boolean isRemoved() {
         return removed;
     }
+
 }

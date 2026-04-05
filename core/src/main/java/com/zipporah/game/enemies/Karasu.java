@@ -8,7 +8,7 @@ public class Karasu extends Enemy {
 
         // Spawn Location
         super.x = 1750;
-        super.y = 250;
+        super.y = 50;
         super.size = 200;
 
         // HitBox
@@ -16,6 +16,6 @@ public class Karasu extends Enemy {
         super.innerXOffsetFacingLeft = 70f;
         super.innerXOffset = super.innerXOffsetFacingLeft;
 
-        innerBoundaries = new Rectangle((int) (x + innerXOffset), (int) y, 62, 140);
+        innerBoundaries = new Rectangle((int) (x + innerXOffset), (int) y, 62, 120);
     }
 }
