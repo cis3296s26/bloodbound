@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import com.zipporah.game.Enemy;
 import com.zipporah.game.screens.GameScreen;
 
-public class  Karasu extends Enemy{
+public class Karasu extends Enemy {
     TextureRegion currFrame;
 
     // add walk later search up bot logic
@@ -25,6 +25,10 @@ public class  Karasu extends Enemy{
     Texture deathSpriteSheet;
     Animation<TextureRegion> death;
 
+    Texture hurtSpriteSheet;
+    Animation<TextureRegion> hurt;
+    boolean isHurt = false;
+
     public float time = 0;
     public float x = 1750;
     public float y = 250;
@@ -39,7 +43,9 @@ public class  Karasu extends Enemy{
     boolean facingRight = true;
 
     // variables for bot states. i need idle, walk and attack
-    enum State {idle, walk, attack, death}
+    enum State {
+        idle, walk, attack, hurt, death
+    }
 
     State currState = State.idle;
     float stateTime = 0;
@@ -59,7 +65,7 @@ public class  Karasu extends Enemy{
     public Rectangle ground = new Rectangle();
     float groundAhead = 10f;
 
-    public void create(){
+    public void create() {
         removed = false;
         health = 100;
         // idle anim
@@ -102,13 +108,26 @@ public class  Karasu extends Enemy{
         }
         death = new Animation<>(0.2f, deathFrames);
 
+        hurtSpriteSheet = new Texture("Karasu_tengu/Hurt_u.png");
+        TextureRegion[][] hurtTmp = TextureRegion.split(hurtSpriteSheet, 128, 128);
+        TextureRegion[] hurtFrames = new TextureRegion[hurtTmp[0].length];
+        for (int i = 0; i < hurtTmp[0].length; i++) {
+            hurtFrames[i] = hurtTmp[0][i];
+        }
+        hurt = new Animation<>(0.1f, hurtFrames);
+
         // Create Karasu's Inner Boundaries
         innerBoundaries = new Rectangle((int) (x + innerXOffset), (int) y, 62, 180);
     }
 
     // follow player sprite
     public void botLogic(float playerX, float playerY, float delta) {
-        if(removed) return;
+        if (removed)
+            return;
+
+        if (isHurt) {
+            return;
+        }
 
         if (health <= 0) {
             if (currState != State.death) {
@@ -130,26 +149,25 @@ public class  Karasu extends Enemy{
         enemyBox.set(x + 10, y, width, height);
         onGround = false;
 
-
-//        // find if player is to the right or left
-//        float dx = playerX - x;
-//        float dy = playerY - y;
-//
-//        // distance take pythagorean bc player can be on a platform
-//        float distance = (float)Math.sqrt(dx * dx + dy * dy);
-//
-//        facingRight = dx > 0;
-//
-//        // walk down stairs (gravity for y coordinate
-//
-//        onGround = false;
-//
-//        velocityY += gravity * delta;
-//        y += velocityY * delta;
-//
-//        // hit box
-//        onGround = false;
-//        enemyBox.set(x + 10, y, width, height);
+        // // find if player is to the right or left
+        // float dx = playerX - x;
+        // float dy = playerY - y;
+        //
+        // // distance take pythagorean bc player can be on a platform
+        // float distance = (float)Math.sqrt(dx * dx + dy * dy);
+        //
+        // facingRight = dx > 0;
+        //
+        // // walk down stairs (gravity for y coordinate
+        //
+        // onGround = false;
+        //
+        // velocityY += gravity * delta;
+        // y += velocityY * delta;
+        //
+        // // hit box
+        // onGround = false;
+        // enemyBox.set(x + 10, y, width, height);
 
         for (Rectangle rect : GameScreen.collisionRectangles) {
             if (enemyBox.overlaps(rect)) {
@@ -174,28 +192,26 @@ public class  Karasu extends Enemy{
             } else {
                 currState = State.idle;
             }
-        }
-        else if (distance < 150f) {
+        } else if (distance < 150f) {
             currState = State.attack;
-        }
-        else {
+        } else {
             currState = State.idle;
         }
         innerBoundaries.setPosition(x + innerXOffset, y);
     }
 
-    public void draw(SpriteBatch batch, float time, float delta){
-        if (removed) return;
+    public void draw(SpriteBatch batch, float time, float delta) {
+        if (removed)
+            return;
         stateTime += delta;
         float drawX;
         float scaleX;
 
-
         // check if the logic makes sense
-        switch (currState){
-//            case idle:
-//                currFrame = idle.getKeyFrame(time, true);
-//                break;
+        switch (currState) {
+            // case idle:
+            // currFrame = idle.getKeyFrame(time, true);
+            // break;
 
             case walk:
                 currFrame = walk.getKeyFrame(stateTime, true);
@@ -205,10 +221,20 @@ public class  Karasu extends Enemy{
                 currFrame = attack.getKeyFrame(stateTime, true);
                 break;
 
+            case hurt:
+                currFrame = hurt.getKeyFrame(stateTime, false);
+                if (hurt.isAnimationFinished(stateTime)) {
+                    isHurt = false;
+                    currState = State.idle;
+                    stateTime = 0;
+                }
+                break;
+
             case death:
                 currFrame = death.getKeyFrame(stateTime, false);
                 updateEnemyDeath(delta);
-                if (removed) return;
+                if (removed)
+                    return;
                 break;
 
             default:
@@ -258,7 +284,6 @@ public class  Karasu extends Enemy{
         return false;
     }
 
-
     private void updateEnemyDeath(float delta) {
         currFrame = death.getKeyFrame(stateTime, false);
         if (death.isAnimationFinished(stateTime)) {
@@ -268,10 +293,16 @@ public class  Karasu extends Enemy{
     }
 
     public void dispose() {
-        if (idleSpriteSheet != null) idleSpriteSheet.dispose();
-        if (walkSpriteSheet != null) walkSpriteSheet.dispose();
-        if (attackSpriteSheet != null) attackSpriteSheet.dispose();
-        if (deathSpriteSheet != null) deathSpriteSheet.dispose();
+        if (idleSpriteSheet != null)
+            idleSpriteSheet.dispose();
+        if (walkSpriteSheet != null)
+            walkSpriteSheet.dispose();
+        if (attackSpriteSheet != null)
+            attackSpriteSheet.dispose();
+        if (deathSpriteSheet != null)
+            deathSpriteSheet.dispose();
+        if (hurtSpriteSheet != null)
+            hurtSpriteSheet.dispose();
     }
 
     public boolean isRemoved() {
@@ -281,5 +312,14 @@ public class  Karasu extends Enemy{
     // Change this once it is implemented in the shared enemy class
     public boolean isAttacking() {
         return currState == State.attack;
+    }
+
+    public void triggerHurt() {
+        if (removed || currState == State.death) {
+            return;
+        }
+        isHurt = true;
+        currState = State.hurt;
+        stateTime = 0;
     }
 }

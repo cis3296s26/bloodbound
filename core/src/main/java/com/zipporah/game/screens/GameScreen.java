@@ -409,6 +409,7 @@ public class GameScreen implements Screen {
                 Player.Projectile projectile = projectilesIterator.next();
                 if (projectile.box.overlaps(Karasu.innerBoundaries)) {
                     Karasu.health -= projectile.damage;
+                    karasu.triggerHurt();
                     projectilesIterator.remove();
                 }
             }
