@@ -2,15 +2,16 @@ package com.zipporah.game.enemies;
 import com.badlogic.gdx.math.Rectangle;
 import com.zipporah.game.Enemy;
 
-public class Karasu extends Enemy {
+public class Skeleton extends Enemy {
     @Override
     public void create() {
-        super.create("Karasu", new int[] {6, 8, 6, 6});
+        // 0 - idle, 1 - walk, 2 - attack, 3 - dead
+        super.create("Skeleton", new int[] {7, 7, 4, 5});
 
         // Spawn Location
-        super.x = 1750;
+        super.x = 1800;
         super.y = 50;
-        super.size = 180;
+        super.size = 200;
 
         // HitBox
         super.innerXOffsetFacingRight = 60f;

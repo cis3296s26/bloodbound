@@ -5,12 +5,12 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.zipporah.game.Enemy;
 import com.zipporah.game.Player;
 import com.zipporah.game.enemies.Karasu;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -22,15 +22,17 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
+
 import java.util.ArrayList;
 import java.util.Iterator;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.zipporah.game.enemies.Skeleton;
 
 public class GameScreen implements Screen {
 
     private final ScreenManager game;
     Player player = new Player();
+    ArrayList<Enemy> enemies = new ArrayList<>();
 
     TiledMap map;
     OrthogonalTiledMapRenderer renderer;
@@ -70,8 +72,6 @@ public class GameScreen implements Screen {
     Rectangle spriteBox = new Rectangle();
 
     private final ShapeRenderer shapeRenderer = new ShapeRenderer();
-
-    Karasu karasu;
 
     private void getCollisionObject(){
         MapLayer layer = map.getLayers().get("collision");
@@ -188,8 +188,11 @@ public class GameScreen implements Screen {
         player.attack_init();
         player.dead_init();
 
-        karasu = new Karasu();
-        karasu.create();
+        enemies.add(new Karasu());
+        enemies.add(new Skeleton());
+
+        for(Enemy enemy : enemies)
+            enemy.create();
 
     }
 
@@ -281,10 +284,6 @@ public class GameScreen implements Screen {
             player.y += player.velocityY * delta;
         }
 
-        // karasu grav
-        // karasu.velocityY += gravity * delta;
-        // karasu.y += karasu.velocityY * delta;
-
         // change players hitbox with the position due to gravity
         float changedHitbox = (player.sprit_size - hitbox_width) / 2f;
         spriteBox.set(player.x + changedHitbox, player.y, hitbox_width, hitbox_height);
@@ -358,18 +357,13 @@ public class GameScreen implements Screen {
             }
         }
 
-        // bot (for loop for bot floor collision
-        // Karasu floor collision (TEST)
-        // System.out.println("Karasu Y: " + karasu.y);
-
 
 
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
 
-
-        if (karasu != null && !karasu.isRemoved()) {
-            karasu.botLogic(player.x, player.y, delta);
-        }
+        for(Enemy enemy : enemies)
+            if(enemy != null && !enemy.isRemoved())
+                enemy.botLogic(player.x, player.y, delta);
 
 
         float mapWorldWidth  = 240 * 16 * scale;
@@ -392,13 +386,15 @@ public class GameScreen implements Screen {
         game.batch.setProjectionMatrix(cam.combined);
 
         // Handle Projectile and Enemy Collisions
-        if (karasu != null && !karasu.isRemoved()) {
-            Iterator<Player.Projectile> projectilesIterator = player.projectiles.iterator();
-            while (projectilesIterator.hasNext()) {
-                Player.Projectile projectile = projectilesIterator.next();
-                if (projectile.box.overlaps(Karasu.innerBoundaries)) {
-                    Karasu.health -= projectile.damage;
-                    projectilesIterator.remove();
+        for(Enemy enemy : enemies) {
+            if (enemy != null && !enemy.isRemoved()) {
+                Iterator<Player.Projectile> projectilesIterator = player.projectiles.iterator();
+                while (projectilesIterator.hasNext()) {
+                    Player.Projectile projectile = projectilesIterator.next();
+                    if (projectile.box.overlaps(enemy.innerBoundaries)) {
+                        enemy.health -= projectile.damage;
+                        projectilesIterator.remove();
+                    }
                 }
             }
         }
@@ -426,10 +422,9 @@ public class GameScreen implements Screen {
         game.batch.draw(chest2Open ? openChestTexture : closeChestTexture, chest2Position.x, chest2Position.y, chestWidth, chestHeight);
 
 
-
-        if (karasu != null && !karasu.isRemoved()) {
-            karasu.draw(game.batch, karasu.time, delta);
-        }
+        for(Enemy enemy : enemies)
+            if(enemy != null && !enemy.isRemoved())
+                enemy.draw(game.batch, enemy.time, delta);
 
         float drawX;
         float scaleX;
@@ -470,7 +465,6 @@ public class GameScreen implements Screen {
         game.batch.end();
 
         // Test Projectile and Karasu Hitboxes with these
-// TEST
 //        shapeRenderer.setProjectionMatrix(cam.combined);
 //        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 //        for (Player.Projectile projectile : player.projectiles) {
@@ -479,7 +473,7 @@ public class GameScreen implements Screen {
 //        // testing karasu
 //        shapeRenderer.rect(karasu.ground.x, karasu.ground.y, 10, 10);
 //
-//        shapeRenderer.rect(Karasu.innerBoundaries.x, Karasu.innerBoundaries.y, Karasu.innerBoundaries.width, Karasu.innerBoundaries.height);
+//        shapeRenderer.rect(karasu.innerBoundaries.x, karasu.innerBoundaries.y, karasu.innerBoundaries.width, karasu.innerBoundaries.height);
 //        shapeRenderer.end();
 
     }
