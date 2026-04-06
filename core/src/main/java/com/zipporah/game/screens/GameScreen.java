@@ -40,7 +40,6 @@ public class GameScreen implements Screen {
     ExtendViewport viewport;
     FitViewport viewportHUD;
 
-
     // array for all colossion rectangles from tiled map
     public static Array<Rectangle> collisionRectangles = new Array<>();
     // array for all wall collisions
@@ -50,6 +49,8 @@ public class GameScreen implements Screen {
     public static Array<Rectangle> ladderRectangles = new Array<>();
     // array for spikes
     public static Array<Rectangle> spikeRectangles = new Array<>();
+    // array for enemys
+    public static Array<Rectangle> enemyRectangles = new Array<>();
 
     // chests
     Texture openChestTexture;
@@ -73,19 +74,20 @@ public class GameScreen implements Screen {
 
     private final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
-    private void getCollisionObject(){
+    Karasu karasu;
+
+    private void getCollisionObject() {
         MapLayer layer = map.getLayers().get("collision");
-        for (MapObject obj : layer.getObjects()){
-            if(obj instanceof RectangleMapObject){
+        for (MapObject obj : layer.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
                 Rectangle r = ((RectangleMapObject) obj).getRectangle();
 
                 // scale cords so they fit with the specific map dimensions
                 collisionRectangles.add(new Rectangle(
-                        r.x     * scale,
-                        r.y     * scale,
-                        r.width  * scale,
-                        r.height * scale
-                ));
+                        r.x * scale,
+                        r.y * scale,
+                        r.width * scale,
+                        r.height * scale));
             }
         }
     }
@@ -96,11 +98,10 @@ public class GameScreen implements Screen {
             if (obj instanceof RectangleMapObject) {
                 Rectangle r = ((RectangleMapObject) obj).getRectangle();
                 wallRectangles.add(new Rectangle(
-                        r.x     * scale,
-                        r.y     * scale,
-                        r.width  * scale,
-                        r.height * scale
-                ));
+                        r.x * scale,
+                        r.y * scale,
+                        r.width * scale,
+                        r.height * scale));
             }
         }
     }
@@ -111,11 +112,10 @@ public class GameScreen implements Screen {
             if (obj instanceof RectangleMapObject) {
                 Rectangle r = ((RectangleMapObject) obj).getRectangle();
                 ladderRectangles.add(new Rectangle(
-                        r.x     * scale,
-                        r.y     * scale,
-                        r.width  * scale,
-                        r.height * scale
-                ));
+                        r.x * scale,
+                        r.y * scale,
+                        r.width * scale,
+                        r.height * scale));
             }
         }
     }
@@ -126,31 +126,30 @@ public class GameScreen implements Screen {
             if (obj instanceof RectangleMapObject) {
                 Rectangle r = ((RectangleMapObject) obj).getRectangle();
                 spikeRectangles.add(new Rectangle(
-                        r.x     * scale,
-                        r.y     * scale,
-                        r.width  * scale,
-                        r.height * scale
-                ));
+                        r.x * scale,
+                        r.y * scale,
+                        r.width * scale,
+                        r.height * scale));
             }
         }
     }
 
     private void getChestObjects() {
         MapLayer layer1 = map.getLayers().get("chest1");
-            for (MapObject obj : layer1.getObjects()) {
-                if (obj instanceof RectangleMapObject) {
-                    Rectangle r = ((RectangleMapObject) obj).getRectangle();
-                    chest1Position.set(r.x * scale, r.y * scale);
-                }
+        for (MapObject obj : layer1.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                chest1Position.set(r.x * scale, r.y * scale);
             }
+        }
 
         MapLayer layer2 = map.getLayers().get("chest2");
-            for (MapObject obj : layer2.getObjects()) {
-                if (obj instanceof RectangleMapObject) {
-                    Rectangle r = ((RectangleMapObject) obj).getRectangle();
-                    chest2Position.set(r.x * scale, r.y * scale);
-                }
+        for (MapObject obj : layer2.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                chest2Position.set(r.x * scale, r.y * scale);
             }
+        }
     }
 
     public GameScreen(ScreenManager game) {
@@ -186,21 +185,26 @@ public class GameScreen implements Screen {
         player.jump_init();
         player.sprint_init();
         player.attack_init();
+        player.hurt_init();
         player.dead_init();
 
-        enemies.add(new Karasu());
+        karasu = new Karasu();
+        enemies.add(karasu);
         enemies.add(new Skeleton());
 
-        for(Enemy enemy : enemies)
+        for (Enemy enemy : enemies) {
             enemy.create();
-
+        }
     }
 
     @Override
     public void resize(int width, int height) {
-        // If the window is minimized on a desktop (LWJGL3) platform, width and height are 0, which causes problems.
-        // In that case, we don't resize anything, and wait for the window to be a normal size before updating.
-        if(width <= 0 || height <= 0) return;
+        // If the window is minimized on a desktop (LWJGL3) platform, width and height
+        // are 0, which causes problems.
+        // In that case, we don't resize anything, and wait for the window to be a
+        // normal size before updating.
+        if (width <= 0 || height <= 0)
+            return;
 
         // Resize your application here. The parameters represent the new window size.
         viewport.update(width, height, true);
@@ -230,9 +234,9 @@ public class GameScreen implements Screen {
                 player.currFrame = player.walk.getKeyFrame(player.time, true);
             }
             // get off ladder by pressing left or right
-            if (Gdx.input.isKeyPressed(Input.Keys.A)    ||
-                    Gdx.input.isKeyPressed(Input.Keys.LEFT)  ||
-                    Gdx.input.isKeyPressed(Input.Keys.D)     ||
+            if (Gdx.input.isKeyPressed(Input.Keys.A) ||
+                    Gdx.input.isKeyPressed(Input.Keys.LEFT) ||
+                    Gdx.input.isKeyPressed(Input.Keys.D) ||
                     Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 onLadder = false;
             }
@@ -265,14 +269,13 @@ public class GameScreen implements Screen {
         game.timer.update();
 
         // if the player is daed go to the homescreen
-        if(player.isDead){
+        if (player.isDead) {
             boolean animationDone = player.updateSpriteDead(delta);
             if (animationDone) {
                 game.setScreen(new HomeScreen(game));
             }
             return;
         }
-
 
         if (onLadder) {
             // on ladder, disable gravity and lock x
@@ -315,7 +318,7 @@ public class GameScreen implements Screen {
 
             if (spriteBox.overlaps(rectangle)) {
                 float playerCenterX = spriteBox.x + spriteBox.width / 2f;
-                float rectCenterX   = rectangle.x + rectangle.width / 2f;
+                float rectCenterX = rectangle.x + rectangle.width / 2f;
 
                 if (playerCenterX < rectCenterX) {
                     player.x = rectangle.x - hitbox_width - changedHitbox;
@@ -336,7 +339,7 @@ public class GameScreen implements Screen {
                 // get off ladder if feet at top
                 if (onLadder && spriteBox.y >= ladder.y + ladder.height - hitbox_height) {
                     onLadder = false;
-                    player.jumping  = false;
+                    player.jumping = false;
                 }
                 break;
             }
@@ -347,9 +350,27 @@ public class GameScreen implements Screen {
             onLadder = false;
         }
 
+        // enemy collision detection
+        if (!player.isDead && karasu != null && !karasu.isRemoved()) {
+            if (karasu.isAttacking() && spriteBox.overlaps(karasu.innerBoundaries) && !player.isHurt
+                    && player.hurtCooldown <= 0f) {
+                player.isHurt = true;
+                player.hurtCooldown = 1.0f;
+
+                float knockback = 40f;
+                if (player.x < karasu.x) {
+                    player.x -= knockback;
+                } else {
+                    player.x += knockback;
+                }
+
+                player.velocityY = 250f;
+            }
+        }
+
         // spike collision detection, set death to true
-        if(!player.isDead){
-            for(int i = 0; i < spikeRectangles.size; i++){
+        if (!player.isDead) {
+            for (int i = 0; i < spikeRectangles.size; i++) {
                 if (spriteBox.overlaps(spikeRectangles.get(i))) {
                     player.isDead = true;
                     player.velocityY = 0;
@@ -357,26 +378,23 @@ public class GameScreen implements Screen {
             }
         }
 
-
-
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
 
-        for(Enemy enemy : enemies)
-            if(enemy != null && !enemy.isRemoved())
+        for (Enemy enemy : enemies) {
+            if (enemy != null && !enemy.isRemoved()) {
                 enemy.botLogic(player.x, player.y, delta);
+            }
+        }
 
-
-        float mapWorldWidth  = 240 * 16 * scale;
-        float mapWorldHeight = 13  * 16 * scale;
-        float half_of_width = viewport.getWorldWidth()  / 2f;
+        float mapWorldWidth = 240 * 16 * scale;
+        float mapWorldHeight = 13 * 16 * scale;
+        float half_of_width = viewport.getWorldWidth() / 2f;
         float half_of_height = viewport.getWorldHeight() / 2f;
-
 
         float targetX = player.x + player.sprit_size / 2f;
         float targetY = player.y + player.sprit_size / 2f;
 
-
-        targetX = Math.max(half_of_width, Math.min(targetX, mapWorldWidth  - half_of_width));
+        targetX = Math.max(half_of_width, Math.min(targetX, mapWorldWidth - half_of_width));
         targetY = Math.max(half_of_height, Math.min(targetY, mapWorldHeight - half_of_height));
 
         cam.position.x += (targetX - cam.position.x) * 0.1f;
@@ -386,20 +404,20 @@ public class GameScreen implements Screen {
         game.batch.setProjectionMatrix(cam.combined);
 
         // Handle Projectile and Enemy Collisions
-        for(Enemy enemy : enemies) {
+        for (Enemy enemy : enemies) {
             if (enemy != null && !enemy.isRemoved()) {
                 Iterator<Player.Projectile> projectilesIterator = player.projectiles.iterator();
                 while (projectilesIterator.hasNext()) {
                     Player.Projectile projectile = projectilesIterator.next();
                     if (projectile.box.overlaps(enemy.innerBoundaries)) {
                         enemy.health -= projectile.damage;
+                        enemy.triggerHurt();
                         projectilesIterator.remove();
                     }
                 }
             }
         }
     }
-
 
     private void draw(float delta) {
         ScreenUtils.clear(Color.BLACK);
@@ -418,38 +436,43 @@ public class GameScreen implements Screen {
         // draw chests
         float chestWidth = 16 * scale;
         float chestHeight = 32 * scale;
-        game.batch.draw(chest1Open ? openChestTexture : closeChestTexture, chest1Position.x, chest1Position.y, chestWidth, chestHeight);
-        game.batch.draw(chest2Open ? openChestTexture : closeChestTexture, chest2Position.x, chest2Position.y, chestWidth, chestHeight);
+        game.batch.draw(chest1Open ? openChestTexture : closeChestTexture, chest1Position.x, chest1Position.y,
+                chestWidth, chestHeight);
+        game.batch.draw(chest2Open ? openChestTexture : closeChestTexture, chest2Position.x, chest2Position.y,
+                chestWidth, chestHeight);
 
-
-        for(Enemy enemy : enemies)
-            if(enemy != null && !enemy.isRemoved())
+        for (Enemy enemy : enemies) {
+            if (enemy != null && !enemy.isRemoved()) {
                 enemy.draw(game.batch, enemy.time, delta);
+            }
+        }
 
         float drawX;
         float scaleX;
 
-        if(player.facing_right) {
+        if (player.facing_right) {
             drawX = player.x;
             scaleX = 1;
-        } else{
+        } else {
             drawX = player.x + player.sprit_size;
             scaleX = -1;
         }
 
-        if(player.attacking) player.updateSpriteAttack(delta);
+        if (player.attacking)
+            player.updateSpriteAttack(delta);
 
         Iterator<Player.Projectile> projectilesIterator = player.projectiles.iterator();
         while (projectilesIterator.hasNext()) {
             Player.Projectile projectile = projectilesIterator.next();
             projectile.update(delta);
-            if(projectile.lifetime <= 0) projectilesIterator.remove();
+            if (projectile.lifetime <= 0)
+                projectilesIterator.remove();
             else {
-                TextureRegion projectileFrame = projectile.projectileAnimation.getKeyFrame(projectile.animationDuration, true);
+                TextureRegion projectileFrame = projectile.projectileAnimation.getKeyFrame(projectile.animationDuration,
+                        true);
                 game.batch.draw(projectileFrame, projectile.x, projectile.y, 0, 0, 64, 48, projectile.scaleX, 1, 0);
             }
         }
-
 
         game.batch.draw(player.currFrame, drawX, player.y, 0, 0, player.sprit_size, player.sprit_size, scaleX, 1, 0);
 
@@ -461,26 +484,19 @@ public class GameScreen implements Screen {
         game.batch.begin();
         game.timer.draw(game.batch);
         game.batch.draw(player.hpForeground1, 10, 700);
-        //game.batch.draw(player.hpBackground1, 20, 20);
+        // game.batch.draw(player.hpBackground1, 20, 20);
         game.batch.end();
 
         // Test Projectile and Karasu Hitboxes with these
-//        shapeRenderer.setProjectionMatrix(cam.combined);
-//        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-//        for (Player.Projectile projectile : player.projectiles) {
-//            shapeRenderer.rect(projectile.box.x, projectile.box.y, projectile.box.width, projectile.box.height);
-//        }
-//        // testing karasu
-//        shapeRenderer.rect(karasu.ground.x, karasu.ground.y, 10, 10);
-//
-//        shapeRenderer.rect(karasu.innerBoundaries.x, karasu.innerBoundaries.y, karasu.innerBoundaries.width, karasu.innerBoundaries.height);
-//        shapeRenderer.end();
+        // shapeRenderer.setProjectionMatrix(cam.combined);
+        // shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        // for (Player.Projectile projectile : player.projectiles) {
+        //     shapeRenderer.rect(projectile.box.x, projectile.box.y, projectile.box.width,
+        //             projectile.box.height);
+        // }
+        // shapeRenderer.end();
 
     }
-
-
-
-
 
     @Override
     public void pause() {
