@@ -299,6 +299,26 @@ public class GameScreen implements Screen {
                     haveChest2key = true;
                 }
             }
+
+            // door interaction
+            // first door needs first key
+            if (!firstDoorOpen && haveChest1key){
+                float distToDoor1 = Vector2.dst(player.x, player.y, firstDoorPosition.x, firstDoorPosition.y);
+                if (distToDoor1 < doorInteractionRange) {
+                    firstDoorOpen = true;
+                    // door can be walked through
+                    wallRectangles.removeValue(firstDoorRect, true);
+                }
+            }
+
+            if (!lastDoorOpen && haveChest2key){
+                float distToDoor2 = Vector2.dst(player.x, player.y, lastDoorPosition.x, lastDoorPosition.y);
+                if (distToDoor2 < doorInteractionRange) {
+                    lastDoorOpen = true;
+                    // door can be walked through
+                    wallRectangles.removeValue(lastDoorRect, true);
+                }
+            }
         }
     }
 
@@ -480,7 +500,10 @@ public class GameScreen implements Screen {
                 chestWidth, chestHeight);
 
         // draw doors
-
+        float doorWidth = 16 * scale;
+        float doorHeight = 32 * scale;
+        game.batch.draw(firstDoorOpen ? openDoorTexture : closeDoorTexture, firstDoorPosition.x, firstDoorPosition.y, doorWidth, doorHeight);
+        game.batch.draw(lastDoorOpen  ? openDoorTexture : closeDoorTexture, lastDoorPosition.x,  lastDoorPosition.y,  doorWidth, doorHeight);
 
         for (Enemy enemy : enemies) {
             if (enemy != null && !enemy.isRemoved()) {
