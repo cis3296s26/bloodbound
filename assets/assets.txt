@@ -4,6 +4,7 @@ Buttons/OptionsButton.png
 Buttons/QuitButton.png
 Buttons/RankingsButton.png
 Buttons/StartButton.png
+Buttons/TutorialButton.png
 Enemies/Karasu/Attack_1.png
 Enemies/Karasu/Attack_2.png
 Enemies/Karasu/Attack_3.png

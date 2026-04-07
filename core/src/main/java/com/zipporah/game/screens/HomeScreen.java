@@ -43,7 +43,7 @@ public class HomeScreen implements Screen {
     pixelLogo = new Texture("Logos/PixelLogo.png");
     startButton = new Texture("Buttons/StartButton.png");
     rankingsButton = new Texture("Buttons/RankingsButton.png");
-    controlsButton = new Texture("Buttons/ControlsButton.png");
+    controlsButton = new Texture("Buttons/TutorialButton.png");
     optionsButton = new Texture("Buttons/OptionsButton.png");
     quitButton = new Texture("Buttons/QuitButton.png");
 
