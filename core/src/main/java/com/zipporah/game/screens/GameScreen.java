@@ -52,6 +52,9 @@ public class GameScreen implements Screen {
     // array for enemys
     public static Array<Rectangle> enemyRectangles = new Array<>();
 
+    Texture keyTexture;
+    int keyCount = 0;
+
     // chests
     Texture openChestTexture;
     Texture closeChestTexture;
@@ -212,6 +215,7 @@ public class GameScreen implements Screen {
         openChestTexture = new Texture(Gdx.files.internal("Maps/chest_open.png"));
         closeDoorTexture = new Texture(Gdx.files.internal("Maps/door_closed.png"));
         openDoorTexture = new Texture(Gdx.files.internal("Maps/door_open.png"));
+        keyTexture = new Texture(Gdx.files.internal("Maps/key.png"));
 
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
         cam.position.set(640, 360, 0);
@@ -288,6 +292,7 @@ public class GameScreen implements Screen {
                 if (dist1 < chestInteractionRange) {
                     chest1Open = true;
                     haveChest1key = true;
+                    keyCount++;
                 }
             }
 
@@ -297,6 +302,7 @@ public class GameScreen implements Screen {
                 if (dist2 < chestInteractionRange) {
                     chest2Open = true;
                     haveChest2key = true;
+                    keyCount++;
                 }
             }
 
@@ -308,6 +314,7 @@ public class GameScreen implements Screen {
                     firstDoorOpen = true;
                     // door can be walked through
                     wallRectangles.removeValue(firstDoorRect, true);
+                    keyCount--;
                 }
             }
 
@@ -317,6 +324,7 @@ public class GameScreen implements Screen {
                     lastDoorOpen = true;
                     // door can be walked through
                     wallRectangles.removeValue(lastDoorRect, true);
+                    keyCount--;
                 }
             }
         }
@@ -549,6 +557,8 @@ public class GameScreen implements Screen {
         game.timer.draw(game.batch);
         game.batch.draw(player.hpForeground1, 10, 700);
         // game.batch.draw(player.hpBackground1, 20, 20);
+        game.batch.draw(keyTexture, 882, 672, 64f, 64f);
+        game.timer.font.draw(game.batch, String.format("%dx", keyCount), 946, 700);
         game.batch.end();
 
         // Test Projectile and Karasu Hitboxes with these

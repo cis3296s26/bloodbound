@@ -31,6 +31,7 @@ Maps/chest_closed.png
 Maps/chest_open.png
 Maps/door_closed.png
 Maps/door_open.png
+Maps/key.png
 Player/Attack_1.png
 Player/Attack_2.png
 Player/Attack_3.png
