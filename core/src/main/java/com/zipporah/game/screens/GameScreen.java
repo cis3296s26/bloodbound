@@ -220,6 +220,12 @@ public class GameScreen implements Screen {
         music1.setVolume(0.30f);
         music1.play();
 
+        collisionRectangles.clear();
+        wallRectangles.clear();
+        ladderRectangles.clear();
+        spikeRectangles.clear();
+        enemyRectangles.clear();
+
         getCollisionObject();
         getWallObjects();
         getLadderObjects();
@@ -274,6 +280,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
+        delta = Math.min(delta, 0.05f); // attempt to bug fix for windows player falling through map
         input(delta);
         logic(delta);
         draw(delta);
