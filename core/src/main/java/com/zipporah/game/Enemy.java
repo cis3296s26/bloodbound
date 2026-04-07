@@ -1,5 +1,6 @@
 package com.zipporah.game;
 import com.badlogic.gdx.Gdx;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -12,13 +13,12 @@ import com.badlogic.gdx.audio.Sound;
 
 public class Enemy {
 
-    TextureRegion currFrame;
+    protected TextureRegion currFrame;
     public float time = 0;
     Sound skeletonDead;
 
 
-    // Animations
-    private static class AnimationBundle {
+    protected static class AnimationBundle {
         private final Texture texture;
         private final Animation<TextureRegion> animation;
 
@@ -28,52 +28,52 @@ public class Enemy {
         }
     }
 
-    AnimationBundle walk, idle, attack, death;
-    String path;
-    int[] frameCount;   // 0 - idle, 1 - walk, 2 - attack, 3 - dead
+    protected AnimationBundle walk;
+    protected AnimationBundle idle;
+    protected AnimationBundle attack;
+    protected AnimationBundle death;
+    protected AnimationBundle hurt;
+    protected String path;
+    protected int[] frameCount;
     public int size = 128;
 
-    // States
-    enum State {idle, walk, attack, death}
-    State currState = State.idle;
-    float stateTime = 0;
+    protected enum State {
+        idle, walk, attack, hurt, death
+    }
 
-    // Inner Boundaries / HitBox
+    protected State currState = State.idle;
+    protected float stateTime = 0;
+
     public Rectangle innerBoundaries;
     public float innerXOffset;
     public float innerXOffsetFacingRight;
     public float innerXOffsetFacingLeft;
 
-    // Flipping
-    boolean facingRight = true;
+    protected boolean facingRight = true;
 
-    // Gravity Simulation
     public float velocityY = 0f;
     public float gravity = -1500f;
     public boolean onGround = false;
 
-    // Current Position
     public float x;
     public float y;
 
-    // Characteristics
-    float speed = 150.0f;
+    protected float speed = 150.0f;
     public float health = 100;
 
-    // Disposal
-    boolean removed = false;
+    protected boolean removed = false;
+    protected boolean hurtActive = false;
 
-    // check for ground
     public Rectangle ground = new Rectangle();
-    float groundAhead = 10f;
+    protected float groundAhead = 10f;
 
-    // Load Animations
-    private AnimationBundle loadAnimation(String pictureName, int frames, float frameDuration) {
+    protected AnimationBundle loadAnimation(String pictureName, int frames, float frameDuration) {
         Texture spriteSheet = new Texture("Enemies/" + path + "/" + pictureName + ".png");
         TextureRegion[][] split = TextureRegion.split(spriteSheet, 128, 128);
         TextureRegion[] splitFrames = new TextureRegion[frames];
-        for (int i = 0; i < frames; i++)
+        for (int i = 0; i < frames; i++) {
             splitFrames[i] = split[0][i];
+        }
         Animation<TextureRegion> animation = new Animation<>(frameDuration, splitFrames);
         return new AnimationBundle(spriteSheet, animation);
     }
@@ -81,14 +81,14 @@ public class Enemy {
     public void create() {
     }
 
-    public void create(String path, int[] frameCount){
+    public void create(String path, int[] frameCount) {
         removed = false;
+        hurtActive = false;
         health = 100;
         this.path = path;
-        this.frameCount = frameCount; // 0 - idle, 1 - walk, 2 - attack, 3 - dead
+        this.frameCount = frameCount;
         innerXOffset = innerXOffsetFacingLeft;
 
-        // Load Animations
         idle = loadAnimation("Idle", frameCount[0], 0.1f);
         walk = loadAnimation("Walk", frameCount[1], 0.1f);
         attack = loadAnimation("Attack_1", frameCount[2], 0.1f);
@@ -97,29 +97,46 @@ public class Enemy {
         skeletonDead = Gdx.audio.newSound(Gdx.files.internal("Sounds/Enemy/death_3_alex.wav"));
 
 
+        if (frameCount.length > 4 && frameCount[4] > 0) {
+            hurt = loadAnimation("Hurt", frameCount[4], 0.1f);
+        }
     }
 
-    public void draw(SpriteBatch batch, float time, float delta){
-        if (removed) return;
+    public void draw(SpriteBatch batch, float time, float delta) {
+        if (removed) {
+            return;
+        }
+
         stateTime += delta;
         float drawX;
         float scaleX;
 
-        switch (currState){
+        switch (currState) {
             case walk:
                 currFrame = walk.animation.getKeyFrame(stateTime, true);
                 break;
-
             case attack:
                 currFrame = attack.animation.getKeyFrame(stateTime, true);
                 break;
-
+            case hurt:
+                if (hurt != null) {
+                    currFrame = hurt.animation.getKeyFrame(stateTime, false);
+                    if (hurt.animation.isAnimationFinished(stateTime)) {
+                        hurtActive = false;
+                        currState = State.idle;
+                        stateTime = 0;
+                    }
+                } else {
+                    currFrame = idle.animation.getKeyFrame(stateTime, true);
+                }
+                break;
             case death:
                 currFrame = death.animation.getKeyFrame(stateTime, false);
-                updateEnemyDeath(delta);
-                if (removed) return;
+                updateEnemyDeath();
+                if (removed) {
+                    return;
+                }
                 break;
-
             default:
                 currFrame = idle.animation.getKeyFrame(stateTime, true);
         }
@@ -135,12 +152,10 @@ public class Enemy {
         }
 
         batch.draw(currFrame, drawX, y, 0, 0, size, size, scaleX, 1, 0);
-
-        // Move Inner Boundaries
         innerBoundaries.setPosition(x + innerXOffset, y);
     }
 
-    private void updateEnemyDeath(float delta) {
+    private void updateEnemyDeath() {
         currFrame = death.animation.getKeyFrame(stateTime, false);
         if (death.animation.isAnimationFinished(stateTime)) {
             removed = true;
@@ -148,9 +163,14 @@ public class Enemy {
         }
     }
 
-    // follow player sprite
     public void botLogic(float playerX, float playerY, float delta) {
-        if(removed) return;
+        if (removed) {
+            return;
+        }
+
+        if (hurtActive) {
+            return;
+        }
 
         if (health <= 0) {
             if (currState != State.death) {
@@ -161,12 +181,9 @@ public class Enemy {
             return;
         }
 
-        // Set direction
         float dx = playerX - x;
         float dy = playerY - y;
-        float distance = (float) Math.sqrt(dx * dx + dy * dy);
 
-        // Don't move and switch animation if near the player or can't move ahead
         float attackRange = 80f;
         float attackVerticalRange = 80f;
         float stopRange = 80f;
@@ -176,20 +193,26 @@ public class Enemy {
             if (Math.abs(dx) <= attackRange && Math.abs(dy) <= attackVerticalRange) {
                 facingRight = dx > 0;
                 innerXOffset = facingRight ? innerXOffsetFacingRight : innerXOffsetFacingLeft;
-                if (currState != State.attack) stateTime = 0;
+                if (currState != State.attack) {
+                    stateTime = 0;
+                }
                 currState = State.attack;
-            } else currState = State.idle;
+            } else {
+                currState = State.idle;
+            }
             return;
         }
 
-        if (Math.abs(dx) > faceDeadzone) facingRight = dx > 0;
+        if (Math.abs(dx) > faceDeadzone) {
+            facingRight = dx > 0;
+        }
+
         float dirX = facingRight ? 1f : -1f;
         innerXOffset = facingRight ? innerXOffsetFacingRight : innerXOffsetFacingLeft;
 
         move(dirX, delta);
     }
 
-    /// !!! AI GENERATED LOGIC <- USE TEMPORARY AND REPLACE OR ACKNOWLEDGE IN REPORT / ASK PROFESSOR !!!
     private void move(float dirX, float delta) {
         currState = State.walk;
         float stepX = speed * delta * dirX;
@@ -201,7 +224,6 @@ public class Enemy {
         velocityY += gravity * delta;
         float newY = y + velocityY * delta;
 
-        // ceiling collision (use a thin head slice)
         if (velocityY > 0f) {
             float lowestCeiling = Float.POSITIVE_INFINITY;
             float headHeight = 2f;
@@ -211,8 +233,9 @@ public class Enemy {
             for (Rectangle rectangle : collisionRectangles) {
                 if (head.overlaps(rectangle)) {
                     float rectBottom = rectangle.y;
-                    if (rectBottom < lowestCeiling)
+                    if (rectBottom < lowestCeiling) {
                         lowestCeiling = rectBottom;
+                    }
                 }
             }
             if (lowestCeiling != Float.POSITIVE_INFINITY) {
@@ -221,7 +244,6 @@ public class Enemy {
             }
         }
 
-        // floor collision (use a thin centered feet slice to avoid stair popping)
         if (velocityY <= 0f) {
             float highestFloor = Float.NEGATIVE_INFINITY;
             float feetHeight = 2f;
@@ -231,8 +253,9 @@ public class Enemy {
             for (Rectangle rectangle : collisionRectangles) {
                 if (feet.overlaps(rectangle)) {
                     float top = rectangle.y + rectangle.height;
-                    if (top > highestFloor)
+                    if (top > highestFloor) {
                         highestFloor = top;
+                    }
                 }
             }
             if (highestFloor != Float.NEGATIVE_INFINITY) {
@@ -270,23 +293,48 @@ public class Enemy {
         Rectangle newPosition = new Rectangle(innerBoundaries);
         newPosition.setPosition(hitboxX + stepX, y);
 
-        for (Rectangle rectangle : wallRectangles)
-            if (newPosition.overlaps(rectangle))
+        for (Rectangle rectangle : wallRectangles) {
+            if (newPosition.overlaps(rectangle)) {
                 return;
+            }
+        }
 
         x += stepX;
         innerBoundaries.setPosition(x + innerXOffset, y);
     }
 
+    public void triggerHurt() {
+        if (hurt == null || removed || currState == State.death) {
+            return;
+        }
+        hurtActive = true;
+        currState = State.hurt;
+        stateTime = 0;
+    }
+
     public void dispose() {
-        if (idle != null) idle.texture.dispose();
-        if (walk != null) walk.texture.dispose();
-        if (attack != null) attack.texture.dispose();
-        if (death != null) death.texture.dispose();
+        if (idle != null) {
+            idle.texture.dispose();
+        }
+        if (walk != null) {
+            walk.texture.dispose();
+        }
+        if (attack != null) {
+            attack.texture.dispose();
+        }
+        if (death != null) {
+            death.texture.dispose();
+        }
+        if (hurt != null) {
+            hurt.texture.dispose();
+        }
     }
 
     public boolean isRemoved() {
         return removed;
     }
 
+    public boolean isAttacking() {
+        return currState == State.attack;
+    }
 }

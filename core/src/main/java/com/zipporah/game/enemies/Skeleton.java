@@ -6,7 +6,7 @@ public class Skeleton extends Enemy {
     @Override
     public void create() {
         // 0 - idle, 1 - walk, 2 - attack, 3 - dead
-        super.create("Skeleton", new int[] {7, 7, 4, 5});
+        super.create("Skeleton", new int[] {7, 7, 4, 5, 3});
 
         // Spawn Location
         super.x = 1800;

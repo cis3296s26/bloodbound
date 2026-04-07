@@ -32,7 +32,7 @@ import com.zipporah.game.enemies.Skeleton;
 
 public class GameScreen implements Screen {
 
-    private final ScreenManager game;
+    protected final ScreenManager game;
     Player player = new Player();
     ArrayList<Enemy> enemies = new ArrayList<>();
 
@@ -41,7 +41,6 @@ public class GameScreen implements Screen {
     float scale = 4f;
     ExtendViewport viewport;
     FitViewport viewportHUD;
-
 
     // array for all colossion rectangles from tiled map
     public static Array<Rectangle> collisionRectangles = new Array<>();
@@ -52,6 +51,11 @@ public class GameScreen implements Screen {
     public static Array<Rectangle> ladderRectangles = new Array<>();
     // array for spikes
     public static Array<Rectangle> spikeRectangles = new Array<>();
+    // array for enemys
+    public static Array<Rectangle> enemyRectangles = new Array<>();
+
+    Texture keyTexture;
+    int keyCount = 0;
 
     // chests
     Texture openChestTexture;
@@ -63,6 +67,18 @@ public class GameScreen implements Screen {
     boolean haveChest1key = false;
     boolean haveChest2key = false;
     float chestInteractionRange = 150f;
+
+    // doors
+    Texture openDoorTexture;
+    Texture closeDoorTexture;
+    Vector2 firstDoorPosition = new Vector2();
+    Vector2 lastDoorPosition = new Vector2();
+    boolean firstDoorOpen = false;
+    boolean lastDoorOpen = false;
+    Rectangle firstDoorRect = new Rectangle();
+    Rectangle lastDoorRect = new Rectangle();
+    float doorInteractionRange = 150f;
+    float doorOpenTime = 0f;
 
     // physics
     float gravity = -1500f;
@@ -81,19 +97,20 @@ public class GameScreen implements Screen {
 
     private final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
-    private void getCollisionObject(){
+    Karasu karasu;
+
+    private void getCollisionObject() {
         MapLayer layer = map.getLayers().get("collision");
-        for (MapObject obj : layer.getObjects()){
-            if(obj instanceof RectangleMapObject){
+        for (MapObject obj : layer.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
                 Rectangle r = ((RectangleMapObject) obj).getRectangle();
 
                 // scale cords so they fit with the specific map dimensions
                 collisionRectangles.add(new Rectangle(
-                        r.x     * scale,
-                        r.y     * scale,
-                        r.width  * scale,
-                        r.height * scale
-                ));
+                        r.x * scale,
+                        r.y * scale,
+                        r.width * scale,
+                        r.height * scale));
             }
         }
     }
@@ -104,11 +121,10 @@ public class GameScreen implements Screen {
             if (obj instanceof RectangleMapObject) {
                 Rectangle r = ((RectangleMapObject) obj).getRectangle();
                 wallRectangles.add(new Rectangle(
-                        r.x     * scale,
-                        r.y     * scale,
-                        r.width  * scale,
-                        r.height * scale
-                ));
+                        r.x * scale,
+                        r.y * scale,
+                        r.width * scale,
+                        r.height * scale));
             }
         }
     }
@@ -119,11 +135,10 @@ public class GameScreen implements Screen {
             if (obj instanceof RectangleMapObject) {
                 Rectangle r = ((RectangleMapObject) obj).getRectangle();
                 ladderRectangles.add(new Rectangle(
-                        r.x     * scale,
-                        r.y     * scale,
-                        r.width  * scale,
-                        r.height * scale
-                ));
+                        r.x * scale,
+                        r.y * scale,
+                        r.width * scale,
+                        r.height * scale));
             }
         }
     }
@@ -134,31 +149,54 @@ public class GameScreen implements Screen {
             if (obj instanceof RectangleMapObject) {
                 Rectangle r = ((RectangleMapObject) obj).getRectangle();
                 spikeRectangles.add(new Rectangle(
-                        r.x     * scale,
-                        r.y     * scale,
-                        r.width  * scale,
-                        r.height * scale
-                ));
+                        r.x * scale,
+                        r.y * scale,
+                        r.width * scale,
+                        r.height * scale));
             }
         }
     }
 
     private void getChestObjects() {
         MapLayer layer1 = map.getLayers().get("chest1");
-            for (MapObject obj : layer1.getObjects()) {
-                if (obj instanceof RectangleMapObject) {
-                    Rectangle r = ((RectangleMapObject) obj).getRectangle();
-                    chest1Position.set(r.x * scale, r.y * scale);
-                }
+        for (MapObject obj : layer1.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                chest1Position.set(r.x * scale, r.y * scale);
             }
+        }
 
         MapLayer layer2 = map.getLayers().get("chest2");
-            for (MapObject obj : layer2.getObjects()) {
-                if (obj instanceof RectangleMapObject) {
-                    Rectangle r = ((RectangleMapObject) obj).getRectangle();
-                    chest2Position.set(r.x * scale, r.y * scale);
-                }
+        for (MapObject obj : layer2.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                chest2Position.set(r.x * scale, r.y * scale);
             }
+        }
+    }
+
+    private void getDoorObjects() {
+        MapLayer layer1 = map.getLayers().get("first_door");
+        for (MapObject obj : layer1.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                firstDoorPosition.set(r.x * scale, r.y * scale);
+                firstDoorRect.set(r.x * scale, r.y * scale, r.width * scale, r.height * scale);
+            }
+        }
+
+        MapLayer layer2 = map.getLayers().get("last_door");
+        for (MapObject obj : layer2.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                lastDoorPosition.set(r.x * scale, r.y * scale);
+                lastDoorRect.set(r.x * scale, r.y * scale, r.width * scale, r.height * scale);
+            }
+        }
+
+        // start walls as a wall object so can't pass
+        wallRectangles.add(firstDoorRect);
+        wallRectangles.add(lastDoorRect);
     }
 
     public GameScreen(ScreenManager game) {
@@ -187,9 +225,13 @@ public class GameScreen implements Screen {
         getLadderObjects();
         getSpikeObjects();
         getChestObjects();
+        getDoorObjects();
 
         closeChestTexture = new Texture(Gdx.files.internal("Maps/chest_closed.png"));
         openChestTexture = new Texture(Gdx.files.internal("Maps/chest_open.png"));
+        closeDoorTexture = new Texture(Gdx.files.internal("Maps/door_closed.png"));
+        openDoorTexture = new Texture(Gdx.files.internal("Maps/door_open.png"));
+        keyTexture = new Texture(Gdx.files.internal("Maps/key.png"));
 
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
         cam.position.set(640, 360, 0);
@@ -201,9 +243,11 @@ public class GameScreen implements Screen {
         player.jump_init();
         player.sprint_init();
         player.attack_init();
+        player.hurt_init();
         player.dead_init();
 
-        enemies.add(new Karasu());
+        karasu = new Karasu();
+        enemies.add(karasu);
         enemies.add(new Skeleton());
 
         for(Enemy enemy : enemies) {
@@ -216,9 +260,12 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        // If the window is minimized on a desktop (LWJGL3) platform, width and height are 0, which causes problems.
-        // In that case, we don't resize anything, and wait for the window to be a normal size before updating.
-        if(width <= 0 || height <= 0) return;
+        // If the window is minimized on a desktop (LWJGL3) platform, width and height
+        // are 0, which causes problems.
+        // In that case, we don't resize anything, and wait for the window to be a
+        // normal size before updating.
+        if (width <= 0 || height <= 0)
+            return;
 
         // Resize your application here. The parameters represent the new window size.
         viewport.update(width, height, true);
@@ -232,7 +279,7 @@ public class GameScreen implements Screen {
         draw(delta);
     }
 
-    private void input(float delta) {
+    protected void input(float delta) {
         player.input(delta);
         if (touchingLadder || onLadder) {
             if (Gdx.input.isKeyPressed(Input.Keys.W) ||
@@ -248,9 +295,9 @@ public class GameScreen implements Screen {
                 player.currFrame = player.walk.getKeyFrame(player.time, true);
             }
             // get off ladder by pressing left or right
-            if (Gdx.input.isKeyPressed(Input.Keys.A)    ||
-                    Gdx.input.isKeyPressed(Input.Keys.LEFT)  ||
-                    Gdx.input.isKeyPressed(Input.Keys.D)     ||
+            if (Gdx.input.isKeyPressed(Input.Keys.A) ||
+                    Gdx.input.isKeyPressed(Input.Keys.LEFT) ||
+                    Gdx.input.isKeyPressed(Input.Keys.D) ||
                     Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 onLadder = false;
             }
@@ -264,6 +311,7 @@ public class GameScreen implements Screen {
                 if (dist1 < chestInteractionRange) {
                     chest1Open = true;
                     haveChest1key = true;
+                    keyCount++;
                 }
             }
 
@@ -273,12 +321,37 @@ public class GameScreen implements Screen {
                 if (dist2 < chestInteractionRange) {
                     chest2Open = true;
                     haveChest2key = true;
+                    keyCount++;
+                }
+            }
+
+            // door interaction
+            // first door needs first key
+            if (!firstDoorOpen && haveChest1key){
+                float distToDoor1 = Vector2.dst(player.x, player.y, firstDoorPosition.x, firstDoorPosition.y);
+                if (distToDoor1 < doorInteractionRange) {
+                    firstDoorOpen = true;
+                    // door can be walked through
+                    wallRectangles.removeValue(firstDoorRect, true);
+                    float doorOpenTime = 0.1f;
+                    keyCount--;
+                }
+            }
+
+            if (!lastDoorOpen && haveChest2key){
+                float distToDoor2 = Vector2.dst(player.x, player.y, lastDoorPosition.x, lastDoorPosition.y);
+                if (distToDoor2 < doorInteractionRange) {
+                    lastDoorOpen = true;
+                    // door can be walked through
+                    wallRectangles.removeValue(lastDoorRect, true);
+                    float doorOpenTime = 0.1f;
+                    keyCount--;
                 }
             }
         }
     }
 
-    private void logic(float delta) {
+    protected void logic(float delta) {
         player.time += Gdx.graphics.getDeltaTime();
         game.timer.update();
 
@@ -292,7 +365,6 @@ public class GameScreen implements Screen {
             }
             return;
         }
-
 
         if (onLadder) {
             // on ladder, disable gravity and lock x
@@ -319,6 +391,10 @@ public class GameScreen implements Screen {
             }
         }
 
+        if (doorOpenTime > 0){
+            doorOpenTime -= delta;
+        }
+
         // floor loop
         for (Rectangle rectangle : collisionRectangles) {
             if (spriteBox.overlaps(rectangle) && player.velocityY <= 0 && !onLadder) {
@@ -335,7 +411,7 @@ public class GameScreen implements Screen {
 
             if (spriteBox.overlaps(rectangle)) {
                 float playerCenterX = spriteBox.x + spriteBox.width / 2f;
-                float rectCenterX   = rectangle.x + rectangle.width / 2f;
+                float rectCenterX = rectangle.x + rectangle.width / 2f;
 
                 if (playerCenterX < rectCenterX) {
                     player.x = rectangle.x - hitbox_width - changedHitbox;
@@ -356,7 +432,7 @@ public class GameScreen implements Screen {
                 // get off ladder if feet at top
                 if (onLadder && spriteBox.y >= ladder.y + ladder.height - hitbox_height) {
                     onLadder = false;
-                    player.jumping  = false;
+                    player.jumping = false;
                 }
                 break;
             }
@@ -367,9 +443,32 @@ public class GameScreen implements Screen {
             onLadder = false;
         }
 
+        // enemy collision detection
+        if (!player.isDead && karasu != null && !karasu.isRemoved()) {
+            if (karasu.isAttacking() && spriteBox.overlaps(karasu.innerBoundaries) && !player.isHurt
+                    && player.hurtCooldown <= 0f) {
+                player.isHurt = true;
+                player.curr_health -= 10;
+                player.health_percentage = player.curr_health / player.max_health;
+                if(player.curr_health == 0) {
+                    player.isDead = true;
+                }
+                player.hurtCooldown = 1.0f;
+
+                float knockback = 40f;
+                if (player.x < karasu.x) {
+                    player.x -= knockback;
+                } else {
+                    player.x += knockback;
+                }
+
+                player.velocityY = 250f;
+            }
+        }
+
         // spike collision detection, set death to true
-        if(!player.isDead){
-            for(int i = 0; i < spikeRectangles.size; i++){
+        if (!player.isDead) {
+            for (int i = 0; i < spikeRectangles.size; i++) {
                 if (spriteBox.overlaps(spikeRectangles.get(i))) {
                     player.isDead = true;
                     player.velocityY = 0;
@@ -377,26 +476,23 @@ public class GameScreen implements Screen {
             }
         }
 
-
-
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
 
-        for(Enemy enemy : enemies)
-            if(enemy != null && !enemy.isRemoved())
+        for (Enemy enemy : enemies) {
+            if (enemy != null && !enemy.isRemoved()) {
                 enemy.botLogic(player.x, player.y, delta);
+            }
+        }
 
-
-        float mapWorldWidth  = 240 * 16 * scale;
-        float mapWorldHeight = 13  * 16 * scale;
-        float half_of_width = viewport.getWorldWidth()  / 2f;
+        float mapWorldWidth = 240 * 16 * scale;
+        float mapWorldHeight = 13 * 16 * scale;
+        float half_of_width = viewport.getWorldWidth() / 2f;
         float half_of_height = viewport.getWorldHeight() / 2f;
-
 
         float targetX = player.x + player.sprit_size / 2f;
         float targetY = player.y + player.sprit_size / 2f;
 
-
-        targetX = Math.max(half_of_width, Math.min(targetX, mapWorldWidth  - half_of_width));
+        targetX = Math.max(half_of_width, Math.min(targetX, mapWorldWidth - half_of_width));
         targetY = Math.max(half_of_height, Math.min(targetY, mapWorldHeight - half_of_height));
 
         cam.position.x += (targetX - cam.position.x) * 0.1f;
@@ -406,7 +502,7 @@ public class GameScreen implements Screen {
         game.batch.setProjectionMatrix(cam.combined);
 
         // Handle Projectile and Enemy Collisions
-        for(Enemy enemy : enemies) {
+        for (Enemy enemy : enemies) {
             if (enemy != null && !enemy.isRemoved()) {
                 Iterator<Player.Projectile> projectilesIterator = player.projectiles.iterator();
                 while (projectilesIterator.hasNext()) {
@@ -414,6 +510,7 @@ public class GameScreen implements Screen {
                     if (projectile.box.overlaps(enemy.innerBoundaries)) {
                         enemy.health -= projectile.damage;
                         skeletonHurt.play(0.25f);
+                        enemy.triggerHurt();
                         projectilesIterator.remove();
                     }
                 }
@@ -421,8 +518,7 @@ public class GameScreen implements Screen {
         }
     }
 
-
-    private void draw(float delta) {
+    protected void draw(float delta) {
         ScreenUtils.clear(Color.BLACK);
         viewport.apply();
 
@@ -439,38 +535,49 @@ public class GameScreen implements Screen {
         // draw chests
         float chestWidth = 16 * scale;
         float chestHeight = 32 * scale;
-        game.batch.draw(chest1Open ? openChestTexture : closeChestTexture, chest1Position.x, chest1Position.y, chestWidth, chestHeight);
-        game.batch.draw(chest2Open ? openChestTexture : closeChestTexture, chest2Position.x, chest2Position.y, chestWidth, chestHeight);
+        game.batch.draw(chest1Open ? openChestTexture : closeChestTexture, chest1Position.x, chest1Position.y,
+                chestWidth, chestHeight);
+        game.batch.draw(chest2Open ? openChestTexture : closeChestTexture, chest2Position.x, chest2Position.y,
+                chestWidth, chestHeight);
 
+        // draw doors
+        float doorWidth = 16 * scale;
+        float doorHeight = 32 * scale;
+        game.batch.draw(firstDoorOpen ? openDoorTexture : closeDoorTexture, firstDoorPosition.x, firstDoorPosition.y, doorWidth, doorHeight);
+        game.batch.draw(lastDoorOpen  ? openDoorTexture : closeDoorTexture, lastDoorPosition.x,  lastDoorPosition.y,  doorWidth, doorHeight);
 
-        for(Enemy enemy : enemies)
-            if(enemy != null && !enemy.isRemoved())
+        for (Enemy enemy : enemies) {
+            if (enemy != null && !enemy.isRemoved()) {
                 enemy.draw(game.batch, enemy.time, delta);
+            }
+        }
 
         float drawX;
         float scaleX;
 
-        if(player.facing_right) {
+        if (player.facing_right) {
             drawX = player.x;
             scaleX = 1;
-        } else{
+        } else {
             drawX = player.x + player.sprit_size;
             scaleX = -1;
         }
 
-        if(player.attacking) player.updateSpriteAttack(delta);
+        if (player.attacking)
+            player.updateSpriteAttack(delta);
 
         Iterator<Player.Projectile> projectilesIterator = player.projectiles.iterator();
         while (projectilesIterator.hasNext()) {
             Player.Projectile projectile = projectilesIterator.next();
             projectile.update(delta);
-            if(projectile.lifetime <= 0) projectilesIterator.remove();
+            if (projectile.lifetime <= 0)
+                projectilesIterator.remove();
             else {
-                TextureRegion projectileFrame = projectile.projectileAnimation.getKeyFrame(projectile.animationDuration, true);
+                TextureRegion projectileFrame = projectile.projectileAnimation.getKeyFrame(projectile.animationDuration,
+                        true);
                 game.batch.draw(projectileFrame, projectile.x, projectile.y, 0, 0, 64, 48, projectile.scaleX, 1, 0);
             }
         }
-
 
         game.batch.draw(player.currFrame, drawX, player.y, 0, 0, player.sprit_size, player.sprit_size, scaleX, 1, 0);
 
@@ -478,30 +585,26 @@ public class GameScreen implements Screen {
 
         viewportHUD.apply();
         game.batch.setProjectionMatrix(viewportHUD.getCamera().combined);
+        player.bar_width = player.health_percentage * player.hpForeground1.getWidth();
 
         game.batch.begin();
         game.timer.draw(game.batch);
-        game.batch.draw(player.hpForeground1, 10, 700);
-        //game.batch.draw(player.hpBackground1, 20, 20);
+        game.batch.draw(player.hpBackground1, 10, 700);
+        game.batch.draw(player.hpForeground1, 10, 700, player.bar_width, player.hpForeground1.getHeight());
+        game.batch.draw(keyTexture, 882, 672, 64f, 64f);
+        game.timer.font.draw(game.batch, String.format("%dx", keyCount), 946, 700);
         game.batch.end();
 
         // Test Projectile and Karasu Hitboxes with these
-//        shapeRenderer.setProjectionMatrix(cam.combined);
-//        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-//        for (Player.Projectile projectile : player.projectiles) {
-//            shapeRenderer.rect(projectile.box.x, projectile.box.y, projectile.box.width, projectile.box.height);
-//        }
-//        // testing karasu
-//        shapeRenderer.rect(karasu.ground.x, karasu.ground.y, 10, 10);
-//
-//        shapeRenderer.rect(karasu.innerBoundaries.x, karasu.innerBoundaries.y, karasu.innerBoundaries.width, karasu.innerBoundaries.height);
-//        shapeRenderer.end();
+        // shapeRenderer.setProjectionMatrix(cam.combined);
+        // shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        // for (Player.Projectile projectile : player.projectiles) {
+        //     shapeRenderer.rect(projectile.box.x, projectile.box.y, projectile.box.width,
+        //             projectile.box.height);
+        // }
+        // shapeRenderer.end();
 
     }
-
-
-
-
 
     @Override
     public void pause() {
