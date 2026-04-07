@@ -31,6 +31,8 @@ Maps/Battleground2.png
 Maps/Dungeon Tile Set.png
 Maps/chest_closed.png
 Maps/chest_open.png
+Maps/spritesheet.png
+Music/spencer_yk-castle-of-athanasius-151010.mp3
 Maps/door_closed.png
 Maps/door_open.png
 Maps/key.png
@@ -50,11 +52,15 @@ Player/Run.png
 Player/Walk.png
 Player/hp/HealthBar3.png
 Player/hp/HealthBar7.png
+Sounds/Enemy/crunch_splat.wav
+Sounds/Enemy/death_3_alex.wav
+Sounds/Player/death_9_meghan.wav
 Sounds/textSound.mp3
 Player/hp/HealthBarDARK.png
 Player/hp/hpbackground.png
 Player/hp/hpforeground.png
 level_1.tmx
+level_2.tmx
 runs_by_points.json
 runs_by_speed.json
 test2.tmx

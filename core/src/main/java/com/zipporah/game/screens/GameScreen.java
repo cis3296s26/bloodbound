@@ -3,6 +3,7 @@ package com.zipporah.game.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -22,6 +23,7 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.audio.Sound;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -87,7 +89,13 @@ public class GameScreen implements Screen {
     boolean touchingLadder = false;
     Rectangle spriteBox = new Rectangle();
 
-    protected final ShapeRenderer shapeRenderer = new ShapeRenderer();
+    // sound
+    Sound skeletonHurt;
+
+    //music
+    Music music1;
+
+    private final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     Karasu karasu;
 
@@ -202,8 +210,15 @@ public class GameScreen implements Screen {
         game.batch.setProjectionMatrix(viewport.getCamera().combined);
 
         // render in map
+        // switching to test level 2
         map = new TmxMapLoader().load("level_1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, scale);
+
+        // music
+        music1 = Gdx.audio.newMusic(Gdx.files.internal("Music/spencer_yk-castle-of-athanasius-151010.mp3"));
+        music1.setLooping(true);
+        music1.setVolume(0.30f);
+        music1.play();
 
         getCollisionObject();
         getWallObjects();
@@ -235,9 +250,12 @@ public class GameScreen implements Screen {
         enemies.add(karasu);
         enemies.add(new Skeleton());
 
-        for (Enemy enemy : enemies) {
+        for(Enemy enemy : enemies) {
             enemy.create();
         }
+        // sounds
+        skeletonHurt = Gdx.audio.newSound(Gdx.files.internal("Sounds/Enemy/crunch_splat.wav"));
+        // playerDead = Gdx.audio.newSound(Gdx.files.internal("Sounds/Player/death_9_meghan.wav"));
     }
 
     @Override
@@ -338,10 +356,12 @@ public class GameScreen implements Screen {
         game.timer.update();
 
         // if the player is daed go to the homescreen
-        if (player.isDead) {
+        if(player.isDead){
+            // playerDead.play(0.25f);
             boolean animationDone = player.updateSpriteDead(delta);
             if (animationDone) {
                 game.setScreen(new HomeScreen(game));
+                // game.setScreen(new MapTestScreen());
             }
             return;
         }
@@ -489,6 +509,7 @@ public class GameScreen implements Screen {
                     Player.Projectile projectile = projectilesIterator.next();
                     if (projectile.box.overlaps(enemy.innerBoundaries)) {
                         enemy.health -= projectile.damage;
+                        skeletonHurt.play(0.25f);
                         enemy.triggerHurt();
                         projectilesIterator.remove();
                     }
@@ -597,11 +618,14 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
+        //left screen
+        music1.stop();
 
     }
 
     @Override
     public void dispose() {
+        music1.dispose();
 
     }
 }
