@@ -95,7 +95,7 @@ public class GameScreen implements Screen {
     //music
     Music music1;
 
-    private final ShapeRenderer shapeRenderer = new ShapeRenderer();
+    protected final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     Karasu karasu;
 
