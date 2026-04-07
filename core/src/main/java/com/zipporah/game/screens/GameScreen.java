@@ -428,6 +428,11 @@ public class GameScreen implements Screen {
             if (karasu.isAttacking() && spriteBox.overlaps(karasu.innerBoundaries) && !player.isHurt
                     && player.hurtCooldown <= 0f) {
                 player.isHurt = true;
+                player.curr_health -= 10;
+                player.health_percentage = player.curr_health / player.max_health;
+                if(player.curr_health == 0) {
+                    player.isDead = true;
+                }
                 player.hurtCooldown = 1.0f;
 
                 float knockback = 40f;
@@ -559,11 +564,12 @@ public class GameScreen implements Screen {
 
         viewportHUD.apply();
         game.batch.setProjectionMatrix(viewportHUD.getCamera().combined);
+        player.bar_width = player.health_percentage * player.hpForeground1.getWidth();
 
         game.batch.begin();
         game.timer.draw(game.batch);
-        game.batch.draw(player.hpForeground1, 10, 700);
-        // game.batch.draw(player.hpBackground1, 20, 20);
+        game.batch.draw(player.hpBackground1, 10, 700);
+        game.batch.draw(player.hpForeground1, 10, 700, player.bar_width, player.hpForeground1.getHeight());
         game.batch.draw(keyTexture, 882, 672, 64f, 64f);
         game.timer.font.draw(game.batch, String.format("%dx", keyCount), 946, 700);
         game.batch.end();

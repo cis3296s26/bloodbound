@@ -20,6 +20,10 @@ public class Player extends Sprite {
 
     public Texture hpForeground1 = new Texture("Player/hp/HealthBar3.png");
     public Texture hpBackground1 = new Texture("Player/hp/HealthBar7.png");
+    public float curr_health = 100;
+    public float max_health = 100;
+    public float health_percentage;
+    public float bar_width;
 
     public Texture jumpSpriteSheet;
     public Animation<TextureRegion> jump;
