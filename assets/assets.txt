@@ -4,6 +4,7 @@ Buttons/OptionsButton.png
 Buttons/QuitButton.png
 Buttons/RankingsButton.png
 Buttons/StartButton.png
+Buttons/TutorialButton.png
 Enemies/Karasu/Attack_1.png
 Enemies/Karasu/Attack_2.png
 Enemies/Karasu/Attack_3.png
@@ -24,6 +25,7 @@ Enemies/Skeleton/Protect.png
 Enemies/Skeleton/Run+attack.png
 Enemies/Skeleton/Run.png
 Enemies/Skeleton/Walk.png
+Fonts/Final_Fantasy_VII.ttf
 Logos/PixelLogo.png
 Maps/Battleground2.png
 Maps/Dungeon Tile Set.png
@@ -48,6 +50,7 @@ Player/Run.png
 Player/Walk.png
 Player/hp/HealthBar3.png
 Player/hp/HealthBar7.png
+Sounds/textSound.mp3
 Player/hp/HealthBarDARK.png
 Player/hp/hpbackground.png
 Player/hp/hpforeground.png

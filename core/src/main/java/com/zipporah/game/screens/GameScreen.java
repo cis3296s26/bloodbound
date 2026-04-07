@@ -30,7 +30,7 @@ import com.zipporah.game.enemies.Skeleton;
 
 public class GameScreen implements Screen {
 
-    private final ScreenManager game;
+    protected final ScreenManager game;
     Player player = new Player();
     ArrayList<Enemy> enemies = new ArrayList<>();
 
@@ -87,7 +87,7 @@ public class GameScreen implements Screen {
     boolean touchingLadder = false;
     Rectangle spriteBox = new Rectangle();
 
-    private final ShapeRenderer shapeRenderer = new ShapeRenderer();
+    protected final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     Karasu karasu;
 
@@ -261,7 +261,7 @@ public class GameScreen implements Screen {
         draw(delta);
     }
 
-    private void input(float delta) {
+    protected void input(float delta) {
         player.input(delta);
         if (touchingLadder || onLadder) {
             if (Gdx.input.isKeyPressed(Input.Keys.W) ||
@@ -333,7 +333,7 @@ public class GameScreen implements Screen {
         }
     }
 
-    private void logic(float delta) {
+    protected void logic(float delta) {
         player.time += Gdx.graphics.getDeltaTime();
         game.timer.update();
 
@@ -497,7 +497,7 @@ public class GameScreen implements Screen {
         }
     }
 
-    private void draw(float delta) {
+    protected void draw(float delta) {
         ScreenUtils.clear(Color.BLACK);
         viewport.apply();
 
