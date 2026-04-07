@@ -63,6 +63,17 @@ public class GameScreen implements Screen {
     boolean haveChest2key = false;
     float chestInteractionRange = 150f;
 
+    // doors
+    Texture openDoorTexture;
+    Texture closeDoorTexture;
+    Vector2 firstDoorPosition = new Vector2();
+    Vector2 lastDoorPosition = new Vector2();
+    boolean firstDoorOpen = false;
+    boolean lastDoorOpen = false;
+    Rectangle firstDoorRect = new Rectangle();
+    Rectangle lastDoorRect = new Rectangle();
+    float doorInteractionRange = 150f;
+
     // physics
     float gravity = -1500f;
     float hitbox_width = 60f;
@@ -440,6 +451,9 @@ public class GameScreen implements Screen {
                 chestWidth, chestHeight);
         game.batch.draw(chest2Open ? openChestTexture : closeChestTexture, chest2Position.x, chest2Position.y,
                 chestWidth, chestHeight);
+
+        // draw doors
+
 
         for (Enemy enemy : enemies) {
             if (enemy != null && !enemy.isRemoved()) {
