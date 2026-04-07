@@ -30,6 +30,7 @@ Maps/Dungeon Tile Set.png
 Maps/chest_closed.png
 Maps/chest_open.png
 Maps/spritesheet.png
+Music/spencer_yk-castle-of-athanasius-151010.mp3
 Player/Attack_1.png
 Player/Attack_2.png
 Player/Attack_3.png

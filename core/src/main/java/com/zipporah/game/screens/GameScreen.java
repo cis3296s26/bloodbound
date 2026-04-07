@@ -3,6 +3,7 @@ package com.zipporah.game.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -76,6 +77,9 @@ public class GameScreen implements Screen {
     Sound skeletonHurt;
 
     Sound playerDead;
+
+    //music
+    Music music1;
 
     private final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
@@ -173,6 +177,12 @@ public class GameScreen implements Screen {
         // switching to test level 2
         map = new TmxMapLoader().load("level_1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, scale);
+
+        // music
+        music1 = Gdx.audio.newMusic(Gdx.files.internal("Music/spencer_yk-castle-of-athanasius-151010.mp3"));
+        music1.setLooping(true);
+        music1.setVolume(0.30f);
+        music1.play();
 
         getCollisionObject();
         getWallObjects();
@@ -507,11 +517,14 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
+        //left screen
+        music1.stop();
 
     }
 
     @Override
     public void dispose() {
+        music1.dispose();
 
     }
 }
