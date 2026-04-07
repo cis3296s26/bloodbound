@@ -1,4 +1,5 @@
 package com.zipporah.game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -7,11 +8,14 @@ import com.badlogic.gdx.math.Rectangle;
 
 import static com.zipporah.game.screens.GameScreen.collisionRectangles;
 import static com.zipporah.game.screens.GameScreen.wallRectangles;
+import com.badlogic.gdx.audio.Sound;
 
 public class Enemy {
 
     TextureRegion currFrame;
     public float time = 0;
+    Sound skeletonDead;
+
 
     // Animations
     private static class AnimationBundle {
@@ -74,7 +78,8 @@ public class Enemy {
         return new AnimationBundle(spriteSheet, animation);
     }
 
-    public void create() {}
+    public void create() {
+    }
 
     public void create(String path, int[] frameCount){
         removed = false;
@@ -88,6 +93,9 @@ public class Enemy {
         walk = loadAnimation("Walk", frameCount[1], 0.1f);
         attack = loadAnimation("Attack_1", frameCount[2], 0.1f);
         death = loadAnimation("Dead", frameCount[3], 0.2f);
+
+        skeletonDead = Gdx.audio.newSound(Gdx.files.internal("Sounds/Enemy/death_3_alex.wav"));
+
 
     }
 
@@ -148,6 +156,7 @@ public class Enemy {
             if (currState != State.death) {
                 currState = State.death;
                 stateTime = 0;
+                skeletonDead.play(0.25f);
             }
             return;
         }

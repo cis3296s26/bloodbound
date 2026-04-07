@@ -22,6 +22,7 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.audio.Sound;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -70,6 +71,11 @@ public class GameScreen implements Screen {
     float ladderCenterX = 0f;
     boolean touchingLadder = false;
     Rectangle spriteBox = new Rectangle();
+
+    // sound
+    Sound skeletonHurt;
+
+    Sound playerDead;
 
     private final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
@@ -164,6 +170,7 @@ public class GameScreen implements Screen {
         game.batch.setProjectionMatrix(viewport.getCamera().combined);
 
         // render in map
+        // switching to test level 2
         map = new TmxMapLoader().load("level_1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, scale);
 
@@ -191,9 +198,12 @@ public class GameScreen implements Screen {
         enemies.add(new Karasu());
         enemies.add(new Skeleton());
 
-        for(Enemy enemy : enemies)
+        for(Enemy enemy : enemies) {
             enemy.create();
-
+        }
+        // sounds
+        skeletonHurt = Gdx.audio.newSound(Gdx.files.internal("Sounds/Enemy/crunch_splat.wav"));
+        playerDead = Gdx.audio.newSound(Gdx.files.internal("Sounds/Player/death_9_meghan.wav"));
     }
 
     @Override
@@ -266,9 +276,11 @@ public class GameScreen implements Screen {
 
         // if the player is daed go to the homescreen
         if(player.isDead){
+            // playerDead.play(0.25f);
             boolean animationDone = player.updateSpriteDead(delta);
             if (animationDone) {
                 game.setScreen(new HomeScreen(game));
+                // game.setScreen(new MapTestScreen());
             }
             return;
         }
@@ -393,6 +405,7 @@ public class GameScreen implements Screen {
                     Player.Projectile projectile = projectilesIterator.next();
                     if (projectile.box.overlaps(enemy.innerBoundaries)) {
                         enemy.health -= projectile.damage;
+                        skeletonHurt.play(0.25f);
                         projectilesIterator.remove();
                     }
                 }

@@ -2,6 +2,7 @@ package com.zipporah.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -54,6 +55,7 @@ public class Player extends Sprite {
 
     public TextureRegion[][] tmp2;
     public TextureRegion[] idleFrames;
+
 
 
     public final float HP = 100;
@@ -183,6 +185,7 @@ public class Player extends Sprite {
     public void input(float delta) {
         // default frame idle
         if(isDead){
+            // playerDead.play(0.25f);
             return;
         }
         currFrame = idle.getKeyFrame(time, true);
