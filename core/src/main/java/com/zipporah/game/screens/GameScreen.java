@@ -163,6 +163,30 @@ public class GameScreen implements Screen {
         }
     }
 
+    private void getDoorObjects() {
+        MapLayer layer1 = map.getLayers().get("first_door");
+        for (MapObject obj : layer1.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                firstDoorPosition.set(r.x * scale, r.y * scale);
+                firstDoorRect.set(r.x * scale, r.y * scale, r.width * scale, r.height * scale);
+            }
+        }
+
+        MapLayer layer2 = map.getLayers().get("last_door");
+        for (MapObject obj : layer2.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                lastDoorPosition.set(r.x * scale, r.y * scale);
+                lastDoorRect.set(r.x * scale, r.y * scale, r.width * scale, r.height * scale);
+            }
+        }
+
+        // start walls as a wall object so can't pass
+        wallRectangles.add(firstDoorRect);
+        wallRectangles.add(lastDoorRect);
+    }
+
     public GameScreen(ScreenManager game) {
         this.game = game;
     }
@@ -182,9 +206,12 @@ public class GameScreen implements Screen {
         getLadderObjects();
         getSpikeObjects();
         getChestObjects();
+        getDoorObjects();
 
         closeChestTexture = new Texture(Gdx.files.internal("Maps/chest_closed.png"));
         openChestTexture = new Texture(Gdx.files.internal("Maps/chest_open.png"));
+        closeDoorTexture = new Texture(Gdx.files.internal("Maps/door_closed.png"));
+        openDoorTexture = new Texture(Gdx.files.internal("Maps/door_open.png"));
 
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
         cam.position.set(640, 360, 0);
