@@ -76,8 +76,6 @@ public class GameScreen implements Screen {
     // sound
     Sound skeletonHurt;
 
-    Sound playerDead;
-
     //music
     Music music1;
 
@@ -213,7 +211,7 @@ public class GameScreen implements Screen {
         }
         // sounds
         skeletonHurt = Gdx.audio.newSound(Gdx.files.internal("Sounds/Enemy/crunch_splat.wav"));
-        playerDead = Gdx.audio.newSound(Gdx.files.internal("Sounds/Player/death_9_meghan.wav"));
+        // playerDead = Gdx.audio.newSound(Gdx.files.internal("Sounds/Player/death_9_meghan.wav"));
     }
 
     @Override
