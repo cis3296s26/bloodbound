@@ -38,10 +38,10 @@ public class Player extends Sprite {
     public Texture hpBackground1  = new Texture("Player/hp/hpbackground.png");
 
 
-    float max_hp = 100;
-    float curr_hp;
+    float max_hp = 500;
+    public float curr_hp = 500;
     float hp_percent = curr_hp / max_hp;
-    public float bar_width = hpForeground1.getWidth();
+    public float bar_width = hpForeground1.getWidth() * hp_percent;
 
 
     public Texture jumpSpriteSheet;
