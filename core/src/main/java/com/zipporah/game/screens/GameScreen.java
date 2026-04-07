@@ -52,6 +52,9 @@ public class GameScreen implements Screen {
     // array for enemys
     public static Array<Rectangle> enemyRectangles = new Array<>();
 
+    Texture keyTexture;
+    int keyCount = 0;
+
     // chests
     Texture openChestTexture;
     Texture closeChestTexture;
@@ -62,6 +65,17 @@ public class GameScreen implements Screen {
     boolean haveChest1key = false;
     boolean haveChest2key = false;
     float chestInteractionRange = 150f;
+
+    // doors
+    Texture openDoorTexture;
+    Texture closeDoorTexture;
+    Vector2 firstDoorPosition = new Vector2();
+    Vector2 lastDoorPosition = new Vector2();
+    boolean firstDoorOpen = false;
+    boolean lastDoorOpen = false;
+    Rectangle firstDoorRect = new Rectangle();
+    Rectangle lastDoorRect = new Rectangle();
+    float doorInteractionRange = 150f;
 
     // physics
     float gravity = -1500f;
@@ -152,6 +166,30 @@ public class GameScreen implements Screen {
         }
     }
 
+    private void getDoorObjects() {
+        MapLayer layer1 = map.getLayers().get("first_door");
+        for (MapObject obj : layer1.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                firstDoorPosition.set(r.x * scale, r.y * scale);
+                firstDoorRect.set(r.x * scale, r.y * scale, r.width * scale, r.height * scale);
+            }
+        }
+
+        MapLayer layer2 = map.getLayers().get("last_door");
+        for (MapObject obj : layer2.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                lastDoorPosition.set(r.x * scale, r.y * scale);
+                lastDoorRect.set(r.x * scale, r.y * scale, r.width * scale, r.height * scale);
+            }
+        }
+
+        // start walls as a wall object so can't pass
+        wallRectangles.add(firstDoorRect);
+        wallRectangles.add(lastDoorRect);
+    }
+
     public GameScreen(ScreenManager game) {
         this.game = game;
     }
@@ -171,9 +209,13 @@ public class GameScreen implements Screen {
         getLadderObjects();
         getSpikeObjects();
         getChestObjects();
+        getDoorObjects();
 
         closeChestTexture = new Texture(Gdx.files.internal("Maps/chest_closed.png"));
         openChestTexture = new Texture(Gdx.files.internal("Maps/chest_open.png"));
+        closeDoorTexture = new Texture(Gdx.files.internal("Maps/door_closed.png"));
+        openDoorTexture = new Texture(Gdx.files.internal("Maps/door_open.png"));
+        keyTexture = new Texture(Gdx.files.internal("Maps/key.png"));
 
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
         cam.position.set(640, 360, 0);
@@ -250,6 +292,7 @@ public class GameScreen implements Screen {
                 if (dist1 < chestInteractionRange) {
                     chest1Open = true;
                     haveChest1key = true;
+                    keyCount++;
                 }
             }
 
@@ -259,6 +302,29 @@ public class GameScreen implements Screen {
                 if (dist2 < chestInteractionRange) {
                     chest2Open = true;
                     haveChest2key = true;
+                    keyCount++;
+                }
+            }
+
+            // door interaction
+            // first door needs first key
+            if (!firstDoorOpen && haveChest1key){
+                float distToDoor1 = Vector2.dst(player.x, player.y, firstDoorPosition.x, firstDoorPosition.y);
+                if (distToDoor1 < doorInteractionRange) {
+                    firstDoorOpen = true;
+                    // door can be walked through
+                    wallRectangles.removeValue(firstDoorRect, true);
+                    keyCount--;
+                }
+            }
+
+            if (!lastDoorOpen && haveChest2key){
+                float distToDoor2 = Vector2.dst(player.x, player.y, lastDoorPosition.x, lastDoorPosition.y);
+                if (distToDoor2 < doorInteractionRange) {
+                    lastDoorOpen = true;
+                    // door can be walked through
+                    wallRectangles.removeValue(lastDoorRect, true);
+                    keyCount--;
                 }
             }
         }
@@ -441,6 +507,12 @@ public class GameScreen implements Screen {
         game.batch.draw(chest2Open ? openChestTexture : closeChestTexture, chest2Position.x, chest2Position.y,
                 chestWidth, chestHeight);
 
+        // draw doors
+        float doorWidth = 16 * scale;
+        float doorHeight = 32 * scale;
+        game.batch.draw(firstDoorOpen ? openDoorTexture : closeDoorTexture, firstDoorPosition.x, firstDoorPosition.y, doorWidth, doorHeight);
+        game.batch.draw(lastDoorOpen  ? openDoorTexture : closeDoorTexture, lastDoorPosition.x,  lastDoorPosition.y,  doorWidth, doorHeight);
+
         for (Enemy enemy : enemies) {
             if (enemy != null && !enemy.isRemoved()) {
                 enemy.draw(game.batch, enemy.time, delta);
@@ -485,6 +557,8 @@ public class GameScreen implements Screen {
         game.timer.draw(game.batch);
         game.batch.draw(player.hpForeground1, 10, 700);
         // game.batch.draw(player.hpBackground1, 20, 20);
+        game.batch.draw(keyTexture, 882, 672, 64f, 64f);
+        game.timer.font.draw(game.batch, String.format("%dx", keyCount), 946, 700);
         game.batch.end();
 
         // Test Projectile and Karasu Hitboxes with these
