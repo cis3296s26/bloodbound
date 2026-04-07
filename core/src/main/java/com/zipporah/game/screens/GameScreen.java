@@ -76,6 +76,7 @@ public class GameScreen implements Screen {
     Rectangle firstDoorRect = new Rectangle();
     Rectangle lastDoorRect = new Rectangle();
     float doorInteractionRange = 150f;
+    float doorOpenTime = 0f;
 
     // physics
     float gravity = -1500f;
@@ -314,6 +315,7 @@ public class GameScreen implements Screen {
                     firstDoorOpen = true;
                     // door can be walked through
                     wallRectangles.removeValue(firstDoorRect, true);
+                    float doorOpenTime = 0.1f;
                     keyCount--;
                 }
             }
@@ -324,6 +326,7 @@ public class GameScreen implements Screen {
                     lastDoorOpen = true;
                     // door can be walked through
                     wallRectangles.removeValue(lastDoorRect, true);
+                    float doorOpenTime = 0.1f;
                     keyCount--;
                 }
             }
@@ -366,6 +369,10 @@ public class GameScreen implements Screen {
                 player.y = rectBottom - hitbox_height;
                 spriteBox.set(player.x + changedHitbox, player.y, hitbox_width, hitbox_height);
             }
+        }
+
+        if (doorOpenTime > 0){
+            doorOpenTime -= delta;
         }
 
         // floor loop
