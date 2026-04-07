@@ -84,7 +84,7 @@ public class HomeScreen implements Screen {
         game.setScreen(new RankingsScreen(game));
       }
       if(controlsHovering){
-        game.setScreen(new ControlsScreen(game));
+        game.setScreen(new TutorialScreen(game));
       }
       if(optionsHovering){
         game.setScreen(new OptionsScreen(game));

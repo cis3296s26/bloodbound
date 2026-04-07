@@ -24,6 +24,7 @@ Enemies/Skeleton/Protect.png
 Enemies/Skeleton/Run+attack.png
 Enemies/Skeleton/Run.png
 Enemies/Skeleton/Walk.png
+Fonts/Final_Fantasy_VII.ttf
 Logos/PixelLogo.png
 Maps/Battleground2.png
 Maps/Dungeon Tile Set.png
@@ -48,6 +49,7 @@ Player/Run.png
 Player/Walk.png
 Player/hp/HealthBar3.png
 Player/hp/HealthBar7.png
+Sounds/textSound.mp3
 level_1.tmx
 runs_by_points.json
 runs_by_speed.json
