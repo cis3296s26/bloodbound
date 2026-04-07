@@ -35,9 +35,6 @@ Player/Run.png
 Player/Walk.png
 Player/hp/HealthBar3.png
 Player/hp/HealthBar7.png
-Player/hp/HealthBarDARK.png
-Player/hp/hpbackground.png
-Player/hp/hpforeground.png
 Skeleton/Attack_1.png
 Skeleton/Attack_2.png
 Skeleton/Dead.png

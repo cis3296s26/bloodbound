@@ -8,7 +8,7 @@ public class CurrentRun {
 
   private float elapsedTime = 0f;
   private int points = 0;
-  BitmapFont font;
+  public BitmapFont font;
 
   public CurrentRun(){
     font = new BitmapFont();
@@ -36,7 +36,7 @@ public class CurrentRun {
   }
 
   public float getPoints() {
-    return elapsedTime;
+    return points;
   }
 
   public void reset() {
