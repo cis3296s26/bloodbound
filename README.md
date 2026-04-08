@@ -20,8 +20,6 @@ Unpack the .dmg file and drag the .app file (game) to your desktop.
 - ./gradlew build
 - ./gradlew lwjgl3:run
 
-### Quick Links:
-- Download Windows Game Version: https://tinyurl.com/bbound2
 
 _**Enjoy!**_
 
