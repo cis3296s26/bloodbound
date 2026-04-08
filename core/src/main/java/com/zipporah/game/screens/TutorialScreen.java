@@ -16,6 +16,7 @@ public class TutorialScreen extends GameScreen {
           "Collect keys to open doors. Be wary of enemies and spikes as they can kill you!",
           "Press D to move right.",
           "Press A to move left.",
+          "Move while pressing SHIFT to run",
           "Press SPACE or W to jump.",
           "Press Q to send out an attack.",
           "Go up the ladder by holding W and find a chest and press E to collect a key.",
@@ -114,22 +115,26 @@ public class TutorialScreen extends GameScreen {
       beginStep(4);
     }
 
-    if (currentStep == 4 && textDone && !hasJumped && player.jumping) {
-      hasJumped = true;
+    if (currentStep == 4 && textDone && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
       beginStep(5);
     }
 
-    if (currentStep == 5 && textDone && !hasAttacked && Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
-      hasAttacked = true;
+    if (currentStep == 5 && textDone && !hasJumped && player.jumping) {
+      hasJumped = true;
       beginStep(6);
     }
 
-    // chest step — chest1Open is set by super.input(), we just watch for it
-    if (currentStep == 6 && textDone && chest1Open) {
+    if (currentStep == 6 && textDone && !hasAttacked && Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
+      hasAttacked = true;
       beginStep(7);
     }
+
+    // chest step — chest1Open is set by super.input(), we just watch for it
+    if (currentStep == 7 && textDone && chest1Open) {
+      beginStep(8);
+    }
     // door step — firstDoorOpen being set means tutorial is done
-    if (currentStep == 7 && firstDoorOpen) {
+    if (currentStep == 8 && firstDoorOpen) {
       game.setScreen(new HomeScreen(game));
     }
   }

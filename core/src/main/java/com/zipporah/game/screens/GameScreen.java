@@ -255,7 +255,7 @@ public class GameScreen implements Screen {
         player.hurt_init();
         player.dead_init();
 
-        // we only want one skelaton guy, karasu is final boss
+        // we only want one skeleton guy, karasu is final boss
         // karasu = new Karasu();
         // enemies.add(karasu);
         enemies.add(new Skeleton());
@@ -509,6 +509,25 @@ public class GameScreen implements Screen {
         // player.velocityY = 250f;
         // }
         // }
+
+        if (!player.isDead && !player.isHurt && player.hurtCooldown <= 0f) {
+            for (Enemy enemy : enemies) {
+                if (enemy != null && !enemy.isRemoved() && enemy.isAttacking()) {
+                    if (spriteBox.overlaps(enemy.innerBoundaries)) {
+                        player.isHurt = true;
+                        player.curr_health -= 10;
+                        player.health_percentage = player.curr_health / player.max_health;
+                        player.hurtCooldown = 1.0f;
+                        if (player.curr_health <= 0) {
+                            player.isDead = true;
+                        }
+                        float knockback = 40f;
+                        player.x += (player.x < enemy.x) ? -knockback : knockback;
+                        player.velocityY = 250f;
+                    }
+                }
+            }
+        }
 
         // spike collision detection, set death to true
         if (!player.isDead) {
