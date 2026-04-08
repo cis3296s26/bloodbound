@@ -3,19 +3,11 @@
 
 ## How to run
 
-**This GitHub Repository > Releases > Select the most recent release**
-
-### **MacOS:**
-- For M-Chips, download a .dmg file that begins with "GameDemo-macM1"
-- For Intel-Chips, download a .dmg file that begins with "GameDemo-macX64"
-
-Unpack the .dmg file and drag the .app file (game) to your desktop.
-
 ### **Windows:**
-- Download and run the GameDemo.exe file 
+- Download and run the GameDemo.exe file from the latest release
 
 ### **Else** 
-- Clone the repository and run these following commands:
+- Clone the repository, open the project and run these following commands in yor terminal:
 - chmod +x gradlew
 - ./gradlew build
 - ./gradlew lwjgl3:run
