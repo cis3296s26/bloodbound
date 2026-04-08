@@ -17,6 +17,7 @@ Unpack the .dmg file and drag the .app file (game) to your desktop.
 ### **Else** 
 - Clone the repository and run these following commands:
 - chmod +x gradlew
+- ./gradlew build
 - ./gradlew lwjgl3:run
 
 ### Quick Links:
