@@ -255,14 +255,15 @@ public class GameScreen implements Screen {
         player.hurt_init();
         player.dead_init();
 
-        // we only want one skeleton guy, karasu is final boss
-        // karasu = new Karasu();
-        // enemies.add(karasu);
-        enemies.add(new Skeleton());
+        // Karasu's the final boss
+        // enemies.add(new Karasu(1750, 50, 180, 60f, 70f, 62, 120));
 
-        for (Enemy enemy : enemies) {
-            enemy.create();
-        }
+        // First Door Skeleton
+        enemies.add(new Skeleton(1800, 50, 200, 60f, 70f, 62, 120));
+
+        // Second Chest Skeleton
+        enemies.add(new Skeleton(3774, 128, 200, 60f, 70f, 62, 120));
+
         // sounds
         skeletonHurt = Gdx.audio.newSound(Gdx.files.internal("Sounds/Enemy/crunch_splat.wav"));
         // playerDead =
