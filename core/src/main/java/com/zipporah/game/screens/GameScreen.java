@@ -38,7 +38,7 @@ public class GameScreen implements Screen {
 
     TiledMap map;
     OrthogonalTiledMapRenderer renderer;
-    float scale = 4f;
+    float scale = 4f; // change back to 4f just for test
     ExtendViewport viewport;
     FitViewport viewportHUD;
 
@@ -97,7 +97,7 @@ public class GameScreen implements Screen {
 
     protected final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
-    Karasu karasu;
+    // Karasu karasu;
 
     private void getCollisionObject() {
         MapLayer layer = map.getLayers().get("collision");
@@ -209,22 +209,25 @@ public class GameScreen implements Screen {
         viewportHUD = new FitViewport(1280, 720);
         game.batch.setProjectionMatrix(viewport.getCamera().combined);
 
-        // render in map
-        // switching to test level 2
-        map = new TmxMapLoader().load("level_1.tmx");
-        renderer = new OrthogonalTiledMapRenderer(map, scale);
+//        // render in map
+//        // moving this is initLevel method
+//        map = new TmxMapLoader().load("level_1.tmx");
+//        renderer = new OrthogonalTiledMapRenderer(map, scale);
 
         // music
-        music1 = Gdx.audio.newMusic(Gdx.files.internal("Music/spencer_yk-castle-of-athanasius-151010.mp3"));
-        music1.setLooping(true);
-        music1.setVolume(0.30f);
-        music1.play();
+//        music1 = Gdx.audio.newMusic(Gdx.files.internal("Music/spencer_yk-castle-of-athanasius-151010.mp3"));
+//        music1.setLooping(true);
+//        music1.setVolume(0.30f);
+//        music1.play();
 
         collisionRectangles.clear();
         wallRectangles.clear();
         ladderRectangles.clear();
         spikeRectangles.clear();
         enemyRectangles.clear();
+
+        initLevel();
+
 
         getCollisionObject();
         getWallObjects();
@@ -252,8 +255,9 @@ public class GameScreen implements Screen {
         player.hurt_init();
         player.dead_init();
 
-        karasu = new Karasu();
-        enemies.add(karasu);
+        // we only want one skelaton guy, karasu is final boss
+        //karasu = new Karasu();
+        //enemies.add(karasu);
         enemies.add(new Skeleton());
 
         for(Enemy enemy : enemies) {
@@ -262,6 +266,21 @@ public class GameScreen implements Screen {
         // sounds
         skeletonHurt = Gdx.audio.newSound(Gdx.files.internal("Sounds/Enemy/crunch_splat.wav"));
         // playerDead = Gdx.audio.newSound(Gdx.files.internal("Sounds/Player/death_9_meghan.wav"));
+    }
+
+    // load assets in a method so its easier to override in GameScreen2
+    // gamescreen2 will have its own method that will be called withing the show function
+
+    protected void initLevel() {
+        // render in map
+        // switching to test level 2
+        map = new TmxMapLoader().load("level_1.tmx");
+        renderer = new OrthogonalTiledMapRenderer(map, scale);
+
+        music1 = Gdx.audio.newMusic(Gdx.files.internal("Music/spencer_yk-castle-of-athanasius-151010.mp3"));
+        music1.setLooping(true);
+        music1.setVolume(0.30f);
+        music1.play();
     }
 
     @Override
@@ -353,9 +372,23 @@ public class GameScreen implements Screen {
                     wallRectangles.removeValue(lastDoorRect, true);
                     float doorOpenTime = 0.1f;
                     keyCount--;
+
+                    // switching game screens
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            music1.stop();
+                            game.setScreen(new GameScreen2(game));
+                        }
+                    });
                 }
             }
         }
+
+        // test game level 2
+//        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
+//            game.setScreen(new GameScreen2(game));
+//        }
     }
 
     protected void logic(float delta) {
@@ -368,7 +401,7 @@ public class GameScreen implements Screen {
             boolean animationDone = player.updateSpriteDead(delta);
             if (animationDone) {
                 game.setScreen(new HomeScreen(game));
-                // game.setScreen(new MapTestScreen());
+                // game.setScreen(new GameScreen2(game));
             }
             return;
         }
@@ -450,28 +483,29 @@ public class GameScreen implements Screen {
             onLadder = false;
         }
 
+        // use this for boss battle
         // enemy collision detection
-        if (!player.isDead && karasu != null && !karasu.isRemoved()) {
-            if (karasu.isAttacking() && spriteBox.overlaps(karasu.innerBoundaries) && !player.isHurt
-                    && player.hurtCooldown <= 0f) {
-                player.isHurt = true;
-                player.curr_health -= 10;
-                player.health_percentage = player.curr_health / player.max_health;
-                if(player.curr_health == 0) {
-                    player.isDead = true;
-                }
-                player.hurtCooldown = 1.0f;
-
-                float knockback = 40f;
-                if (player.x < karasu.x) {
-                    player.x -= knockback;
-                } else {
-                    player.x += knockback;
-                }
-
-                player.velocityY = 250f;
-            }
-        }
+//        if (!player.isDead && karasu != null && !karasu.isRemoved()) {
+//            if (karasu.isAttacking() && spriteBox.overlaps(karasu.innerBoundaries) && !player.isHurt
+//                    && player.hurtCooldown <= 0f) {
+//                player.isHurt = true;
+//                player.curr_health -= 10;
+//                player.health_percentage = player.curr_health / player.max_health;
+//                if(player.curr_health == 0) {
+//                    player.isDead = true;
+//                }
+//                player.hurtCooldown = 1.0f;
+//
+//                float knockback = 40f;
+//                if (player.x < karasu.x) {
+//                    player.x -= knockback;
+//                } else {
+//                    player.x += knockback;
+//                }
+//
+//                player.velocityY = 250f;
+//            }
+//        }
 
         // spike collision detection, set death to true
         if (!player.isDead) {
@@ -491,8 +525,18 @@ public class GameScreen implements Screen {
             }
         }
 
-        float mapWorldWidth = 240 * 16 * scale;
-        float mapWorldHeight = 13 * 16 * scale;
+        // level 2 got different width and height
+//        float mapWorldWidth = 240 * 16 * scale;
+//        float mapWorldHeight = 13 * 16 * scale;
+        int mapWidth = map.getProperties().get("width", Integer.class);
+        int mapHeight = map.getProperties().get("height", Integer.class);
+        int tileWidth = map.getProperties().get("tilewidth", Integer.class);
+        int tileHeight = map.getProperties().get("tileheight", Integer.class);
+        // System.out.println("PLAYER SPAWN: " + player.x + ", " + player.y);
+
+        float mapWorldWidth = mapWidth * tileWidth * scale;
+        float mapWorldHeight = mapHeight * tileHeight * scale;
+
         float half_of_width = viewport.getWorldWidth() / 2f;
         float half_of_height = viewport.getWorldHeight() / 2f;
 
@@ -626,13 +670,17 @@ public class GameScreen implements Screen {
     @Override
     public void hide() {
         //left screen
-        music1.stop();
+        if (music1 != null) {
+            music1.stop();
+        }
 
     }
 
     @Override
     public void dispose() {
-        music1.dispose();
+        if (music1 != null) {
+            music1.dispose();
+        }
 
     }
 }
