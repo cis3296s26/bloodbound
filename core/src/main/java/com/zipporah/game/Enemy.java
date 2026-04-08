@@ -1,4 +1,5 @@
 package com.zipporah.game;
+
 import com.badlogic.gdx.Gdx;
 
 import com.badlogic.gdx.graphics.Texture;
@@ -16,7 +17,6 @@ public class Enemy {
     protected TextureRegion currFrame;
     public float time = 0;
     Sound skeletonDead;
-
 
     protected static class AnimationBundle {
         private final Texture texture;
@@ -64,6 +64,8 @@ public class Enemy {
     protected boolean removed = false;
     protected boolean hurtActive = false;
 
+    protected boolean pointsAwarded = false;
+
     public Rectangle ground = new Rectangle();
     protected float groundAhead = 10f;
 
@@ -84,6 +86,7 @@ public class Enemy {
     public void create(String path, int[] frameCount) {
         removed = false;
         hurtActive = false;
+        pointsAwarded = false;
         health = 100;
         this.path = path;
         this.frameCount = frameCount;
@@ -95,7 +98,6 @@ public class Enemy {
         death = loadAnimation("Dead", frameCount[3], 0.2f);
 
         skeletonDead = Gdx.audio.newSound(Gdx.files.internal("Sounds/Enemy/death_3_alex.wav"));
-
 
         if (frameCount.length > 4 && frameCount[4] > 0) {
             hurt = loadAnimation("Hurt", frameCount[4], 0.1f);
@@ -336,5 +338,13 @@ public class Enemy {
 
     public boolean isAttacking() {
         return currState == State.attack;
+    }
+
+    public boolean shouldAwardPoints() {
+        if (health <= 0 && !pointsAwarded) {
+            pointsAwarded = true;
+            return true;
+        }
+        return false;
     }
 }
