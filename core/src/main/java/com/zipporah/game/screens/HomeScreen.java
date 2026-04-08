@@ -78,6 +78,7 @@ public class HomeScreen implements Screen {
 
     if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
       if(startHovering){
+        game.timer.reset();
         game.setScreen(new GameScreen(game));
       }
       if(rankingsHovering){
