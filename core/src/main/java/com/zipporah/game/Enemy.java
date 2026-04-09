@@ -49,6 +49,10 @@ public class Enemy {
     public float innerXOffsetFacingRight;
     public float innerXOffsetFacingLeft;
 
+    public Rectangle attackBox = new Rectangle();
+    float attackBoxWidth = 80f;
+    float attackBoxHeight = 80f;
+
     protected boolean facingRight = true;
 
     public float velocityY = 0f;
@@ -155,6 +159,16 @@ public class Enemy {
 
         batch.draw(currFrame, drawX, y, 0, 0, size, size, scaleX, 1, 0);
         innerBoundaries.setPosition(x + innerXOffset, y);
+
+        if (currState == State.attack) {
+            if (facingRight) {
+                attackBox.set(x + innerXOffset + innerBoundaries.width, y + 20, attackBoxWidth, attackBoxHeight);
+            } else {
+                attackBox.set(x + innerXOffset - attackBoxWidth, y + 20, attackBoxWidth, attackBoxHeight);
+            }
+        } else {
+            attackBox.set(-1000, -1000, attackBoxWidth, attackBoxHeight);
+        }
     }
 
     private void updateEnemyDeath() {
@@ -186,9 +200,9 @@ public class Enemy {
         float dx = playerX - x;
         float dy = playerY - y;
 
-        float attackRange = 80f;
-        float attackVerticalRange = 80f;
-        float stopRange = 80f;
+        float attackRange = 80;
+        float attackVerticalRange = 80;
+        float stopRange = 70;
         float faceDeadzone = 40f;
 
         if (Math.abs(dx) <= stopRange) {

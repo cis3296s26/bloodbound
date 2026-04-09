@@ -513,15 +513,13 @@ public class GameScreen implements Screen {
 
         if (!player.isDead && !player.isHurt && player.hurtCooldown <= 0f) {
             for (Enemy enemy : enemies) {
-                if (enemy != null && !enemy.isRemoved() && enemy.isAttacking()) {
-                    if (spriteBox.overlaps(enemy.innerBoundaries)) {
+                if (enemy != null && !enemy.isRemoved()) {
+                    if (spriteBox.overlaps(enemy.attackBox)) {
                         player.isHurt = true;
                         player.curr_health -= 10;
                         player.health_percentage = player.curr_health / player.max_health;
                         player.hurtCooldown = 1.0f;
-                        if (player.curr_health <= 0) {
-                            player.isDead = true;
-                        }
+                        if (player.curr_health <= 0) player.isDead = true;
                         float knockback = 40f;
                         player.x += (player.x < enemy.x) ? -knockback : knockback;
                         player.velocityY = 250f;
