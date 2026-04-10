@@ -5,9 +5,11 @@
 1.) Install most recent java SE version
 https://www.oracle.com/java/technologies/downloads/
 
-2.) download .jar file from most recent release page
+2.) Download .jar file from most recent release page
 
-3.) install and run!
+3.) Run this command in your terminal: xattr -d com.apple.quarantine ~/Downloads/GameDemo-1.0.0.jar 
+
+4.) Double click on the jar and run!
 
 
 _**Enjoy!**_
