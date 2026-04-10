@@ -3,7 +3,9 @@ package com.zipporah.game.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
@@ -13,6 +15,11 @@ public class OptionsScreen implements Screen{
 
   ExtendViewport viewport;
   BitmapFont font;
+  Texture homeButtonTexture;
+  float homeButtonX = 1205f;
+  float homeButtonY = 670f;
+  float homeButtonWidth = 42f;
+  float homeButtonHeight = 39f;
   
   public OptionsScreen(ScreenManager game){
     this.game = game;
@@ -27,6 +34,7 @@ public class OptionsScreen implements Screen{
 
     viewport = new ExtendViewport(1280, 720);
     font = new BitmapFont();
+    homeButtonTexture = new Texture(Gdx.files.internal("Buttons/HomeButton.png"));
   }
 
   @Override
@@ -34,18 +42,24 @@ public class OptionsScreen implements Screen{
     // Refresh screen
     ScreenUtils.clear(0f, 0f, 0f, 1f);
 
-    // Back to home
-    if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+    viewport.apply();
+    game.batch.setProjectionMatrix(viewport.getCamera().combined);
+
+    Vector2 hudMouse = viewport.unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+    boolean homeButtonHovering =
+        hudMouse.x >= homeButtonX &&
+        hudMouse.x <= homeButtonX + homeButtonWidth &&
+        hudMouse.y >= homeButtonY &&
+        hudMouse.y <= homeButtonY + homeButtonHeight;
+
+    if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && homeButtonHovering) {
       game.setScreen(new HomeScreen(game));
       return;
     }
 
-    viewport.apply();
-    game.batch.setProjectionMatrix(viewport.getCamera().combined);
-
     game.batch.begin();
 
-    font.draw(game.batch, "Press Esc For Back",50, 690);
+    game.batch.draw(homeButtonTexture, homeButtonX, homeButtonY, homeButtonWidth, homeButtonHeight);
     
     game.batch.end();
   }
@@ -73,6 +87,9 @@ public class OptionsScreen implements Screen{
   public void dispose() {
     if (font != null) {
       font.dispose();
+    }
+    if (homeButtonTexture != null) {
+      homeButtonTexture.dispose();
     }
   }
   
