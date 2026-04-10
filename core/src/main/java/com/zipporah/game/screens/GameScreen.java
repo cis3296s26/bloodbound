@@ -41,6 +41,11 @@ public class GameScreen implements Screen {
     float scale = 4f; // change back to 4f just for test
     ExtendViewport viewport;
     FitViewport viewportHUD;
+    Texture homeButtonTexture;
+    float homeButtonX = 1205f;
+    float homeButtonY = 670f;
+    float homeButtonWidth = 42f;
+    float homeButtonHeight = 39f;
 
     // array for all colossion rectangles from tiled map
     public static Array<Rectangle> collisionRectangles = new Array<>();
@@ -209,6 +214,8 @@ public class GameScreen implements Screen {
         viewportHUD = new FitViewport(1280, 720);
         game.batch.setProjectionMatrix(viewport.getCamera().combined);
 
+        homeButtonTexture = new Texture(Gdx.files.internal("Buttons/HomeButton.png"));
+
         // // render in map
         // // moving this is initLevel method
         // map = new TmxMapLoader().load("level_1.tmx");
@@ -241,6 +248,7 @@ public class GameScreen implements Screen {
         closeDoorTexture = new Texture(Gdx.files.internal("Maps/door_closed.png"));
         openDoorTexture = new Texture(Gdx.files.internal("Maps/door_open.png"));
         keyTexture = new Texture(Gdx.files.internal("Maps/key.png"));
+        homeButtonTexture = new Texture(Gdx.files.internal("Buttons/HomeButton.png"));
 
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
         cam.position.set(640, 360, 0);
@@ -310,6 +318,22 @@ public class GameScreen implements Screen {
 
     protected void input(float delta) {
         player.input(delta);
+
+        Vector2 hudMouse = viewportHUD.unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+        boolean homeButtonHovering =
+                hudMouse.x >= homeButtonX &&
+                hudMouse.x <= homeButtonX + homeButtonWidth &&
+                hudMouse.y >= homeButtonY &&
+                hudMouse.y <= homeButtonY + homeButtonHeight;
+
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && homeButtonHovering) {
+            if (music1 != null) {
+                music1.stop();
+            }
+            game.setScreen(new HomeScreen(game));
+            return;
+        }
+
         if (touchingLadder || onLadder) {
             if (Gdx.input.isKeyPressed(Input.Keys.W) ||
                     Gdx.input.isKeyPressed(Input.Keys.UP)) {
@@ -673,6 +697,7 @@ public class GameScreen implements Screen {
         game.batch.draw(player.hpForeground1, 10, 700, player.bar_width, player.hpForeground1.getHeight());
         game.batch.draw(keyTexture, 882, 672, 64f, 64f);
         game.timer.font.draw(game.batch, String.format("%dx", keyCount), 946, 700);
+        game.batch.draw(homeButtonTexture, homeButtonX, homeButtonY, homeButtonWidth, homeButtonHeight);
         game.batch.end();
 
         // Test Projectile and Karasu Hitboxes with these
@@ -709,6 +734,9 @@ public class GameScreen implements Screen {
     public void dispose() {
         if (music1 != null) {
             music1.dispose();
+        }
+        if (homeButtonTexture != null) {
+            homeButtonTexture.dispose();
         }
 
     }
