@@ -5,7 +5,9 @@ import java.util.List;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.zipporah.game.entities.GameRun;
@@ -16,6 +18,11 @@ public class RankingsScreen implements Screen {
 
   ExtendViewport viewport;
   BitmapFont font;
+  Texture homeButtonTexture;
+  float homeButtonX = 1205f;
+  float homeButtonY = 670f;
+  float homeButtonWidth = 42f;
+  float homeButtonHeight = 39f;
 
   public RankingsScreen(ScreenManager game) {
     this.game = game;
@@ -25,6 +32,7 @@ public class RankingsScreen implements Screen {
   public void show() {
     viewport = new ExtendViewport(1280, 720);
     font = new BitmapFont();
+    homeButtonTexture = new Texture(Gdx.files.internal("Buttons/HomeButton.png"));
     game.playerData.load();
   }
 
@@ -33,21 +41,25 @@ public class RankingsScreen implements Screen {
     // Refresh screen
     ScreenUtils.clear(0f, 0f, 0f, 1f);
 
-    // Back to home
-    if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+    viewport.apply();
+    game.batch.setProjectionMatrix(viewport.getCamera().combined);
+
+    Vector2 hudMouse = viewport.unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+    boolean homeButtonHovering =
+        hudMouse.x >= homeButtonX &&
+        hudMouse.x <= homeButtonX + homeButtonWidth &&
+        hudMouse.y >= homeButtonY &&
+        hudMouse.y <= homeButtonY + homeButtonHeight;
+
+    if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && homeButtonHovering) {
       game.setScreen(new HomeScreen(game));
       return;
     }
-
-    viewport.apply();
-    game.batch.setProjectionMatrix(viewport.getCamera().combined);
 
     List<GameRun> pointsRuns = game.playerData.getPointsRuns();
     List<GameRun> speedRuns = game.playerData.getSpeedRuns();
 
     game.batch.begin();
-
-    font.draw(game.batch, "Press Esc For Back",50, 690);
 
     font.draw(game.batch, "Player Stats", 560, 690);
     font.draw(game.batch, "Best Run (Overall)", 220, 630);
@@ -77,6 +89,8 @@ public class RankingsScreen implements Screen {
       }
     }
 
+    game.batch.draw(homeButtonTexture, homeButtonX, homeButtonY, homeButtonWidth, homeButtonHeight);
+
     game.batch.end();
   }
 
@@ -102,6 +116,11 @@ public class RankingsScreen implements Screen {
 
   @Override
   public void dispose() {
-    font.dispose();
+    if (font != null) {
+      font.dispose();
+    }
+    if (homeButtonTexture != null) {
+      homeButtonTexture.dispose();
+    }
   }
 }

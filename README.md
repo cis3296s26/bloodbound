@@ -2,25 +2,15 @@
    For bored gamers who are looking for something fun in their spare time, without spending any money, Bloodbound is a new 2D platformer that is fully free and open source. Unlike other platformers from publishers like Nintendo, which come at a high cost, Bloodbound is free and accessible to all who wish to play or contribute.  
 
 ## How to run
+1.) Install most recent java SE version
+https://www.oracle.com/java/technologies/downloads/
 
-**This GitHub Repository > Releases > Select the most recent release**
+2.) Download .jar file from most recent release page
 
-### **MacOS:**
-- For M-Chips, download a .dmg file that begins with "GameDemo-macM1"
-- For Intel-Chips, download a .dmg file that begins with "GameDemo-macX64"
+3.) If your are on mac run this command in your terminal: xattr -d com.apple.quarantine ~/Downloads/GameDemo-1.0.0.jar 
 
-Unpack the .dmg file and drag the .app file (game) to your desktop.
+4.) Double click on the jar and run!
 
-### **Windows:**
-- Download and run the GameDemo.exe file 
-
-### **Else** 
-- Clone the repository and run these following commands:
-- chmod +x gradlew
-- ./gradlew lwjgl3:run
-
-### Quick Links:
-- Download Windows Game Version: https://tinyurl.com/bbound2
 
 _**Enjoy!**_
 

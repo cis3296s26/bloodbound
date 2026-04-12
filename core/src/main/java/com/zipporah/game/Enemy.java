@@ -1,4 +1,5 @@
 package com.zipporah.game;
+
 import com.badlogic.gdx.Gdx;
 
 import com.badlogic.gdx.graphics.Texture;
@@ -16,7 +17,6 @@ public class Enemy {
     protected TextureRegion currFrame;
     public float time = 0;
     Sound skeletonDead;
-
 
     protected static class AnimationBundle {
         private final Texture texture;
@@ -49,6 +49,10 @@ public class Enemy {
     public float innerXOffsetFacingRight;
     public float innerXOffsetFacingLeft;
 
+    public Rectangle attackBox = new Rectangle();
+    float attackBoxWidth = 80f;
+    float attackBoxHeight = 80f;
+
     protected boolean facingRight = true;
 
     public float velocityY = 0f;
@@ -63,6 +67,8 @@ public class Enemy {
 
     protected boolean removed = false;
     protected boolean hurtActive = false;
+
+    protected boolean pointsAwarded = false;
 
     public Rectangle ground = new Rectangle();
     protected float groundAhead = 10f;
@@ -84,6 +90,7 @@ public class Enemy {
     public void create(String path, int[] frameCount) {
         removed = false;
         hurtActive = false;
+        pointsAwarded = false;
         health = 100;
         this.path = path;
         this.frameCount = frameCount;
@@ -95,7 +102,6 @@ public class Enemy {
         death = loadAnimation("Dead", frameCount[3], 0.2f);
 
         skeletonDead = Gdx.audio.newSound(Gdx.files.internal("Sounds/Enemy/death_3_alex.wav"));
-
 
         if (frameCount.length > 4 && frameCount[4] > 0) {
             hurt = loadAnimation("Hurt", frameCount[4], 0.1f);
@@ -153,6 +159,16 @@ public class Enemy {
 
         batch.draw(currFrame, drawX, y, 0, 0, size, size, scaleX, 1, 0);
         innerBoundaries.setPosition(x + innerXOffset, y);
+
+        if (currState == State.attack) {
+            if (facingRight) {
+                attackBox.set(x + innerXOffset + innerBoundaries.width, y + 20, attackBoxWidth, attackBoxHeight);
+            } else {
+                attackBox.set(x + innerXOffset - attackBoxWidth, y + 20, attackBoxWidth, attackBoxHeight);
+            }
+        } else {
+            attackBox.set(-1000, -1000, attackBoxWidth, attackBoxHeight);
+        }
     }
 
     private void updateEnemyDeath() {
@@ -184,9 +200,9 @@ public class Enemy {
         float dx = playerX - x;
         float dy = playerY - y;
 
-        float attackRange = 80f;
-        float attackVerticalRange = 80f;
-        float stopRange = 80f;
+        float attackRange = 80;
+        float attackVerticalRange = 80;
+        float stopRange = 70;
         float faceDeadzone = 40f;
 
         if (Math.abs(dx) <= stopRange) {
@@ -336,5 +352,13 @@ public class Enemy {
 
     public boolean isAttacking() {
         return currState == State.attack;
+    }
+
+    public boolean shouldAwardPoints() {
+        if (health <= 0 && !pointsAwarded) {
+            pointsAwarded = true;
+            return true;
+        }
+        return false;
     }
 }

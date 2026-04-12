@@ -1,5 +1,6 @@
 .gitkeep
 Buttons/ControlsButton.png
+Buttons/HomeButton.png
 Buttons/OptionsButton.png
 Buttons/QuitButton.png
 Buttons/RankingsButton.png

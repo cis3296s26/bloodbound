@@ -3,21 +3,21 @@ import com.badlogic.gdx.math.Rectangle;
 import com.zipporah.game.Enemy;
 
 public class Skeleton extends Enemy {
-    @Override
-    public void create() {
+    public Skeleton(int spawnX, int spawnY, int spriteSize, float innerXOffsetFacingRight, float innerXOffsetFacingLeft, int boundaryWidth, int boundaryHeight) {
         // 0 - idle, 1 - walk, 2 - attack, 3 - dead
-        super.create("Skeleton", new int[] {7, 7, 4, 5, 3});
+        super.create("Skeleton", new int[]{7, 7, 4, 5, 3});
 
         // Spawn Location
-        super.x = 1800;
-        super.y = 50;
-        super.size = 200;
+        super.x = spawnX;
+        super.y = spawnY;
+        super.size = spriteSize;
 
         // HitBox
-        super.innerXOffsetFacingRight = 60f;
-        super.innerXOffsetFacingLeft = 70f;
+        super.innerXOffsetFacingRight = innerXOffsetFacingRight;
+        super.innerXOffsetFacingLeft = innerXOffsetFacingLeft;
         super.innerXOffset = super.innerXOffsetFacingLeft;
 
-        innerBoundaries = new Rectangle((int) (x + innerXOffset), (int) y, 62, 120);
+        innerBoundaries = new Rectangle((int) (x + innerXOffset), (int) y, boundaryWidth, boundaryHeight);
     }
 }
+//(1800, 50, 200, 60f, 70f, 62, 120)
