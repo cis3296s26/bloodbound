@@ -76,6 +76,12 @@ public class GameScreen implements Screen {
     // doors
     Texture openDoorTexture;
     Texture closeDoorTexture;
+    Texture openDoor2Texture;
+    Texture closeDoor2Texture;
+    Vector2 finalDoorPosition = new Vector2();
+    Rectangle finalDoorRect = new Rectangle();
+    boolean finalDoorOpen = false;
+    protected boolean lastDoorTransitions = true;
     Vector2 firstDoorPosition = new Vector2();
     Vector2 lastDoorPosition = new Vector2();
     boolean firstDoorOpen = false;
@@ -180,6 +186,19 @@ public class GameScreen implements Screen {
         }
     }
 
+    private void getFinalDoorObjects() {
+        MapLayer layer = map.getLayers().get("final_door");
+        if (layer == null) return;
+        for (MapObject obj : layer.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                finalDoorPosition.set(r.x * scale, r.y * scale);
+                finalDoorRect.set(r.x * scale, r.y * scale, r.width * scale, r.height * scale);
+            }
+        }
+        wallRectangles.add(finalDoorRect);
+    }
+
     private void getDoorObjects() {
         MapLayer layer1 = map.getLayers().get("first_door");
         for (MapObject obj : layer1.getObjects()) {
@@ -242,11 +261,14 @@ public class GameScreen implements Screen {
         getSpikeObjects();
         getChestObjects();
         getDoorObjects();
+        getFinalDoorObjects();
 
         closeChestTexture = new Texture(Gdx.files.internal("Maps/chest_closed.png"));
         openChestTexture = new Texture(Gdx.files.internal("Maps/chest_open.png"));
         closeDoorTexture = new Texture(Gdx.files.internal("Maps/door_closed.png"));
         openDoorTexture = new Texture(Gdx.files.internal("Maps/door_open.png"));
+        closeDoor2Texture = new Texture(Gdx.files.internal("Maps/door2_closed.png"));
+        openDoor2Texture = new Texture(Gdx.files.internal("Maps/door2_open.png"));
         keyTexture = new Texture(Gdx.files.internal("Maps/key.png"));
         homeButtonTexture = new Texture(Gdx.files.internal("Buttons/HomeButton.png"));
 
@@ -401,13 +423,15 @@ public class GameScreen implements Screen {
                     keyCount--;
 
                     // switching game screens
-                    Gdx.app.postRunnable(new Runnable() {
-                        @Override
-                        public void run() {
-                            music1.stop();
-                            game.setScreen(new GameScreen2(game));
-                        }
-                    });
+                    if (lastDoorTransitions) {
+                        Gdx.app.postRunnable(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (music1 != null) music1.stop();
+                                game.setScreen(new GameScreen2(game));
+                            }
+                        });
+                    }
                 }
             }
         }

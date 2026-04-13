@@ -1,9 +1,18 @@
 package com.zipporah.game.screens;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.zipporah.game.Enemy;
+import com.zipporah.game.Player;
+
+import java.util.Iterator;
 
 public class GameScreen2 extends GameScreen {
     public GameScreen2(ScreenManager game) {
@@ -42,13 +51,140 @@ public class GameScreen2 extends GameScreen {
         // this will keep the movements and chest interact
         super.input(delta);
 
+
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+            if (!lastDoorOpen && haveChest2key) {
+                float distToDoor2 = Vector2.dst(player.x, player.y, lastDoorPosition.x, lastDoorPosition.y);
+                if (distToDoor2 < doorInteractionRange) {
+                    lastDoorOpen = true;
+                    wallRectangles.removeValue(lastDoorRect, true);
+                    doorOpenTime = 0.1f;
+                    keyCount--;
+                }
+            }
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+
+            // final door of level 2 sends player back to homescreen
+            // ** ONLY TO TEST RANKINGS, CHANGE THIS TO GO TO BOSS LEVEL
+            if (!finalDoorOpen) {
+                float distToFinal = Vector2.dst(player.x, player.y, finalDoorPosition.x, finalDoorPosition.y);
+                if (distToFinal < doorInteractionRange) {
+                    finalDoorOpen = true;
+                    wallRectangles.removeValue(finalDoorRect, true);
+                    doorOpenTime = 0.1f;
+                    keyCount--;
+                    if (music1 != null) {
+                        music1.stop();
+                    }
+                    game.setScreen(new HomeScreen(game));
+                }
+            }
+        }
+
+
+
         // level 2 specific interactions (probably wont be any we shall see)
     }
 
+    @Override
+    protected void draw(float delta) {
+        ScreenUtils.clear(Color.BLACK);
+        viewport.apply();
+
+        OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
+
+        // draw the tiled map, renders at scale of 4 so tiles are 64 units each
+        renderer.setView(cam);
+        renderer.render();
+
+        game.batch.setProjectionMatrix(cam.combined);
+
+        game.batch.begin();
+
+        // draw chests
+        float chestWidth = 16 * 2 * scale;
+        float chestHeight = 32 * 2 * scale;
+        game.batch.draw(chest1Open ? openChestTexture : closeChestTexture, chest1Position.x, chest1Position.y,
+                chestWidth, chestHeight);
+        game.batch.draw(chest2Open ? openChestTexture : closeChestTexture, chest2Position.x, chest2Position.y,
+                chestWidth, chestHeight);
+
+        // draw doors
+        float doorWidth = 16 * 2 * scale;
+        float doorHeight = 32 * 2 * scale;
+        game.batch.draw(firstDoorOpen ? openDoor2Texture : closeDoor2Texture, firstDoorPosition.x, firstDoorPosition.y,
+                doorWidth, doorHeight);
+        game.batch.draw(lastDoorOpen ? openDoor2Texture : closeDoor2Texture, lastDoorPosition.x, lastDoorPosition.y,
+                doorWidth, doorHeight);
+
+        for (Enemy enemy : enemies) {
+            if (enemy != null && !enemy.isRemoved()) {
+                enemy.draw(game.batch, enemy.time, delta);
+            }
+        }
+
+        float drawX;
+        float scaleX;
+
+        if (player.facing_right) {
+            drawX = player.x;
+            scaleX = 1;
+        } else {
+            drawX = player.x + player.sprit_size;
+            scaleX = -1;
+        }
+
+        if (player.attacking)
+            player.updateSpriteAttack(delta);
+
+        Iterator<Player.Projectile> projectilesIterator = player.projectiles.iterator();
+        while (projectilesIterator.hasNext()) {
+            Player.Projectile projectile = projectilesIterator.next();
+            projectile.update(delta);
+            if (projectile.lifetime <= 0)
+                projectilesIterator.remove();
+            else {
+                TextureRegion projectileFrame = projectile.projectileAnimation.getKeyFrame(projectile.animationDuration,
+                        true);
+                game.batch.draw(projectileFrame, projectile.x, projectile.y, 0, 0, 64, 48, projectile.scaleX, 1, 0);
+            }
+        }
+
+        game.batch.draw(player.currFrame, drawX, player.y, 0, 0, player.sprit_size, player.sprit_size, scaleX, 1, 0);
+
+        game.batch.end();
+
+        viewportHUD.apply();
+        game.batch.setProjectionMatrix(viewportHUD.getCamera().combined);
+        player.bar_width = player.health_percentage * player.hpForeground1.getWidth();
+
+        game.batch.begin();
+        game.timer.draw(game.batch);
+        game.batch.draw(player.hpBackground1, 10, 700);
+        game.batch.draw(player.hpForeground1, 10, 700, player.bar_width, player.hpForeground1.getHeight());
+        game.batch.draw(keyTexture, 882, 672, 64f, 64f);
+        game.timer.font.draw(game.batch, String.format("%dx", keyCount), 946, 700);
+        game.batch.draw(homeButtonTexture, homeButtonX, homeButtonY, homeButtonWidth, homeButtonHeight);
+        game.batch.end();
+
+        // Test Projectile and Karasu Hitboxes with these
+        // shapeRenderer.setProjectionMatrix(cam.combined);
+        // shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        // for (Player.Projectile projectile : player.projectiles) {
+        // shapeRenderer.rect(projectile.box.x, projectile.box.y, projectile.box.width,
+        // projectile.box.height);
+        // }
+        // shapeRenderer.end();
+
+    }
 
     @Override
     public void show() {
         super.show();
+        lastDoorTransitions = false;
 
         // clear old enemies
         enemies.clear();
