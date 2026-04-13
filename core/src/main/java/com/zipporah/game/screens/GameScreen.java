@@ -413,9 +413,9 @@ public class GameScreen implements Screen {
         }
 
         // test game level 2
-        // if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
-        // game.setScreen(new GameScreen2(game));
-        // }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
+            game.setScreen(new GameScreen2(game));
+        }
     }
 
     protected void logic(float delta) {
@@ -611,7 +611,7 @@ public class GameScreen implements Screen {
                     Player.Projectile projectile = projectilesIterator.next();
                     if (projectile.box.overlaps(enemy.innerBoundaries)) {
                         enemy.health -= projectile.damage;
-                        skeletonHurt.play(0.25f);
+                        skeletonHurt.play(0.40f);
                         enemy.triggerHurt();
                         projectilesIterator.remove();
                     }

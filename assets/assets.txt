@@ -29,12 +29,15 @@ Enemies/Skeleton/Walk.png
 Fonts/Final_Fantasy_VII.ttf
 Logos/PixelLogo.png
 Maps/Battleground2.png
+Maps/Decor.png
 Maps/Dungeon Tile Set.png
 Maps/chest_closed.png
 Maps/chest_open.png
+Maps/door.png
 Maps/door_closed.png
 Maps/door_open.png
 Maps/key.png
+Maps/more tiles.png
 Maps/spritesheet.png
 Music/spencer_yk-castle-of-athanasius-151010.mp3
 Player/Attack_1.png
