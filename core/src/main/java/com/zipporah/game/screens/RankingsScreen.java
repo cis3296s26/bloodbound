@@ -20,10 +20,15 @@ public class RankingsScreen implements Screen {
   ExtendViewport viewport;
   BitmapFont font;
   Texture homeButtonTexture;
+  Texture clearButtonTexture;
   float homeButtonX = 1205f;
   float homeButtonY = 670f;
   float homeButtonWidth = 42f;
   float homeButtonHeight = 39f;
+  float clearButtonX = 1100f;
+  float clearButtonY = 20f;
+  float clearButtonWidth = 168f;
+  float clearButtonHeight = 64f;
 
   public RankingsScreen(ScreenManager game) {
     this.game = game;
@@ -34,6 +39,7 @@ public class RankingsScreen implements Screen {
     viewport = new ExtendViewport(1280, 720);
     font = new BitmapFont();
     homeButtonTexture = new Texture(Gdx.files.internal("Buttons/HomeButton.png"));
+    clearButtonTexture = new Texture(Gdx.files.internal("Buttons/clearButton.png"));
     game.playerData.load();
   }
 
@@ -54,6 +60,17 @@ public class RankingsScreen implements Screen {
 
     if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && homeButtonHovering) {
       game.setScreen(new HomeScreen(game));
+      return;
+    }
+
+    boolean clearButtonHovering =
+            hudMouse.x >= clearButtonX &&
+                    hudMouse.x <= clearButtonX + clearButtonWidth &&
+                    hudMouse.y >= clearButtonY &&
+                    hudMouse.y <= clearButtonY + clearButtonHeight;
+
+    if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && clearButtonHovering) {
+      game.playerData.clearRuns();
       return;
     }
 
@@ -108,6 +125,7 @@ public class RankingsScreen implements Screen {
     font.setColor(Color.WHITE);
 
     game.batch.draw(homeButtonTexture, homeButtonX, homeButtonY, homeButtonWidth, homeButtonHeight);
+    game.batch.draw(clearButtonTexture, clearButtonX, clearButtonY, clearButtonWidth, clearButtonHeight);
     game.batch.end();
   }
 
@@ -138,6 +156,9 @@ public class RankingsScreen implements Screen {
     }
     if (homeButtonTexture != null) {
       homeButtonTexture.dispose();
+    }
+    if (clearButtonTexture != null) {
+      clearButtonTexture.dispose();
     }
   }
 }

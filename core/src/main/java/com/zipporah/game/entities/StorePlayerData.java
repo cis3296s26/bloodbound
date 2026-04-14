@@ -21,6 +21,11 @@ public class StorePlayerData {
     Gdx.files.local(RUNS_FILE).writeString(json.prettyPrint(runs), false);
   }
 
+  public void clearRuns() {
+    runs.clear();
+    Gdx.files.local(RUNS_FILE).writeString("[]", false);
+  }
+
   public void load() {
     runs.clear();
     FileHandle file = Gdx.files.local(RUNS_FILE);
