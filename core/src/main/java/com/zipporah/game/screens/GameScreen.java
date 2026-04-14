@@ -717,8 +717,8 @@ public class GameScreen implements Screen {
 
         game.batch.begin();
         game.timer.draw(game.batch);
-        game.batch.draw(player.hpBackground1, 10, 700);
-        game.batch.draw(player.hpForeground1, 10, 700, player.bar_width, player.hpForeground1.getHeight());
+        game.batch.draw(player.hpBackground1, 10, 700, player.hpBackground1.getWidth() * player.w_scale, player.hpBackground1.getHeight());
+        game.batch.draw(player.hpForeground1, 11, 700, player.bar_width * player.w_scale, player.hpForeground1.getHeight());
         game.batch.draw(keyTexture, 882, 672, 64f, 64f);
         game.timer.font.draw(game.batch, String.format("%dx", keyCount), 946, 700);
         game.batch.draw(homeButtonTexture, homeButtonX, homeButtonY, homeButtonWidth, homeButtonHeight);

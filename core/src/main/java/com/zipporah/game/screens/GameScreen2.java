@@ -11,6 +11,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.zipporah.game.Enemy;
 import com.zipporah.game.Player;
+import com.zipporah.game.enemies.Skeleton;
 
 import java.util.Iterator;
 
@@ -44,6 +45,7 @@ public class GameScreen2 extends GameScreen {
 
 
         // add music
+
     }
 
     @Override
@@ -163,8 +165,8 @@ public class GameScreen2 extends GameScreen {
 
         game.batch.begin();
         game.timer.draw(game.batch);
-        game.batch.draw(player.hpBackground1, 10, 700);
-        game.batch.draw(player.hpForeground1, 10, 700, player.bar_width, player.hpForeground1.getHeight());
+        game.batch.draw(player.hpBackground1, 10, 700, player.hpBackground1.getWidth() * player.w_scale, player.hpBackground1.getHeight());
+        game.batch.draw(player.hpForeground1, 10, 700, player.bar_width * player.w_scale, player.hpForeground1.getHeight());
         game.batch.draw(keyTexture, 882, 672, 64f, 64f);
         game.timer.font.draw(game.batch, String.format("%dx", keyCount), 946, 700);
         game.batch.draw(homeButtonTexture, homeButtonX, homeButtonY, homeButtonWidth, homeButtonHeight);
@@ -190,6 +192,9 @@ public class GameScreen2 extends GameScreen {
         enemies.clear();
 
         // add level 2 enemies
+        enemies.add(new Skeleton(10, 400, 200, 60f, 70f, 62, 120));
+        enemies.add(new Skeleton(1300, 200, 200, 60f, 70f, 62, 120));
+        enemies.add(new Skeleton(3000, 200, 200, 60f, 70f, 62, 120));
 
     }
 // let render be handled in game screen 1
