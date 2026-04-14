@@ -102,6 +102,8 @@ public class GameScreen implements Screen {
 
     // sound
     Sound skeletonHurt;
+    Sound keyFound;
+    Sound doorUnlocked;
 
     // music
     Music music1;
@@ -296,6 +298,10 @@ public class GameScreen implements Screen {
 
         // sounds
         skeletonHurt = Gdx.audio.newSound(Gdx.files.internal("Sounds/Enemy/crunch_splat.wav"));
+
+        keyFound = Gdx.audio.newSound(Gdx.files.internal("Sounds/Interactables/keys_jingling.wav"));
+
+        doorUnlocked = Gdx.audio.newSound(Gdx.files.internal("Sounds/Interactables/lock_unlock.wav"));
         // playerDead =
         // Gdx.audio.newSound(Gdx.files.internal("Sounds/Player/death_9_meghan.wav"));
     }
@@ -385,6 +391,7 @@ public class GameScreen implements Screen {
                 float dist1 = Vector2.dst(player.x, player.y, chest1Position.x, chest1Position.y);
                 if (dist1 < chestInteractionRange) {
                     chest1Open = true;
+                    keyFound.play(30);
                     haveChest1key = true;
                     keyCount++;
                 }
@@ -395,6 +402,7 @@ public class GameScreen implements Screen {
                 float dist2 = Vector2.dst(player.x, player.y, chest2Position.x, chest2Position.y);
                 if (dist2 < chestInteractionRange) {
                     chest2Open = true;
+                    keyFound.play(30);
                     haveChest2key = true;
                     keyCount++;
                 }
@@ -408,6 +416,7 @@ public class GameScreen implements Screen {
                     firstDoorOpen = true;
                     // door can be walked through
                     wallRectangles.removeValue(firstDoorRect, true);
+                    doorUnlocked.play(30);
                     float doorOpenTime = 0.1f;
                     keyCount--;
                 }
@@ -419,6 +428,7 @@ public class GameScreen implements Screen {
                     lastDoorOpen = true;
                     // door can be walked through
                     wallRectangles.removeValue(lastDoorRect, true);
+                    doorUnlocked.play(30);
                     float doorOpenTime = 0.1f;
                     keyCount--;
 
