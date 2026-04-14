@@ -192,8 +192,10 @@ public class GameScreen2 extends GameScreen {
         enemies.clear();
 
         // add level 2 enemies
-       // enemies.add(new Skeleton(1, 1, 200, 60f, 70f, 62, 120));
-       // enemies.add(new Skeleton(1, 1, 200, 60f, 70f, 62, 120));
+        enemies.add(new Skeleton(10, 400, 200, 60f, 70f, 62, 120));
+        enemies.add(new Skeleton(1300, 200, 200, 60f, 70f, 62, 120));
+        enemies.add(new Skeleton(3000, 200, 200, 60f, 70f, 62, 120));
+
     }
 // let render be handled in game screen 1
 //    @Override
