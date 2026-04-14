@@ -8,61 +8,51 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 
 public class StorePlayerData {
-  private static final String POINTS_FILE = "runs_by_points.json";
-  private static final String SPEED_FILE = "runs_by_speed.json";
+  private static final String RUNS_FILE = "runs.json";
 
   private final Json json = new Json();
-  private final ArrayList<GameRun> pointsRuns = new ArrayList<>();
-  private final ArrayList<GameRun> speedRuns = new ArrayList<>();
+  private final ArrayList<GameRun> runs = new ArrayList<>();
+
+  public void saveRun(float elapsedTime, int points) {
+    load();
+    int runNumber = runs.size() + 1;
+    runs.add(new GameRun(elapsedTime, points, runNumber));
+    sortRuns();
+    Gdx.files.local(RUNS_FILE).writeString(json.prettyPrint(runs), false);
+  }
 
   public void load() {
-    pointsRuns.clear();
-    speedRuns.clear();
-    readRuns(POINTS_FILE, pointsRuns);
-    readRuns(SPEED_FILE, speedRuns);
-    sortPointsRuns();
-    sortSpeedRuns();
-  }
+    runs.clear();
+    FileHandle file = Gdx.files.local(RUNS_FILE);
 
-  private void readRuns(String path, ArrayList<GameRun> target) {
-    FileHandle file = Gdx.files.local(path);
     if (!file.exists()) {
       file.writeString("[]", false);
-    }
-    String fileRaw = file.readString();
-    if (fileRaw == null || fileRaw.trim().isEmpty()) {
       return;
     }
-    ArrayList loaded = json.fromJson(ArrayList.class, GameRun.class, fileRaw);
-    if (loaded == null) {
+
+    String raw = file.readString();
+    if (raw == null || raw.trim().isEmpty()){
       return;
     }
+
+    ArrayList loaded = json.fromJson(ArrayList.class, GameRun.class, raw);
+    if (loaded == null){
+      return;
+    }
+
     for (Object item : loaded) {
       if (item instanceof GameRun) {
-        target.add((GameRun) item);
+        runs.add((GameRun) item);
       }
     }
+    sortRuns();
   }
 
-  private void writeRuns(String path, ArrayList<GameRun> runs) {
-    Gdx.files.local(path).writeString(json.prettyPrint(runs), false);
+  private void sortRuns() {
+    runs.sort(Comparator.comparingDouble(run -> run.elapsedTime));
   }
 
-  public ArrayList<GameRun> getPointsRuns() {
-    return pointsRuns;
-  }
-
-  public ArrayList<GameRun> getSpeedRuns() {
-    return speedRuns;
-  }
-
-  private void sortPointsRuns() {
-    pointsRuns.sort(Comparator
-        .comparingInt((GameRun run) -> run.points).reversed()
-        .thenComparingDouble(run -> run.elapsedTime));
-  }
-
-  private void sortSpeedRuns() {
-    speedRuns.sort(Comparator.comparingDouble(run -> run.elapsedTime));
+  public ArrayList<GameRun> getRuns() {
+    return runs;
   }
 }

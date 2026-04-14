@@ -56,41 +56,24 @@ public class RankingsScreen implements Screen {
       return;
     }
 
-    List<GameRun> pointsRuns = game.playerData.getPointsRuns();
-    List<GameRun> speedRuns = game.playerData.getSpeedRuns();
+    List<GameRun> runs = game.playerData.getRuns();
 
     game.batch.begin();
+    font.draw(game.batch, "Rankings", 560, 690);
 
-    font.draw(game.batch, "Player Stats", 560, 690);
-    font.draw(game.batch, "Best Run (Overall)", 220, 630);
-    font.draw(game.batch, "Fastest Run", 760, 630);
-
-    // Pull Best Runs
-    float pointsY = 580;
-    if (pointsRuns.isEmpty()) {
-      font.draw(game.batch, "No runs saved yet", 120, pointsY);
+    if (runs.isEmpty()) {
+      font.draw(game.batch, "No runs saved yet", 400, 580);
     } else {
-      for (int i = 0; i < pointsRuns.size() && i < 10; i++) {
-        GameRun run = pointsRuns.get(i);
-        font.draw(game.batch, (i + 1) + ". " + run.points + " pts  " + run.elapsedTime + " s", 120, pointsY);
-        pointsY -= 35;
+      float y = 630;
+      for (int i = 0; i < runs.size() && i < 10; i++) {
+        GameRun run = runs.get(i);
+        String line = (i + 1) + ".)  Run " + run.runNumber
+                + ":  Time: " + String.format("%.1f", run.elapsedTime)
+                + " seconds,  " + run.points + " points";
+        font.draw(game.batch, line, 120, y);
+        y -= 45;
       }
     }
-
-    // Pull Speed Runs
-    float speedY = 580;
-    if (speedRuns.isEmpty()) {
-      font.draw(game.batch, "No runs saved yet", 660, speedY);
-    } else {
-      for (int i = 0; i < speedRuns.size() && i < 10; i++) {
-        GameRun run = speedRuns.get(i);
-        font.draw(game.batch, (i + 1) + ". " + run.elapsedTime + " s  " + run.points + " pts", 660, speedY);
-        speedY -= 35;
-      }
-    }
-
-    game.batch.draw(homeButtonTexture, homeButtonX, homeButtonY, homeButtonWidth, homeButtonHeight);
-
     game.batch.end();
   }
 
