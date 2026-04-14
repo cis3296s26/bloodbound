@@ -81,6 +81,10 @@ public class GameScreen2 extends GameScreen {
                     if (music1 != null) {
                         music1.stop();
                     }
+
+                    game.timer.stop(); // we need to add this method to CurrentRun
+                    game.playerData.saveRun(game.timer.getElapsedTime(), (int) game.timer.getPoints());
+
                     game.setScreen(new HomeScreen(game));
                 }
             }

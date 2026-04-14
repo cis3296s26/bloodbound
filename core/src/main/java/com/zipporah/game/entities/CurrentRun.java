@@ -9,13 +9,20 @@ public class CurrentRun {
   private float elapsedTime = 0f;
   private int points = 0;
   public BitmapFont font;
+  private boolean running = true;
 
   public CurrentRun(){
     font = new BitmapFont();
   }
 
+  public void stop(){
+    running = false;
+  }
+
   public void update() {
+    if (running){
       elapsedTime += Gdx.graphics.getDeltaTime();
+    }
   }
 
   public void addPoints(int amount) {
@@ -42,5 +49,6 @@ public class CurrentRun {
   public void reset() {
     elapsedTime = 0f;
     points = 0;
+    running = true;
   }
 }
