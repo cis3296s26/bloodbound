@@ -5,6 +5,7 @@ import java.util.List;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
@@ -59,21 +60,54 @@ public class RankingsScreen implements Screen {
     List<GameRun> runs = game.playerData.getRuns();
 
     game.batch.begin();
-    font.draw(game.batch, "Rankings", 560, 690);
+
+    // title
+    font.draw(game.batch, "YOUR HIGH SCORES", 570, 690);
+
+    // column headers
+    font.draw(game.batch, "RANK", 280, 640);
+    font.draw(game.batch, "TIME", 620, 640);
+    font.draw(game.batch, "POINTS", 920, 640);
+
+    // row of alt red and white
+    Color[] rowColors = {
+            Color.WHITE,
+            Color.RED,
+            Color.WHITE,
+            Color.RED,
+            Color.WHITE,
+            Color.RED,
+            Color.WHITE,
+            Color.RED,
+            Color.WHITE,
+            Color.RED
+    };
+
+    String[] ranks = {"1ST","2ND","3RD","4TH","5TH","6TH","7TH","8TH","9TH","10TH"};
 
     if (runs.isEmpty()) {
+      font.setColor(Color.WHITE);
       font.draw(game.batch, "No runs saved yet", 400, 580);
     } else {
-      float y = 630;
+      float y = 590;
       for (int i = 0; i < runs.size() && i < 10; i++) {
         GameRun run = runs.get(i);
-        String line = (i + 1) + ".)  Run " + run.runNumber
-                + ":  Time: " + String.format("%.1f", run.elapsedTime)
-                + " seconds,  " + run.points + " points";
-        font.draw(game.batch, line, 120, y);
-        y -= 45;
+        font.setColor(rowColors[i]);
+        font.draw(game.batch, ranks[i], 280, y);
+        font.draw(game.batch, String.format("%.1fs", run.elapsedTime), 620, y);
+        if(run.points >= 10){
+          font.draw(game.batch, String.valueOf(run.points), 937, y);
+        } else{
+          font.draw(game.batch, String.valueOf(run.points), 940, y);
+        }
+        y -= 50;
       }
     }
+
+    // reset color to fix homewscreen button bug
+    font.setColor(Color.WHITE);
+
+    game.batch.draw(homeButtonTexture, homeButtonX, homeButtonY, homeButtonWidth, homeButtonHeight);
     game.batch.end();
   }
 
