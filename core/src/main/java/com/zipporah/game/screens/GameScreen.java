@@ -47,7 +47,7 @@ public class GameScreen implements Screen {
     float homeButtonWidth = 42f;
     float homeButtonHeight = 39f;
 
-    // array for all colossion rectangles from tiled map
+    // array for all collision rectangles from tiled map
     public static Array<Rectangle> collisionRectangles = new Array<>();
     // array for all wall collisions
     public static Array<Rectangle> wallRectangles = new Array<>();
@@ -101,14 +101,12 @@ public class GameScreen implements Screen {
     Rectangle spriteBox = new Rectangle();
 
     // sound
-    Sound skeletonHurt;
+    Sound enemyHurt;
 
     // music
     Music music1;
 
     protected final ShapeRenderer shapeRenderer = new ShapeRenderer();
-
-    // Karasu karasu;
 
     private void getCollisionObject() {
         MapLayer layer = map.getLayers().get("collision");
@@ -293,9 +291,12 @@ public class GameScreen implements Screen {
 
         // Second Chest Skeleton
         enemies.add(new Skeleton(3774, 128, 200, 60f, 70f, 62, 120));
+        
+        // Test Karasu 
+        enemies.add(new Karasu(3774, 128, 200, 60f, 70f, 62, 120));
 
         // sounds
-        skeletonHurt = Gdx.audio.newSound(Gdx.files.internal("Sounds/Enemy/crunch_splat.wav"));
+        enemyHurt = Gdx.audio.newSound(Gdx.files.internal("Sounds/Enemy/crunch_splat.wav"));
         // playerDead =
         // Gdx.audio.newSound(Gdx.files.internal("Sounds/Player/death_9_meghan.wav"));
     }
@@ -446,7 +447,7 @@ public class GameScreen implements Screen {
         player.time += Gdx.graphics.getDeltaTime();
         game.timer.update();
 
-        // if the player is daed go to the homescreen
+        // if the player is dead go to the homescreen
         if (player.isDead) {
             // playerDead.play(0.25f);
             boolean animationDone = player.updateSpriteDead(delta);
@@ -635,7 +636,7 @@ public class GameScreen implements Screen {
                     Player.Projectile projectile = projectilesIterator.next();
                     if (projectile.box.overlaps(enemy.innerBoundaries)) {
                         enemy.health -= projectile.damage;
-                        skeletonHurt.play(0.40f);
+                        enemyHurt.play(0.40f);
                         enemy.triggerHurt();
                         projectilesIterator.remove();
                     }
@@ -723,16 +724,6 @@ public class GameScreen implements Screen {
         game.timer.font.draw(game.batch, String.format("%dx", keyCount), 946, 700);
         game.batch.draw(homeButtonTexture, homeButtonX, homeButtonY, homeButtonWidth, homeButtonHeight);
         game.batch.end();
-
-        // Test Projectile and Karasu Hitboxes with these
-        // shapeRenderer.setProjectionMatrix(cam.combined);
-        // shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        // for (Player.Projectile projectile : player.projectiles) {
-        // shapeRenderer.rect(projectile.box.x, projectile.box.y, projectile.box.width,
-        // projectile.box.height);
-        // }
-        // shapeRenderer.end();
-
     }
 
     @Override
