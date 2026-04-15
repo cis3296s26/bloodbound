@@ -1,8 +1,6 @@
 package com.zipporah.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
@@ -17,16 +15,6 @@ public class Enemy {
     protected TextureRegion currFrame;
     public float time = 0;
     Sound enemyDead;
-
-    protected static class AnimationBundle {
-        private final Texture texture;
-        private final Animation<TextureRegion> animation;
-
-        private AnimationBundle(Texture texture, Animation<TextureRegion> animation) {
-            this.texture = texture;
-            this.animation = animation;
-        }
-    }
 
     protected AnimationBundle walk;
     protected AnimationBundle idle;
@@ -82,19 +70,7 @@ public class Enemy {
     
     protected boolean hurtActive = false;
     protected boolean pointsAwarded = false;
-    
 
-
-    protected AnimationBundle loadAnimation(String pictureName, int frames, float frameDuration) {
-        Texture spriteSheet = new Texture("Enemies/" + path + "/" + pictureName + ".png");
-        TextureRegion[][] split = TextureRegion.split(spriteSheet, 128, 128);
-        TextureRegion[] splitFrames = new TextureRegion[frames];
-        for (int i = 0; i < frames; i++) {
-            splitFrames[i] = split[0][i];
-        }
-        Animation<TextureRegion> animation = new Animation<>(frameDuration, splitFrames);
-        return new AnimationBundle(spriteSheet, animation);
-    }
 
     // Initialization
     public void create(String path, int[] frameCount) {
@@ -106,15 +82,15 @@ public class Enemy {
         this.frameCount = frameCount;
         innerXOffset = innerXOffsetFacingLeft;
 
-        idle = loadAnimation("Idle", frameCount[0], 0.1f);
-        walk = loadAnimation("Walk", frameCount[1], 0.1f);
-        attack = loadAnimation("Attack_1", frameCount[2], 0.1f);
-        death = loadAnimation("Dead", frameCount[3], 0.2f);
+        idle = new AnimationBundle(path + "Idle", frameCount[0], 0.1f);
+        walk = new AnimationBundle(path + "Walk", frameCount[1], 0.1f);
+        attack = new AnimationBundle(path + "Attack_1", frameCount[2], 0.1f);
+        death = new AnimationBundle(path + "Dead", frameCount[3], 0.2f);
 
         enemyDead = Gdx.audio.newSound(Gdx.files.internal("Sounds/Enemy/death_3_alex.wav"));
 
-        if (frameCount.length > 4 && frameCount[4] > 0) hurt = loadAnimation("Hurt", frameCount[4], 0.1f);
-        if (frameCount.length > 5 && frameCount[5] > 0) jump = loadAnimation("Jump", frameCount[5], 0.09f);
+        if (frameCount.length > 4 && frameCount[4] > 0) hurt = new AnimationBundle(path + "Hurt", frameCount[4], 0.1f);
+        if (frameCount.length > 5 && frameCount[5] > 0) jump = new AnimationBundle(path + "Jump", frameCount[5], 0.09f);
     }
 
     // Draw and Animate
@@ -596,6 +572,9 @@ public class Enemy {
         }
         if (hurt != null) {
             hurt.texture.dispose();
+        }
+        if (jump != null) {
+            jump.texture.dispose();
         }
     }
 
