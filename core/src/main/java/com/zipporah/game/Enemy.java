@@ -1,63 +1,64 @@
 package com.zipporah.game;
 
 import com.badlogic.gdx.Gdx;
-
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
 import static com.zipporah.game.screens.GameScreen.collisionRectangles;
+import static com.zipporah.game.screens.GameScreen.spikeRectangles;
 import static com.zipporah.game.screens.GameScreen.wallRectangles;
-import com.badlogic.gdx.audio.Sound;
 
 public class Enemy {
 
     protected TextureRegion currFrame;
     public float time = 0;
-    Sound skeletonDead;
 
-    protected static class AnimationBundle {
-        private final Texture texture;
-        private final Animation<TextureRegion> animation;
-
-        private AnimationBundle(Texture texture, Animation<TextureRegion> animation) {
-            this.texture = texture;
-            this.animation = animation;
-        }
-    }
+    public static float sfxVolume = 0.40f;
+    private Sound deathSound;
 
     protected AnimationBundle walk;
     protected AnimationBundle idle;
     protected AnimationBundle attack;
     protected AnimationBundle death;
     protected AnimationBundle hurt;
+    protected AnimationBundle jump;
+
     protected String path;
     protected int[] frameCount;
-    public int size = 128;
+    protected int size = 128;
 
     protected enum State {
-        idle, walk, attack, hurt, death
+        idle, walk, attack, jump, hurt, death
     }
 
     protected State currState = State.idle;
     protected float stateTime = 0;
 
     public Rectangle innerBoundaries;
-    public float innerXOffset;
-    public float innerXOffsetFacingRight;
-    public float innerXOffsetFacingLeft;
+    protected float innerXOffset;
+    protected float innerXOffsetFacingRight;
+    protected float innerXOffsetFacingLeft;
 
     public Rectangle attackBox = new Rectangle();
-    float attackBoxWidth = 80f;
-    float attackBoxHeight = 80f;
+    private static final float ATTACK_BOX_WIDTH = 80f;
+    private static final float ATTACK_BOX_HEIGHT = 80f;
 
     protected boolean facingRight = true;
 
-    public float velocityY = 0f;
-    public float gravity = -1500f;
-    public boolean onGround = false;
+    protected float jumpImpulse = 950f;
+    protected float minJumpImpulse = 550f;
+    protected float jumpCooldown = 0.75f;
+    protected float jumpCooldownTimer = 0f;
+    protected float jumpAirSpeedMultiplier = 2.1f;
+    protected boolean jumpInProgress = false;
+    protected boolean jumpsEnabled = true;
+
+    protected float groundAhead = 10f;
+    protected float velocityY = 0f;
+    protected float gravity = -1500f;
+    protected boolean onGround = false;
 
     public float x;
     public float y;
@@ -67,25 +68,7 @@ public class Enemy {
 
     protected boolean removed = false;
     protected boolean hurtActive = false;
-
     protected boolean pointsAwarded = false;
-
-    public Rectangle ground = new Rectangle();
-    protected float groundAhead = 10f;
-
-    protected AnimationBundle loadAnimation(String pictureName, int frames, float frameDuration) {
-        Texture spriteSheet = new Texture("Enemies/" + path + "/" + pictureName + ".png");
-        TextureRegion[][] split = TextureRegion.split(spriteSheet, 128, 128);
-        TextureRegion[] splitFrames = new TextureRegion[frames];
-        for (int i = 0; i < frames; i++) {
-            splitFrames[i] = split[0][i];
-        }
-        Animation<TextureRegion> animation = new Animation<>(frameDuration, splitFrames);
-        return new AnimationBundle(spriteSheet, animation);
-    }
-
-    public void create() {
-    }
 
     public void create(String path, int[] frameCount) {
         removed = false;
@@ -96,16 +79,21 @@ public class Enemy {
         this.frameCount = frameCount;
         innerXOffset = innerXOffsetFacingLeft;
 
-        idle = loadAnimation("Idle", frameCount[0], 0.1f);
-        walk = loadAnimation("Walk", frameCount[1], 0.1f);
-        attack = loadAnimation("Attack_1", frameCount[2], 0.1f);
-        death = loadAnimation("Dead", frameCount[3], 0.2f);
+        idle = new AnimationBundle(path + "Idle", frameCount[0], 0.1f);
+        walk = new AnimationBundle(path + "Walk", frameCount[1], 0.1f);
+        attack = new AnimationBundle(path + "Attack_1", frameCount[2], 0.1f);
+        death = new AnimationBundle(path + "Dead", frameCount[3], 0.2f);
 
-        skeletonDead = Gdx.audio.newSound(Gdx.files.internal("Sounds/Enemy/death_3_alex.wav"));
+        setDeathSound("Sounds/Enemy/death_3_alex.wav");
 
         if (frameCount.length > 4 && frameCount[4] > 0) {
-            hurt = loadAnimation("Hurt", frameCount[4], 0.1f);
+            hurt = new AnimationBundle(path + "Hurt", frameCount[4], 0.1f);
         }
+        if (frameCount.length > 5 && frameCount[5] > 0) {
+            jump = new AnimationBundle(path + "Jump", frameCount[5], 0.09f);
+        }
+
+        innerBoundaries = new Rectangle(x, y, size, size);
     }
 
     public void draw(SpriteBatch batch, float time, float delta) {
@@ -124,9 +112,20 @@ public class Enemy {
             case attack:
                 currFrame = attack.animation.getKeyFrame(stateTime, true);
                 break;
+            case jump:
+                if (jump != null) {
+                    currFrame = jump.animation.getKeyFrame(stateTime, true);
+                    if (jump.animation.isAnimationFinished(stateTime)) {
+                        currState = State.idle;
+                        stateTime = 0;
+                    }
+                } else {
+                    currFrame = idle.animation.getKeyFrame(stateTime, true);
+                }
+                break;
             case hurt:
                 if (hurt != null) {
-                    currFrame = hurt.animation.getKeyFrame(stateTime, false);
+                    currFrame = hurt.animation.getKeyFrame(stateTime, true);
                     if (hurt.animation.isAnimationFinished(stateTime)) {
                         hurtActive = false;
                         currState = State.idle;
@@ -162,12 +161,12 @@ public class Enemy {
 
         if (currState == State.attack) {
             if (facingRight) {
-                attackBox.set(x + innerXOffset + innerBoundaries.width, y + 20, attackBoxWidth, attackBoxHeight);
+                attackBox.set(x + innerXOffset + innerBoundaries.width, y + 20, ATTACK_BOX_WIDTH, ATTACK_BOX_HEIGHT);
             } else {
-                attackBox.set(x + innerXOffset - attackBoxWidth, y + 20, attackBoxWidth, attackBoxHeight);
+                attackBox.set(x + innerXOffset - ATTACK_BOX_WIDTH, y + 20, ATTACK_BOX_WIDTH, ATTACK_BOX_HEIGHT);
             }
         } else {
-            attackBox.set(-1000, -1000, attackBoxWidth, attackBoxHeight);
+            attackBox.set(-1000, -1000, ATTACK_BOX_WIDTH, ATTACK_BOX_HEIGHT);
         }
     }
 
@@ -179,12 +178,50 @@ public class Enemy {
         }
     }
 
+    public void triggerHurt() {
+        if (hurt == null || removed || currState == State.death) {
+            return;
+        }
+        hurtActive = true;
+        currState = State.hurt;
+        stateTime = 0;
+    }
+
+    protected void setDeathSound(String soundPath) {
+        if (deathSound != null) {
+            deathSound.dispose();
+        }
+        deathSound = Gdx.audio.newSound(Gdx.files.internal(soundPath));
+    }
+
+    public boolean shouldAwardPoints() {
+        if (health <= 0 && !pointsAwarded) {
+            pointsAwarded = true;
+            return true;
+        }
+        return false;
+    }
+
     public void botLogic(float playerX, float playerY, float delta) {
         if (removed) {
             return;
         }
 
+        float attackRange = 80;
+        float attackVerticalRange = 80;
+        float stopRange = 70;
+        float faceDeadzone = 40f;
+
+        if (jumpCooldownTimer > 0f) {
+            jumpCooldownTimer -= delta;
+            if (jumpCooldownTimer < 0f) {
+                jumpCooldownTimer = 0f;
+            }
+        }
+
         if (hurtActive) {
+            innerXOffset = facingRight ? innerXOffsetFacingRight : innerXOffsetFacingLeft;
+            stepVertical(delta);
             return;
         }
 
@@ -192,20 +229,26 @@ public class Enemy {
             if (currState != State.death) {
                 currState = State.death;
                 stateTime = 0;
-                skeletonDead.play(0.25f);
+                if (deathSound != null) {
+                    deathSound.play(sfxVolume);
+                }
             }
+            innerXOffset = facingRight ? innerXOffsetFacingRight : innerXOffsetFacingLeft;
+            stepVertical(delta);
             return;
         }
 
         float dx = playerX - x;
+        if (Math.abs(dx) > faceDeadzone) {
+            facingRight = dx > 0;
+        }
+        innerXOffset = facingRight ? innerXOffsetFacingRight : innerXOffsetFacingLeft;
+
+        stepVertical(delta);
+
         float dy = playerY - y;
 
-        float attackRange = 80;
-        float attackVerticalRange = 80;
-        float stopRange = 70;
-        float faceDeadzone = 40f;
-
-        if (Math.abs(dx) <= stopRange) {
+        if (onGround && Math.abs(dx) <= stopRange) {
             if (Math.abs(dx) <= attackRange && Math.abs(dy) <= attackVerticalRange) {
                 facingRight = dx > 0;
                 innerXOffset = facingRight ? innerXOffsetFacingRight : innerXOffsetFacingLeft;
@@ -219,19 +262,210 @@ public class Enemy {
             return;
         }
 
-        if (Math.abs(dx) > faceDeadzone) {
-            facingRight = dx > 0;
-        }
-
         float dirX = facingRight ? 1f : -1f;
         innerXOffset = facingRight ? innerXOffsetFacingRight : innerXOffsetFacingLeft;
 
-        move(dirX, delta);
+        if (onGround && velocityY <= 0f && wouldStepOnSpike(dirX, delta)) {
+            if (!jumpsEnabled) {
+                currState = State.idle;
+                return;
+            }
+
+            float plannedImpulse = planJumpImpulseToPlatform(dirX);
+            if (jumpCooldownTimer <= 0f && plannedImpulse > 0f) {
+                jump(plannedImpulse);
+            } else {
+                currState = State.idle;
+                return;
+            }
+        }
+
+        if (onGround && velocityY <= 0f && wouldStepOffEdge(dirX, delta)) {
+            if (!jumpsEnabled) {
+                currState = State.idle;
+                return;
+            }
+
+            float plannedImpulse = planJumpImpulseToPlatform(dirX);
+            if (jumpCooldownTimer <= 0f && plannedImpulse > 0f) {
+                jump(plannedImpulse);
+            } else {
+                currState = State.idle;
+                return;
+            }
+        }
+
+        moveHorizontal(dirX, delta);
     }
 
-    private void move(float dirX, float delta) {
-        currState = State.walk;
+    private void jump(float impulse) {
+        if (!onGround || jumpCooldownTimer > 0f) {
+            return;
+        }
+
+        velocityY = Math.max(minJumpImpulse, Math.min(jumpImpulse, impulse));
+        onGround = false;
+        currState = State.jump;
+        jumpInProgress = true;
+        jumpCooldownTimer = jumpCooldown;
+    }
+
+    private float maxJumpHeight() {
+        float g = Math.abs(gravity);
+        if (g <= 0f) {
+            return 0f;
+        }
+        return (jumpImpulse * jumpImpulse) / (2f * g);
+    }
+
+    private boolean wouldStepOffEdge(float dirX, float delta) {
         float stepX = speed * delta * dirX;
+        float nextHitboxX = (x + innerXOffset) + stepX;
+        float footX = dirX > 0
+                ? nextHitboxX + innerBoundaries.width + groundAhead
+                : nextHitboxX - groundAhead;
+
+        float maxStepDown = 80f;
+        float maxStepUp = 30f;
+
+        for (Rectangle rectangle : collisionRectangles) {
+            if (footX >= rectangle.x && footX <= rectangle.x + rectangle.width) {
+                float top = rectangle.y + rectangle.height;
+                if (top >= y - maxStepDown && top <= y + maxStepUp) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean wouldStepOnSpike(float dirX, float delta) {
+        if (spikeRectangles == null || spikeRectangles.size == 0) {
+            return false;
+        }
+
+        float stepX = speed * delta * dirX;
+        float nextHitboxX = (x + innerXOffset) + stepX;
+
+        float hitboxW = innerBoundaries.width;
+        float feetWidth = Math.min(10f, hitboxW);
+        float feetHeight = 2f;
+        float feetX = nextHitboxX + (hitboxW - feetWidth) / 2f;
+        Rectangle feet = new Rectangle(feetX, y, feetWidth, feetHeight);
+
+        for (Rectangle spike : spikeRectangles) {
+            if (feet.overlaps(spike)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private float planJumpImpulseToPlatform(float dirX) {
+        if (!jumpsEnabled) {
+            return -1f;
+        }
+
+        float g = Math.abs(gravity);
+        if (g <= 1f) {
+            return -1f;
+        }
+
+        float hitboxW = innerBoundaries.width;
+        float feetWidth = Math.min(10f, hitboxW);
+        float takeoffHitboxX = x + innerXOffset;
+        float takeoffFeetX = takeoffHitboxX + (hitboxW - feetWidth) / 2f;
+
+        float airSpeed = speed * Math.max(1f, jumpAirSpeedMultiplier);
+        if (airSpeed <= 1f) {
+            return -1f;
+        }
+
+        float maxTargetDrop = 120f;
+        float minTop = y - maxTargetDrop;
+        float maxTop = y + Math.max(30f, maxJumpHeight() + 5f);
+
+        float margin = 6f;
+
+        float bestImpulse = -1f;
+        float bestDx = Float.POSITIVE_INFINITY;
+
+        for (Rectangle rectangle : collisionRectangles) {
+            if (dirX > 0) {
+                if (rectangle.x + rectangle.width < takeoffFeetX + 1f) continue;
+            } else {
+                if (rectangle.x > takeoffFeetX - 1f) continue;
+            }
+
+            float top = rectangle.y + rectangle.height;
+            if (top < minTop || top > maxTop) {
+                continue;
+            }
+
+            float minX = rectangle.x + margin;
+            float maxX = rectangle.x + rectangle.width - margin;
+            if (minX > maxX) {
+                minX = rectangle.x;
+                maxX = rectangle.x + rectangle.width;
+            }
+
+            float[] candidates = new float[] { minX, (minX + maxX) * 0.5f, maxX };
+            for (float targetFeetX : candidates) {
+                float dxSigned = targetFeetX - takeoffFeetX;
+                if (dxSigned * dirX <= 0f) {
+                    continue;
+                }
+
+                float dx = Math.abs(dxSigned);
+                float t = dx / airSpeed;
+                if (t <= 0.01f) {
+                    continue;
+                }
+
+                float deltaY = top - y;
+                float requiredV = (deltaY + 0.5f * g * t * t) / t;
+
+                if (requiredV < minJumpImpulse || requiredV > jumpImpulse) {
+                    continue;
+                }
+
+                float vyAtT = requiredV - g * t;
+                if (vyAtT > 0f) {
+                    continue;
+                }
+
+                if (wouldLandOnSpike(targetFeetX, top)) {
+                    continue;
+                }
+
+                if (dx < bestDx) {
+                    bestDx = dx;
+                    bestImpulse = requiredV;
+                }
+            }
+        }
+
+        return bestImpulse;
+    }
+
+    private boolean wouldLandOnSpike(float feetX, float topY) {
+        if (spikeRectangles == null || spikeRectangles.size == 0) {
+            return false;
+        }
+
+        float hitboxW = innerBoundaries.width;
+        float feetWidth = Math.min(10f, hitboxW);
+        float feetHeight = 2f;
+        Rectangle feet = new Rectangle(feetX, topY, feetWidth, feetHeight);
+        for (Rectangle spike : spikeRectangles) {
+            if (feet.overlaps(spike)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void stepVertical(float delta) {
         float hitboxW = innerBoundaries.width;
         float hitboxH = innerBoundaries.height;
         float hitboxX = x + innerXOffset;
@@ -278,32 +512,27 @@ public class Enemy {
                 newY = highestFloor;
                 velocityY = 0f;
                 onGround = true;
+                jumpInProgress = false;
             }
         }
 
         y = newY;
         innerBoundaries.setPosition(hitboxX, y);
+    }
 
-        if (onGround) {
-            float footX = facingRight
-                    ? innerBoundaries.x + innerBoundaries.width + groundAhead
-                    : innerBoundaries.x - groundAhead;
-            float maxStepDown = 80f;
-            float maxStepUp = 30f;
-            boolean hasGroundAhead = false;
-            for (Rectangle rectangle : collisionRectangles) {
-                if (footX >= rectangle.x && footX <= rectangle.x + rectangle.width) {
-                    float top = rectangle.y + rectangle.height;
-                    if (top >= y - maxStepDown && top <= y + maxStepUp) {
-                        hasGroundAhead = true;
-                        break;
-                    }
-                }
-            }
-            if (!hasGroundAhead) {
-                currState = State.idle;
-                return;
-            }
+    private void moveHorizontal(float dirX, float delta) {
+        currState = State.walk;
+        if (jumpInProgress) {
+            currState = State.jump;
+        }
+
+        float moveSpeed = jumpInProgress ? speed * Math.max(1f, jumpAirSpeedMultiplier) : speed;
+        float stepX = moveSpeed * delta * dirX;
+        float hitboxX = x + innerXOffset;
+
+        if (onGround && velocityY <= 0f && wouldStepOffEdge(dirX, delta)) {
+            currState = State.idle;
+            return;
         }
 
         Rectangle newPosition = new Rectangle(innerBoundaries);
@@ -319,46 +548,20 @@ public class Enemy {
         innerBoundaries.setPosition(x + innerXOffset, y);
     }
 
-    public void triggerHurt() {
-        if (hurt == null || removed || currState == State.death) {
-            return;
-        }
-        hurtActive = true;
-        currState = State.hurt;
-        stateTime = 0;
-    }
-
     public void dispose() {
-        if (idle != null) {
-            idle.texture.dispose();
-        }
-        if (walk != null) {
-            walk.texture.dispose();
-        }
-        if (attack != null) {
-            attack.texture.dispose();
-        }
-        if (death != null) {
-            death.texture.dispose();
-        }
-        if (hurt != null) {
-            hurt.texture.dispose();
+        if (idle != null && idle.texture != null) idle.texture.dispose();
+        if (walk != null && walk.texture != null) walk.texture.dispose();
+        if (attack != null && attack.texture != null) attack.texture.dispose();
+        if (death != null && death.texture != null) death.texture.dispose();
+        if (hurt != null && hurt.texture != null) hurt.texture.dispose();
+        if (jump != null && jump.texture != null) jump.texture.dispose();
+        if (deathSound != null) {
+            deathSound.dispose();
+            deathSound = null;
         }
     }
 
     public boolean isRemoved() {
         return removed;
-    }
-
-    public boolean isAttacking() {
-        return currState == State.attack;
-    }
-
-    public boolean shouldAwardPoints() {
-        if (health <= 0 && !pointsAwarded) {
-            pointsAwarded = true;
-            return true;
-        }
-        return false;
     }
 }

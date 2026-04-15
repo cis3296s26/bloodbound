@@ -47,7 +47,7 @@ public class GameScreen implements Screen {
     float homeButtonWidth = 42f;
     float homeButtonHeight = 39f;
 
-    // array for all colossion rectangles from tiled map
+    // array for all collision rectangles from tiled map
     public static Array<Rectangle> collisionRectangles = new Array<>();
     // array for all wall collisions
     public static Array<Rectangle> wallRectangles = new Array<>();
@@ -102,13 +102,13 @@ public class GameScreen implements Screen {
 
     // sound
     Sound skeletonHurt;
+    Sound keyFound;
+    Sound doorUnlocked;
 
     // music
     Music music1;
 
     protected final ShapeRenderer shapeRenderer = new ShapeRenderer();
-
-    // Karasu karasu;
 
     private void getCollisionObject() {
         MapLayer layer = map.getLayers().get("collision");
@@ -233,8 +233,6 @@ public class GameScreen implements Screen {
         viewportHUD = new FitViewport(1280, 720);
         game.batch.setProjectionMatrix(viewport.getCamera().combined);
 
-        homeButtonTexture = new Texture(Gdx.files.internal("Buttons/HomeButton.png"));
-
         // // render in map
         // // moving this is initLevel method
         // map = new TmxMapLoader().load("level_1.tmx");
@@ -277,25 +275,23 @@ public class GameScreen implements Screen {
         cam.update();
         game.batch.setProjectionMatrix(cam.combined);
 
-        player.idle_init();
-        player.walk_init();
-        player.jump_init();
-        player.sprint_init();
-        player.attack_init();
-        player.hurt_init();
-        player.dead_init();
-
-        // Karasu's the final boss
-        // enemies.add(new Karasu(1750, 50, 180, 60f, 70f, 62, 120));
+        player = new Player();
 
         // First Door Skeleton
         enemies.add(new Skeleton(1800, 50, 200, 60f, 70f, 62, 120));
 
         // Second Chest Skeleton
         enemies.add(new Skeleton(3774, 128, 200, 60f, 70f, 62, 120));
+        
+        // Test Karasu 
+        enemies.add(new Karasu(3774, 128, 200, 60f, 70f, 62, 120));
 
         // sounds
         skeletonHurt = Gdx.audio.newSound(Gdx.files.internal("Sounds/Enemy/crunch_splat.wav"));
+
+        keyFound = Gdx.audio.newSound(Gdx.files.internal("Sounds/Interactables/keys_jingling.wav"));
+
+        doorUnlocked = Gdx.audio.newSound(Gdx.files.internal("Sounds/Interactables/lock_unlock.wav"));
         // playerDead =
         // Gdx.audio.newSound(Gdx.files.internal("Sounds/Player/death_9_meghan.wav"));
     }
@@ -311,7 +307,7 @@ public class GameScreen implements Screen {
 
         music1 = Gdx.audio.newMusic(Gdx.files.internal("Music/spencer_yk-castle-of-athanasius-151010.mp3"));
         music1.setLooping(true);
-        music1.setVolume(0.30f);
+        music1.setVolume(game.musicVolume);
         music1.play();
     }
 
@@ -360,13 +356,13 @@ public class GameScreen implements Screen {
                     Gdx.input.isKeyPressed(Input.Keys.UP)) {
                 onLadder = true;
                 player.y += player.spriteSpeed * delta;
-                player.currFrame = player.walk.getKeyFrame(player.time, true);
+                player.currFrame = player.walk.animation.getKeyFrame(player.time, true);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.S) ||
                     Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
                 onLadder = true;
                 player.y -= player.spriteSpeed * delta;
-                player.currFrame = player.walk.getKeyFrame(player.time, true);
+                player.currFrame = player.walk.animation.getKeyFrame(player.time, true);
             }
             // get off ladder by pressing left or right
             if (Gdx.input.isKeyPressed(Input.Keys.A) ||
@@ -384,6 +380,7 @@ public class GameScreen implements Screen {
                 float dist1 = Vector2.dst(player.x, player.y, chest1Position.x, chest1Position.y);
                 if (dist1 < chestInteractionRange) {
                     chest1Open = true;
+                    keyFound.play(30);
                     haveChest1key = true;
                     keyCount++;
                 }
@@ -394,6 +391,7 @@ public class GameScreen implements Screen {
                 float dist2 = Vector2.dst(player.x, player.y, chest2Position.x, chest2Position.y);
                 if (dist2 < chestInteractionRange) {
                     chest2Open = true;
+                    keyFound.play(30);
                     haveChest2key = true;
                     keyCount++;
                 }
@@ -407,6 +405,7 @@ public class GameScreen implements Screen {
                     firstDoorOpen = true;
                     // door can be walked through
                     wallRectangles.removeValue(firstDoorRect, true);
+                    doorUnlocked.play(30);
                     float doorOpenTime = 0.1f;
                     keyCount--;
                 }
@@ -418,6 +417,7 @@ public class GameScreen implements Screen {
                     lastDoorOpen = true;
                     // door can be walked through
                     wallRectangles.removeValue(lastDoorRect, true);
+                    doorUnlocked.play(30);
                     float doorOpenTime = 0.1f;
                     keyCount--;
 
@@ -445,7 +445,7 @@ public class GameScreen implements Screen {
         player.time += Gdx.graphics.getDeltaTime();
         game.timer.update();
 
-        // if the player is daed go to the homescreen
+        // if the player is dead go to the homescreen
         if (player.isDead) {
             // playerDead.play(0.25f);
             boolean animationDone = player.updateSpriteDead(delta);
@@ -563,7 +563,7 @@ public class GameScreen implements Screen {
                 if (enemy != null && !enemy.isRemoved()) {
                     if (spriteBox.overlaps(enemy.attackBox)) {
                         player.isHurt = true;
-                        player.curr_health -= 10;
+                        player.curr_health -= 10f * game.getDamageMultiplier();
                         player.health_percentage = player.curr_health / player.max_health;
                         player.hurtCooldown = 1.0f;
                         if (player.curr_health <= 0) player.isDead = true;
@@ -634,7 +634,8 @@ public class GameScreen implements Screen {
                     Player.Projectile projectile = projectilesIterator.next();
                     if (projectile.box.overlaps(enemy.innerBoundaries)) {
                         enemy.health -= projectile.damage;
-                        skeletonHurt.play(0.40f);
+                        Enemy.sfxVolume = game.sfxVolume;
+                        skeletonHurt.play(game.sfxVolume);
                         enemy.triggerHurt();
                         projectilesIterator.remove();
                     }
@@ -697,10 +698,11 @@ public class GameScreen implements Screen {
         while (projectilesIterator.hasNext()) {
             Player.Projectile projectile = projectilesIterator.next();
             projectile.update(delta);
-            if (projectile.lifetime <= 0)
+            if (projectile.lifetime <= 0) {
+                projectile.dispose();
                 projectilesIterator.remove();
-            else {
-                TextureRegion projectileFrame = projectile.projectileAnimation.getKeyFrame(projectile.animationDuration,
+            } else {
+                TextureRegion projectileFrame = projectile.projectileAnimation.animation.getKeyFrame(projectile.animationDuration,
                         true);
                 game.batch.draw(projectileFrame, projectile.x, projectile.y, 0, 0, 64, 48, projectile.scaleX, 1, 0);
             }
@@ -722,16 +724,6 @@ public class GameScreen implements Screen {
         game.timer.font.draw(game.batch, String.format("%dx", keyCount), 946, 700);
         game.batch.draw(homeButtonTexture, homeButtonX, homeButtonY, homeButtonWidth, homeButtonHeight);
         game.batch.end();
-
-        // Test Projectile and Karasu Hitboxes with these
-        // shapeRenderer.setProjectionMatrix(cam.combined);
-        // shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        // for (Player.Projectile projectile : player.projectiles) {
-        // shapeRenderer.rect(projectile.box.x, projectile.box.y, projectile.box.width,
-        // projectile.box.height);
-        // }
-        // shapeRenderer.end();
-
     }
 
     @Override
