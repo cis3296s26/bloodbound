@@ -24,7 +24,7 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.audio.Sound;
-
+import com.badlogic.gdx.Preferences;
 import java.util.ArrayList;
 import java.util.Iterator;
 import com.badlogic.gdx.math.Vector2;
@@ -35,7 +35,7 @@ public class GameScreen implements Screen {
     protected final ScreenManager game;
     Player player = new Player();
     ArrayList<Enemy> enemies = new ArrayList<>();
-
+    Preferences prefs = Gdx.app.getPreferences("Preferences");
     TiledMap map;
     OrthogonalTiledMapRenderer renderer;
     float scale = 4f; // change back to 4f just for test
@@ -61,7 +61,6 @@ public class GameScreen implements Screen {
     Texture keyTexture;
     int keyCount = 0;
 
-    public int dmg = 3;
 
     // chests
     Texture openChestTexture;
@@ -401,6 +400,8 @@ public class GameScreen implements Screen {
                     doorUnlocked.play(30);
                     float doorOpenTime = 0.1f;
                     keyCount--;
+                    prefs.putFloat("hp", player.curr_health);
+                    prefs.flush();
                     // switching game screens
                     if (lastDoorTransitions) {
                         Gdx.app.postRunnable(new Runnable() {
@@ -544,7 +545,6 @@ public class GameScreen implements Screen {
                     if (spriteBox.overlaps(enemy.attackBox)) {
                         player.isHurt = true;
                         player.curr_health -= 10f * game.getDamageMultiplier();
-                        dmg += 1;
                         player.hurtCooldown = 1.0f;
                         if (player.curr_health <= 0) player.isDead = true;
                         float knockback = 40f;

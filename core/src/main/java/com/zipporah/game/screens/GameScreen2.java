@@ -249,9 +249,7 @@ public class GameScreen2 extends GameScreen {
         // clear old enemies
         enemies.clear();
 
-        for(int i = 0; i < dmg; i++) {
-            player.curr_health -= 10f * game.getDamageMultiplier();
-        }
+        player.curr_health = prefs.getFloat("hp");
         // add level 2 enemies
         enemies.add(new Skeleton(10, 400, 200, 60f, 70f, 62, 120));
         enemies.add(new Skeleton(1300, 200, 200, 60f, 70f, 62, 120));
