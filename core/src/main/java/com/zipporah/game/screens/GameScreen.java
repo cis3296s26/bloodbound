@@ -306,7 +306,6 @@ public class GameScreen implements Screen {
 
     protected void initLevel() {
         // render in map
-        // switching to test level 2
         map = new TmxMapLoader().load("level_1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, scale);
 

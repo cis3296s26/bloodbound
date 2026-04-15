@@ -24,7 +24,7 @@ public class Player extends Sprite {
     public float curr_health = 100;
     public float max_health = 100;
     public float health_percentage = curr_health / max_health;
-    public float bar_width = hpForeground1.getWidth();
+    public float bar_width = hpForeground1.getWidth() * health_percentage;
     public float w_scale = 2.0f;
 
 
