@@ -28,10 +28,11 @@ public class Player extends Sprite {
     // healthbar
     public Texture hpForeground1 = new Texture("Player/hp/HealthBar3.png");
     public Texture hpBackground1 = new Texture("Player/hp/HealthBar7.png");
-    public float curr_health = 100;
     public float max_health = 100;
-    public float health_percentage = curr_health / max_health;
-    public float bar_width = hpForeground1.getWidth();
+    public float curr_health = max_health;
+
+    public float health_percentage;
+    public float bar_width;
     public float w_scale = 2.0f;
 
     // animation control logic
@@ -226,5 +227,10 @@ public class Player extends Sprite {
         timeHurt += delta;
         currFrame = hurt.animation.getKeyFrame(timeHurt, false);
         return hurt.animation.isAnimationFinished(timeHurt);
+    }
+
+    public void render_health() {
+        health_percentage = curr_health / max_health;
+        bar_width = health_percentage * hpForeground1.getWidth();
     }
 }

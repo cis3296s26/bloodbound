@@ -24,7 +24,7 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.audio.Sound;
-
+import com.badlogic.gdx.Preferences;
 import java.util.ArrayList;
 import java.util.Iterator;
 import com.badlogic.gdx.math.Vector2;
@@ -35,7 +35,7 @@ public class GameScreen implements Screen {
     protected final ScreenManager game;
     Player player = new Player();
     ArrayList<Enemy> enemies = new ArrayList<>();
-
+    Preferences prefs = Gdx.app.getPreferences("Preferences");
     TiledMap map;
     OrthogonalTiledMapRenderer renderer;
     float scale = 4f; // change back to 4f just for test
@@ -46,7 +46,6 @@ public class GameScreen implements Screen {
     float homeButtonY = 670f;
     float homeButtonWidth = 42f;
     float homeButtonHeight = 39f;
-
     // array for all collision rectangles from tiled map
     public static Array<Rectangle> collisionRectangles = new Array<>();
     // array for all wall collisions
@@ -61,6 +60,7 @@ public class GameScreen implements Screen {
 
     Texture keyTexture;
     int keyCount = 0;
+
 
     // chests
     Texture openChestTexture;
@@ -233,18 +233,6 @@ public class GameScreen implements Screen {
         viewportHUD = new FitViewport(1280, 720);
         game.batch.setProjectionMatrix(viewport.getCamera().combined);
 
-        // // render in map
-        // // moving this is initLevel method
-        // map = new TmxMapLoader().load("level_1.tmx");
-        // renderer = new OrthogonalTiledMapRenderer(map, scale);
-
-        // music
-        // music1 =
-        // Gdx.audio.newMusic(Gdx.files.internal("Music/spencer_yk-castle-of-athanasius-151010.mp3"));
-        // music1.setLooping(true);
-        // music1.setVolume(0.30f);
-        // music1.play();
-
         collisionRectangles.clear();
         wallRectangles.clear();
         ladderRectangles.clear();
@@ -275,8 +263,6 @@ public class GameScreen implements Screen {
         cam.update();
         game.batch.setProjectionMatrix(cam.combined);
 
-        player = new Player();
-
         // First Door Skeleton
         enemies.add(new Skeleton(1800, 50, 200, 60f, 70f, 62, 120));
 
@@ -292,17 +278,10 @@ public class GameScreen implements Screen {
         keyFound = Gdx.audio.newSound(Gdx.files.internal("Sounds/Interactables/keys_jingling.wav"));
 
         doorUnlocked = Gdx.audio.newSound(Gdx.files.internal("Sounds/Interactables/lock_unlock.wav"));
-        // playerDead =
-        // Gdx.audio.newSound(Gdx.files.internal("Sounds/Player/death_9_meghan.wav"));
+
     }
-
-    // load assets in a method so its easier to override in GameScreen2
-    // gamescreen2 will have its own method that will be called withing the show
-    // function
-
     protected void initLevel() {
         // render in map
-        // switching to test level 2
         map = new TmxMapLoader().load("level_1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, scale);
 
@@ -421,7 +400,8 @@ public class GameScreen implements Screen {
                     doorUnlocked.play(30);
                     float doorOpenTime = 0.1f;
                     keyCount--;
-
+                    prefs.putFloat("hp", player.curr_health);
+                    prefs.flush();
                     // switching game screens
                     if (lastDoorTransitions) {
                         Gdx.app.postRunnable(new Runnable() {
@@ -565,7 +545,6 @@ public class GameScreen implements Screen {
                     if (spriteBox.overlaps(enemy.attackBox)) {
                         player.isHurt = true;
                         player.curr_health -= 10f * game.getDamageMultiplier();
-                        player.health_percentage = player.curr_health / player.max_health;
                         player.hurtCooldown = 1.0f;
                         if (player.curr_health <= 0) player.isDead = true;
                         float knockback = 40f;
@@ -715,7 +694,7 @@ public class GameScreen implements Screen {
 
         viewportHUD.apply();
         game.batch.setProjectionMatrix(viewportHUD.getCamera().combined);
-        player.bar_width = player.health_percentage * player.hpForeground1.getWidth();
+        player.render_health();
 
         game.batch.begin();
         game.timer.draw(game.batch);
@@ -726,26 +705,21 @@ public class GameScreen implements Screen {
         game.batch.draw(homeButtonTexture, homeButtonX, homeButtonY, homeButtonWidth, homeButtonHeight);
         game.batch.end();
     }
-
     @Override
     public void pause() {
 
     }
-
     @Override
     public void resume() {
 
     }
-
     @Override
     public void hide() {
         // left screen
         if (music1 != null) {
             music1.stop();
         }
-
     }
-
     @Override
     public void dispose() {
         if (music1 != null) {
@@ -754,6 +728,5 @@ public class GameScreen implements Screen {
         if (homeButtonTexture != null) {
             homeButtonTexture.dispose();
         }
-
     }
 }
