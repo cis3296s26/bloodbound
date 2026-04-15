@@ -1,8 +1,15 @@
 package com.zipporah.game.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -20,6 +27,21 @@ public class GameScreen2 extends GameScreen {
         super(game);
     }
 
+    // potion
+    Texture potionTexture;
+    Vector2 potionPosition = new Vector2();
+    boolean potionSipped = false;
+
+
+    // music
+    Music music2;
+
+    // sounds
+    Sound drink;
+
+
+
+
 //    TiledMap map;
 //    OrthogonalTiledMapRenderer renderer;
 //    OrthographicCamera camera;
@@ -32,6 +54,13 @@ public class GameScreen2 extends GameScreen {
         // load second map
         map = new TmxMapLoader().load("level_2.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, scale);
+        getPotionPosition();
+
+        //music
+        music2 = Gdx.audio.newMusic(Gdx.files.internal("Music/lightyeartraxx-kim-lightyear-kings-and-dragons-275238.mp3"));
+        music2.setLooping(true);
+        music2.setVolume(0.30f);
+        music2.play();
 
 
         //load user
@@ -46,6 +75,16 @@ public class GameScreen2 extends GameScreen {
 
         // add music
 
+    }
+
+    private void getPotionPosition() {
+        MapLayer layer1 = map.getLayers().get("potion");
+        for (MapObject obj : layer1.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle r = ((RectangleMapObject) obj).getRectangle();
+                potionPosition.set(r.x * scale, r.y * scale);
+            }
+        }
     }
 
     @Override
@@ -90,6 +129,23 @@ public class GameScreen2 extends GameScreen {
             }
         }
 
+        // potion interaction, find a drink sound
+        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+            if (!potionSipped) {
+                float dist1 = Vector2.dst(player.x, player.y, potionPosition.x, potionPosition.y);
+                if (dist1 < 150f) {
+                    drink.play(40);
+                    potionSipped = true;
+
+                    // player will enter boss battle wiht full health idk if this actually works tho
+                    player.curr_health = player.max_health;
+                    // for recalculation
+                    player.health_percentage = player.curr_health / player.max_health;
+                }
+            }
+        }
+
+
 
 
         // level 2 specific interactions (probably wont be any we shall see)
@@ -125,6 +181,13 @@ public class GameScreen2 extends GameScreen {
                 doorWidth, doorHeight);
         game.batch.draw(lastDoorOpen ? openDoor2Texture : closeDoor2Texture, lastDoorPosition.x, lastDoorPosition.y,
                 doorWidth, doorHeight);
+
+        // draw  potion
+        if (!potionSipped) {
+            float potionWidth = 20;
+            float potionHeight = 32;
+            game.batch.draw(potionTexture, potionPosition.x, potionPosition.y, potionWidth, potionHeight);
+        }
 
         for (Enemy enemy : enemies) {
             if (enemy != null && !enemy.isRemoved()) {
@@ -200,6 +263,13 @@ public class GameScreen2 extends GameScreen {
         enemies.add(new Skeleton(1300, 200, 200, 60f, 70f, 62, 120));
         enemies.add(new Skeleton(3000, 200, 200, 60f, 70f, 62, 120));
 
+        // potion texture
+        potionTexture = new Texture(Gdx.files.internal("Maps/potion.png"));
+
+        // Sounds
+        drink = Gdx.audio.newSound(Gdx.files.internal("Sounds/Interactables/drink_slurp.wav"));
+
+
     }
 // let render be handled in game screen 1
 //    @Override
@@ -215,6 +285,14 @@ public class GameScreen2 extends GameScreen {
 //    @Override public void resize(int width, int height) {}
 //    @Override public void pause() {}
 //    @Override public void resume() {}
-//    @Override public void hide() {}
-//    @Override public void dispose() {}
+    public void hide() {
+        if (music2 != null) {
+            music2.stop();
+        }
+    }
+    public void dispose() {
+        if (music2 != null) {
+            music2.dispose();
+        }
+    }
 }
