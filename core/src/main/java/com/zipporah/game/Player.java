@@ -77,7 +77,7 @@ public class Player extends Sprite {
 
         // Projectile Animation
         public Projectile(boolean facing_right, float x, float y) {
-            projectileAnimation = new AnimationBundle("Blood_Charge_1", 3, 0.075f, 64, 48);
+            projectileAnimation = new AnimationBundle("Player/Blood_Charge_1", 3, 0.075f, 64, 48);
 
             direction = !facing_right;
             if (direction) {
