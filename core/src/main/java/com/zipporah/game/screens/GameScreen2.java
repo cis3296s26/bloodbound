@@ -213,10 +213,11 @@ public class GameScreen2 extends GameScreen {
         while (projectilesIterator.hasNext()) {
             Player.Projectile projectile = projectilesIterator.next();
             projectile.update(delta);
-            if (projectile.lifetime <= 0)
+            if (projectile.lifetime <= 0) {
+                projectile.dispose();
                 projectilesIterator.remove();
-            else {
-                TextureRegion projectileFrame = projectile.projectileAnimation.getKeyFrame(projectile.animationDuration,
+            } else {
+                TextureRegion projectileFrame = projectile.projectileAnimation.animation.getKeyFrame(projectile.animationDuration,
                         true);
                 game.batch.draw(projectileFrame, projectile.x, projectile.y, 0, 0, 64, 48, projectile.scaleX, 1, 0);
             }

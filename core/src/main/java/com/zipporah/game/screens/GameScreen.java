@@ -277,16 +277,7 @@ public class GameScreen implements Screen {
         cam.update();
         game.batch.setProjectionMatrix(cam.combined);
 
-        player.idle_init();
-        player.walk_init();
-        player.jump_init();
-        player.sprint_init();
-        player.attack_init();
-        player.hurt_init();
-        player.dead_init();
-
-        // Karasu's the final boss
-        // enemies.add(new Karasu(1750, 50, 180, 60f, 70f, 62, 120));
+        player = new Player();
 
         // First Door Skeleton
         enemies.add(new Skeleton(1800, 50, 200, 60f, 70f, 62, 120));
@@ -368,13 +359,13 @@ public class GameScreen implements Screen {
                     Gdx.input.isKeyPressed(Input.Keys.UP)) {
                 onLadder = true;
                 player.y += player.spriteSpeed * delta;
-                player.currFrame = player.walk.getKeyFrame(player.time, true);
+                player.currFrame = player.walk.animation.getKeyFrame(player.time, true);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.S) ||
                     Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
                 onLadder = true;
                 player.y -= player.spriteSpeed * delta;
-                player.currFrame = player.walk.getKeyFrame(player.time, true);
+                player.currFrame = player.walk.animation.getKeyFrame(player.time, true);
             }
             // get off ladder by pressing left or right
             if (Gdx.input.isKeyPressed(Input.Keys.A) ||
@@ -709,10 +700,11 @@ public class GameScreen implements Screen {
         while (projectilesIterator.hasNext()) {
             Player.Projectile projectile = projectilesIterator.next();
             projectile.update(delta);
-            if (projectile.lifetime <= 0)
+            if (projectile.lifetime <= 0) {
+                projectile.dispose();
                 projectilesIterator.remove();
-            else {
-                TextureRegion projectileFrame = projectile.projectileAnimation.getKeyFrame(projectile.animationDuration,
+            } else {
+                TextureRegion projectileFrame = projectile.projectileAnimation.animation.getKeyFrame(projectile.animationDuration,
                         true);
                 game.batch.draw(projectileFrame, projectile.x, projectile.y, 0, 0, 64, 48, projectile.scaleX, 1, 0);
             }
