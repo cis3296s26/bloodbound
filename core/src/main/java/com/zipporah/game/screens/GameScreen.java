@@ -101,7 +101,9 @@ public class GameScreen implements Screen {
     Rectangle spriteBox = new Rectangle();
 
     // sound
-    Sound enemyHurt;
+    Sound skeletonHurt;
+    Sound keyFound;
+    Sound doorUnlocked;
 
     // music
     Music music1;
@@ -296,7 +298,11 @@ public class GameScreen implements Screen {
         enemies.add(new Karasu(3774, 128, 200, 60f, 70f, 62, 120));
 
         // sounds
-        enemyHurt = Gdx.audio.newSound(Gdx.files.internal("Sounds/Enemy/crunch_splat.wav"));
+        skeletonHurt = Gdx.audio.newSound(Gdx.files.internal("Sounds/Enemy/crunch_splat.wav"));
+
+        keyFound = Gdx.audio.newSound(Gdx.files.internal("Sounds/Interactables/keys_jingling.wav"));
+
+        doorUnlocked = Gdx.audio.newSound(Gdx.files.internal("Sounds/Interactables/lock_unlock.wav"));
         // playerDead =
         // Gdx.audio.newSound(Gdx.files.internal("Sounds/Player/death_9_meghan.wav"));
     }
@@ -386,6 +392,7 @@ public class GameScreen implements Screen {
                 float dist1 = Vector2.dst(player.x, player.y, chest1Position.x, chest1Position.y);
                 if (dist1 < chestInteractionRange) {
                     chest1Open = true;
+                    keyFound.play(30);
                     haveChest1key = true;
                     keyCount++;
                 }
@@ -396,6 +403,7 @@ public class GameScreen implements Screen {
                 float dist2 = Vector2.dst(player.x, player.y, chest2Position.x, chest2Position.y);
                 if (dist2 < chestInteractionRange) {
                     chest2Open = true;
+                    keyFound.play(30);
                     haveChest2key = true;
                     keyCount++;
                 }
@@ -409,6 +417,7 @@ public class GameScreen implements Screen {
                     firstDoorOpen = true;
                     // door can be walked through
                     wallRectangles.removeValue(firstDoorRect, true);
+                    doorUnlocked.play(30);
                     float doorOpenTime = 0.1f;
                     keyCount--;
                 }
@@ -420,6 +429,7 @@ public class GameScreen implements Screen {
                     lastDoorOpen = true;
                     // door can be walked through
                     wallRectangles.removeValue(lastDoorRect, true);
+                    doorUnlocked.play(30);
                     float doorOpenTime = 0.1f;
                     keyCount--;
 
@@ -636,7 +646,7 @@ public class GameScreen implements Screen {
                     Player.Projectile projectile = projectilesIterator.next();
                     if (projectile.box.overlaps(enemy.innerBoundaries)) {
                         enemy.health -= projectile.damage;
-                        enemyHurt.play(0.40f);
+                        skeletonHurt.play(0.40f);
                         enemy.triggerHurt();
                         projectilesIterator.remove();
                     }

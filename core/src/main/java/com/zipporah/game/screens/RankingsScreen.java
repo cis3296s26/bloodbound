@@ -5,6 +5,7 @@ import java.util.List;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
@@ -19,10 +20,15 @@ public class RankingsScreen implements Screen {
   ExtendViewport viewport;
   BitmapFont font;
   Texture homeButtonTexture;
+  Texture clearButtonTexture;
   float homeButtonX = 1205f;
   float homeButtonY = 670f;
   float homeButtonWidth = 42f;
   float homeButtonHeight = 39f;
+  float clearButtonX = 1100f;
+  float clearButtonY = 20f;
+  float clearButtonWidth = 168f;
+  float clearButtonHeight = 64f;
 
   public RankingsScreen(ScreenManager game) {
     this.game = game;
@@ -33,6 +39,7 @@ public class RankingsScreen implements Screen {
     viewport = new ExtendViewport(1280, 720);
     font = new BitmapFont();
     homeButtonTexture = new Texture(Gdx.files.internal("Buttons/HomeButton.png"));
+    clearButtonTexture = new Texture(Gdx.files.internal("Buttons/clearButton.png"));
     game.playerData.load();
   }
 
@@ -56,41 +63,69 @@ public class RankingsScreen implements Screen {
       return;
     }
 
-    List<GameRun> pointsRuns = game.playerData.getPointsRuns();
-    List<GameRun> speedRuns = game.playerData.getSpeedRuns();
+    boolean clearButtonHovering =
+            hudMouse.x >= clearButtonX &&
+                    hudMouse.x <= clearButtonX + clearButtonWidth &&
+                    hudMouse.y >= clearButtonY &&
+                    hudMouse.y <= clearButtonY + clearButtonHeight;
+
+    if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && clearButtonHovering) {
+      game.playerData.clearRuns();
+      return;
+    }
+
+    List<GameRun> runs = game.playerData.getRuns();
 
     game.batch.begin();
 
-    font.draw(game.batch, "Player Stats", 560, 690);
-    font.draw(game.batch, "Best Run (Overall)", 220, 630);
-    font.draw(game.batch, "Fastest Run", 760, 630);
+    // title
+    font.draw(game.batch, "YOUR HIGH SCORES", 570, 690);
 
-    // Pull Best Runs
-    float pointsY = 580;
-    if (pointsRuns.isEmpty()) {
-      font.draw(game.batch, "No runs saved yet", 120, pointsY);
+    // column headers
+    font.draw(game.batch, "RANK", 280, 640);
+    font.draw(game.batch, "TIME", 620, 640);
+    font.draw(game.batch, "POINTS", 920, 640);
+
+    // row of alt red and white
+    Color[] rowColors = {
+            Color.WHITE,
+            Color.RED,
+            Color.WHITE,
+            Color.RED,
+            Color.WHITE,
+            Color.RED,
+            Color.WHITE,
+            Color.RED,
+            Color.WHITE,
+            Color.RED
+    };
+
+    String[] ranks = {"1ST","2ND","3RD","4TH","5TH","6TH","7TH","8TH","9TH","10TH"};
+
+    if (runs.isEmpty()) {
+      font.setColor(Color.WHITE);
+      font.draw(game.batch, "No runs saved yet", 400, 580);
     } else {
-      for (int i = 0; i < pointsRuns.size() && i < 10; i++) {
-        GameRun run = pointsRuns.get(i);
-        font.draw(game.batch, (i + 1) + ". " + run.points + " pts  " + run.elapsedTime + " s", 120, pointsY);
-        pointsY -= 35;
+      float y = 590;
+      for (int i = 0; i < runs.size() && i < 10; i++) {
+        GameRun run = runs.get(i);
+        font.setColor(rowColors[i]);
+        font.draw(game.batch, ranks[i], 280, y);
+        font.draw(game.batch, String.format("%.1fs", run.elapsedTime), 620, y);
+        if(run.points >= 10){
+          font.draw(game.batch, String.valueOf(run.points), 937, y);
+        } else{
+          font.draw(game.batch, String.valueOf(run.points), 940, y);
+        }
+        y -= 50;
       }
     }
 
-    // Pull Speed Runs
-    float speedY = 580;
-    if (speedRuns.isEmpty()) {
-      font.draw(game.batch, "No runs saved yet", 660, speedY);
-    } else {
-      for (int i = 0; i < speedRuns.size() && i < 10; i++) {
-        GameRun run = speedRuns.get(i);
-        font.draw(game.batch, (i + 1) + ". " + run.elapsedTime + " s  " + run.points + " pts", 660, speedY);
-        speedY -= 35;
-      }
-    }
+    // reset color to fix homewscreen button bug
+    font.setColor(Color.WHITE);
 
     game.batch.draw(homeButtonTexture, homeButtonX, homeButtonY, homeButtonWidth, homeButtonHeight);
-
+    game.batch.draw(clearButtonTexture, clearButtonX, clearButtonY, clearButtonWidth, clearButtonHeight);
     game.batch.end();
   }
 
@@ -121,6 +156,9 @@ public class RankingsScreen implements Screen {
     }
     if (homeButtonTexture != null) {
       homeButtonTexture.dispose();
+    }
+    if (clearButtonTexture != null) {
+      clearButtonTexture.dispose();
     }
   }
 }
