@@ -39,9 +39,6 @@ public class GameScreen2 extends GameScreen {
     // sounds
     Sound drink;
 
-
-
-
 //    TiledMap map;
 //    OrthogonalTiledMapRenderer renderer;
 //    OrthographicCamera camera;
@@ -66,15 +63,12 @@ public class GameScreen2 extends GameScreen {
         //load user
         player.x = 100;
         player.y = 128;
-
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
         cam.position.set(player.x + player.sprit_size / 2f, player.y + player.sprit_size / 2f, 0);
         cam.update();
         game.batch.setProjectionMatrix(cam.combined);
 
-
         // add music
-
     }
 
     private void getPotionPosition() {
@@ -144,10 +138,6 @@ public class GameScreen2 extends GameScreen {
                 }
             }
         }
-
-
-
-
         // level 2 specific interactions (probably wont be any we shall see)
     }
 
@@ -229,12 +219,12 @@ public class GameScreen2 extends GameScreen {
 
         viewportHUD.apply();
         game.batch.setProjectionMatrix(viewportHUD.getCamera().combined);
-        player.bar_width = player.health_percentage * player.hpForeground1.getWidth();
+        player.render_health();
 
         game.batch.begin();
         game.timer.draw(game.batch);
         game.batch.draw(player.hpBackground1, 10, 700, player.hpBackground1.getWidth() * player.w_scale, player.hpBackground1.getHeight());
-        game.batch.draw(player.hpForeground1, 10, 700, player.bar_width * player.w_scale, player.hpForeground1.getHeight());
+        game.batch.draw(player.hpForeground1, 11, 700, player.bar_width * player.w_scale, player.hpForeground1.getHeight());
         game.batch.draw(keyTexture, 882, 672, 64f, 64f);
         game.timer.font.draw(game.batch, String.format("%dx", keyCount), 946, 700);
         game.batch.draw(homeButtonTexture, homeButtonX, homeButtonY, homeButtonWidth, homeButtonHeight);
@@ -259,6 +249,9 @@ public class GameScreen2 extends GameScreen {
         // clear old enemies
         enemies.clear();
 
+        for(int i = 0; i < dmg; i++) {
+            player.curr_health -= 10f * game.getDamageMultiplier();
+        }
         // add level 2 enemies
         enemies.add(new Skeleton(10, 400, 200, 60f, 70f, 62, 120));
         enemies.add(new Skeleton(1300, 200, 200, 60f, 70f, 62, 120));
