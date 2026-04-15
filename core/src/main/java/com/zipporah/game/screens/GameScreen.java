@@ -233,8 +233,6 @@ public class GameScreen implements Screen {
         viewportHUD = new FitViewport(1280, 720);
         game.batch.setProjectionMatrix(viewport.getCamera().combined);
 
-        homeButtonTexture = new Texture(Gdx.files.internal("Buttons/HomeButton.png"));
-
         // // render in map
         // // moving this is initLevel method
         // map = new TmxMapLoader().load("level_1.tmx");
@@ -312,7 +310,7 @@ public class GameScreen implements Screen {
 
         music1 = Gdx.audio.newMusic(Gdx.files.internal("Music/spencer_yk-castle-of-athanasius-151010.mp3"));
         music1.setLooping(true);
-        music1.setVolume(0.30f);
+        music1.setVolume(game.musicVolume);
         music1.play();
     }
 
@@ -564,7 +562,7 @@ public class GameScreen implements Screen {
                 if (enemy != null && !enemy.isRemoved()) {
                     if (spriteBox.overlaps(enemy.attackBox)) {
                         player.isHurt = true;
-                        player.curr_health -= 10;
+                        player.curr_health -= 10f * game.getDamageMultiplier();
                         player.health_percentage = player.curr_health / player.max_health;
                         player.hurtCooldown = 1.0f;
                         if (player.curr_health <= 0) player.isDead = true;
@@ -635,7 +633,8 @@ public class GameScreen implements Screen {
                     Player.Projectile projectile = projectilesIterator.next();
                     if (projectile.box.overlaps(enemy.innerBoundaries)) {
                         enemy.health -= projectile.damage;
-                        skeletonHurt.play(0.40f);
+                        Enemy.sfxVolume = game.sfxVolume;
+                        skeletonHurt.play(game.sfxVolume);
                         enemy.triggerHurt();
                         projectilesIterator.remove();
                     }

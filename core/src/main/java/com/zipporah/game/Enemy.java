@@ -16,6 +16,7 @@ public class Enemy {
 
     protected TextureRegion currFrame;
     public float time = 0;
+    public static float sfxVolume = 0.40f;
     Sound skeletonDead;
 
     protected static class AnimationBundle {
@@ -192,7 +193,7 @@ public class Enemy {
             if (currState != State.death) {
                 currState = State.death;
                 stateTime = 0;
-                skeletonDead.play(0.25f);
+                skeletonDead.play(sfxVolume);
             }
             return;
         }

@@ -5,9 +5,11 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.zipporah.game.Enemy;
 
 public class OptionsScreen implements Screen{
 
@@ -20,6 +22,12 @@ public class OptionsScreen implements Screen{
   float homeButtonY = 670f;
   float homeButtonWidth = 42f;
   float homeButtonHeight = 39f;
+  Rectangle musicDownBounds = new Rectangle(420f, 520f, 40f, 40f);
+  Rectangle musicUpBounds = new Rectangle(720f, 520f, 40f, 40f);
+  Rectangle sfxDownBounds = new Rectangle(420f, 430f, 40f, 40f);
+  Rectangle sfxUpBounds = new Rectangle(720f, 430f, 40f, 40f);
+  Rectangle difficultyLeftBounds = new Rectangle(420f, 340f, 40f, 40f);
+  Rectangle difficultyRightBounds = new Rectangle(720f, 340f, 40f, 40f);
   
   public OptionsScreen(ScreenManager game){
     this.game = game;
@@ -57,7 +65,42 @@ public class OptionsScreen implements Screen{
       return;
     }
 
+    if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+      if (musicDownBounds.contains(hudMouse)) {
+        game.adjustMusicVolume(-0.05f);
+      } else if (musicUpBounds.contains(hudMouse)) {
+        game.adjustMusicVolume(0.05f);
+      } else if (sfxDownBounds.contains(hudMouse)) {
+        game.adjustSfxVolume(-0.05f);
+        Enemy.sfxVolume = game.sfxVolume;
+      } else if (sfxUpBounds.contains(hudMouse)) {
+        game.adjustSfxVolume(0.05f);
+        Enemy.sfxVolume = game.sfxVolume;
+      } else if (difficultyLeftBounds.contains(hudMouse)) {
+        game.cycleDifficulty(-1);
+      } else if (difficultyRightBounds.contains(hudMouse)) {
+        game.cycleDifficulty(1);
+      }
+    }
+
     game.batch.begin();
+
+    font.draw(game.batch, "Options", 580, 650);
+
+    font.draw(game.batch, "Music Volume", 500, 550);
+    font.draw(game.batch, "[-]", musicDownBounds.x, musicDownBounds.y + 30f);
+    font.draw(game.batch, String.format("%d%%", Math.round(game.musicVolume * 100)), 560, 550);
+    font.draw(game.batch, "[+]", musicUpBounds.x, musicUpBounds.y + 30f);
+
+    font.draw(game.batch, "SFX Volume", 520, 460);
+    font.draw(game.batch, "[-]", sfxDownBounds.x, sfxDownBounds.y + 30f);
+    font.draw(game.batch, String.format("%d%%", Math.round(game.sfxVolume * 100)), 560, 460);
+    font.draw(game.batch, "[+]", sfxUpBounds.x, sfxUpBounds.y + 30f);
+
+    font.draw(game.batch, "Difficulty", 530, 370);
+    font.draw(game.batch, "[<]", difficultyLeftBounds.x, difficultyLeftBounds.y + 30f);
+    font.draw(game.batch, game.difficulty.name(), 560, 370);
+    font.draw(game.batch, "[>]", difficultyRightBounds.x, difficultyRightBounds.y + 30f);
 
     game.batch.draw(homeButtonTexture, homeButtonX, homeButtonY, homeButtonWidth, homeButtonHeight);
     
