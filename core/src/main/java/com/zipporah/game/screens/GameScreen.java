@@ -280,13 +280,13 @@ public class GameScreen implements Screen {
         player = new Player();
 
         // First Door Skeleton
-        enemies.add(new Skeleton(1800, 50, 200, 60f, 70f, 62, 120));
+//        enemies.add(new Skeleton(1800, 50, 200, 60f, 70f, 62, 120));
 
         // Second Chest Skeleton
         enemies.add(new Skeleton(3774, 128, 200, 60f, 70f, 62, 120));
         
         // Test Karasu 
-        enemies.add(new Karasu(3774, 128, 200, 60f, 70f, 62, 120));
+        enemies.add(new Karasu(1800, 50, 200, 60f, 70f, 62, 120));
 
         // sounds
         skeletonHurt = Gdx.audio.newSound(Gdx.files.internal("Sounds/Enemy/crunch_splat.wav"));

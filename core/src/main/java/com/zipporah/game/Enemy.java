@@ -195,7 +195,8 @@ public class Enemy {
     /* BOT LOGIC:
        - the enemy can follow the player on both x- and y-axes through regular move or jump
        - the jump should be separately set in the extension class
-       - the enemy can only perform a jump upwards, won't jump downwards */
+       - the enemy can perform planned jumps to reachable platforms ahead (including landing on lower platforms
+         across a gap when a safe landing exists). */
 
     public void botLogic(float playerX, float playerY, float delta) {
         if (removed) {
@@ -272,7 +273,7 @@ public class Enemy {
             }
 
             float plannedImpulse = planJumpImpulseToPlatform(dirX);
-            if (jumpCooldownTimer <= 0f && plannedImpulse > 0f) {
+            if (jumpCooldownTimer <= 0f && plannedImpulse >= 0f) {
                 jump(plannedImpulse);
             } else {
                 currState = State.idle;
@@ -288,7 +289,7 @@ public class Enemy {
             }
 
             float plannedImpulse = planJumpImpulseToPlatform(dirX);
-            if (jumpCooldownTimer <= 0f && plannedImpulse > 0f) {
+            if (jumpCooldownTimer <= 0f && plannedImpulse >= 0f) {
                 jump(plannedImpulse);
             } else {
                 currState = State.idle;
@@ -304,7 +305,10 @@ public class Enemy {
             return;
         }
 
-        velocityY = Math.max(minJumpImpulse, Math.min(jumpImpulse, impulse));
+        // For "jump down / forward" (landing on a lower platform) we may intentionally use a smaller
+        // impulse than minJumpImpulse, so clamp only to [0, jumpImpulse] here. The planner decides
+        // the appropriate impulse depending on the target.
+        velocityY = Math.max(0f, Math.min(jumpImpulse, impulse));
         onGround = false;
         currState = State.jump;
         jumpInProgress = true;
@@ -385,11 +389,41 @@ public class Enemy {
             return -1f;
         }
 
-        // Allow landing on platforms slightly below current ground (across a dip), but avoid targeting deep drops.
-        float maxTargetDrop = 120f;
-        float minTop = y - maxTargetDrop;
-        float maxTop = y + Math.max(30f, maxJumpHeight() + 5f);
+        // Pass 1: preserve existing behavior: prefer planned jumps that use at least minJumpImpulse
+        // and only target platforms slightly below the current ground.
+        float planned = planJumpImpulseToPlatformInRange(
+                dirX,
+                takeoffFeetX,
+                airSpeed,
+                g,
+                /*minImpulseAllowed=*/minJumpImpulse,
+                /*minTop=*/y - 120f,
+                /*maxTop=*/y + Math.max(30f, maxJumpHeight() + 5f));
+        if (planned >= 0f) {
+            return planned;
+        }
 
+        // Pass 2: "gap jump down": if there's a platform ahead but below the current ground,
+        // allow a smaller impulse so we can land safely on it instead of stopping at the edge.
+        float maxTargetDrop = Math.max(240f, maxJumpHeight() + 180f);
+        return planJumpImpulseToPlatformInRange(
+                dirX,
+                takeoffFeetX,
+                airSpeed,
+                g,
+                /*minImpulseAllowed=*/0f,
+                /*minTop=*/y - maxTargetDrop,
+                /*maxTop=*/y - 2f);
+    }
+
+    private float planJumpImpulseToPlatformInRange(
+            float dirX,
+            float takeoffFeetX,
+            float airSpeed,
+            float g,
+            float minImpulseAllowed,
+            float minTop,
+            float maxTop) {
         float margin = 6f;
 
         float bestImpulse = -1f;
@@ -415,7 +449,17 @@ public class Enemy {
                 maxX = rectangle.x + rectangle.width;
             }
 
-            float[] candidates = new float[] { minX, (minX + maxX) * 0.5f, maxX };
+            float w = maxX - minX;
+            float[] candidates = w >= 24f
+                    ? new float[] {
+                        minX,
+                        minX + w * 0.25f,
+                        minX + w * 0.50f,
+                        minX + w * 0.75f,
+                        maxX
+                    }
+                    : new float[] { minX, (minX + maxX) * 0.5f, maxX };
+
             for (float targetFeetX : candidates) {
                 float dxSigned = targetFeetX - takeoffFeetX;
                 if (dxSigned * dirX <= 0f) {
@@ -431,8 +475,11 @@ public class Enemy {
                 float deltaY = top - y;
                 // y(t) = y + v*t - 0.5*g*t^2  => v = (deltaY + 0.5*g*t^2)/t
                 float requiredV = (deltaY + 0.5f * g * t * t) / t;
+                if (requiredV < 0f) {
+                    continue;
+                }
 
-                if (requiredV < minJumpImpulse || requiredV > jumpImpulse) {
+                if (requiredV < minImpulseAllowed || requiredV > jumpImpulse) {
                     continue;
                 }
 
