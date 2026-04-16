@@ -1,1 +1,8 @@
-[]
+[
+{
+	class: com.zipporah.game.entities.GameRun
+	elapsedTime: 32.92379
+	points: 20
+	runNumber: 1
+}
+]
