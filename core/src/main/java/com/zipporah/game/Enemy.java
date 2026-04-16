@@ -1,6 +1,7 @@
 package com.zipporah.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
@@ -8,13 +9,14 @@ import com.badlogic.gdx.math.Rectangle;
 import static com.zipporah.game.screens.GameScreen.collisionRectangles;
 import static com.zipporah.game.screens.GameScreen.spikeRectangles;
 import static com.zipporah.game.screens.GameScreen.wallRectangles;
-import com.badlogic.gdx.audio.Sound;
 
 public class Enemy {
 
     protected TextureRegion currFrame;
     public float time = 0;
-    Sound enemyDead;
+
+    public static float sfxVolume = 0.40f;
+    private Sound deathSound;
 
     protected AnimationBundle walk;
     protected AnimationBundle idle;
@@ -40,13 +42,11 @@ public class Enemy {
     protected float innerXOffsetFacingLeft;
 
     public Rectangle attackBox = new Rectangle();
-    float attackBoxWidth = 80f;
-    float attackBoxHeight = 80f;
+    private static final float ATTACK_BOX_WIDTH = 80f;
+    private static final float ATTACK_BOX_HEIGHT = 80f;
 
     protected boolean facingRight = true;
-    
-    // Bot logic and jump tuning
-    // jumpImpulse is treated as the maximum allowed impulse; actual jumps may use a smaller planned impulse.
+
     protected float jumpImpulse = 950f;
     protected float minJumpImpulse = 550f;
     protected float jumpCooldown = 0.75f;
@@ -54,7 +54,7 @@ public class Enemy {
     protected float jumpAirSpeedMultiplier = 2.1f;
     protected boolean jumpInProgress = false;
     protected boolean jumpsEnabled = true;
-    
+
     protected float groundAhead = 10f;
     protected float velocityY = 0f;
     protected float gravity = -1500f;
@@ -67,12 +67,9 @@ public class Enemy {
     public float health = 100;
 
     protected boolean removed = false;
-    
     protected boolean hurtActive = false;
     protected boolean pointsAwarded = false;
 
-
-    // Initialization
     public void create(String path, int[] frameCount) {
         removed = false;
         hurtActive = false;
@@ -87,13 +84,18 @@ public class Enemy {
         attack = new AnimationBundle(path + "Attack_1", frameCount[2], 0.1f);
         death = new AnimationBundle(path + "Dead", frameCount[3], 0.2f);
 
-        enemyDead = Gdx.audio.newSound(Gdx.files.internal("Sounds/Enemy/death_3_alex.wav"));
+        setDeathSound("Sounds/Enemy/death_3_alex.wav");
 
-        if (frameCount.length > 4 && frameCount[4] > 0) hurt = new AnimationBundle(path + "Hurt", frameCount[4], 0.1f);
-        if (frameCount.length > 5 && frameCount[5] > 0) jump = new AnimationBundle(path + "Jump", frameCount[5], 0.09f);
+        if (frameCount.length > 4 && frameCount[4] > 0) {
+            hurt = new AnimationBundle(path + "Hurt", frameCount[4], 0.1f);
+        }
+        if (frameCount.length > 5 && frameCount[5] > 0) {
+            jump = new AnimationBundle(path + "Jump", frameCount[5], 0.09f);
+        }
+
+        innerBoundaries = new Rectangle(x, y, size, size);
     }
 
-    // Draw and Animate
     public void draw(SpriteBatch batch, float time, float delta) {
         if (removed) {
             return;
@@ -117,7 +119,9 @@ public class Enemy {
                         currState = State.idle;
                         stateTime = 0;
                     }
-                } else currFrame = idle.animation.getKeyFrame(stateTime, true);
+                } else {
+                    currFrame = idle.animation.getKeyFrame(stateTime, true);
+                }
                 break;
             case hurt:
                 if (hurt != null) {
@@ -127,7 +131,9 @@ public class Enemy {
                         currState = State.idle;
                         stateTime = 0;
                     }
-                } else currFrame = idle.animation.getKeyFrame(stateTime, true);
+                } else {
+                    currFrame = idle.animation.getKeyFrame(stateTime, true);
+                }
                 break;
             case death:
                 currFrame = death.animation.getKeyFrame(stateTime, false);
@@ -154,12 +160,12 @@ public class Enemy {
 
         if (currState == State.attack) {
             if (facingRight) {
-                attackBox.set(x + innerXOffset + innerBoundaries.width, y + 20, attackBoxWidth, attackBoxHeight);
+                attackBox.set(x + innerXOffset + innerBoundaries.width, y + 20, ATTACK_BOX_WIDTH, ATTACK_BOX_HEIGHT);
             } else {
-                attackBox.set(x + innerXOffset - attackBoxWidth, y + 20, attackBoxWidth, attackBoxHeight);
+                attackBox.set(x + innerXOffset - ATTACK_BOX_WIDTH, y + 20, ATTACK_BOX_WIDTH, ATTACK_BOX_HEIGHT);
             }
         } else {
-            attackBox.set(-1000, -1000, attackBoxWidth, attackBoxHeight);
+            attackBox.set(-1000, -1000, ATTACK_BOX_WIDTH, ATTACK_BOX_HEIGHT);
         }
     }
 
@@ -170,7 +176,6 @@ public class Enemy {
         }
     }
 
-    // Logic
     public void triggerHurt() {
         if (hurt == null || removed || currState == State.death) {
             return;
@@ -178,6 +183,13 @@ public class Enemy {
         hurtActive = true;
         currState = State.hurt;
         stateTime = 0;
+    }
+
+    protected void setDeathSound(String soundPath) {
+        if (deathSound != null) {
+            deathSound.dispose();
+        }
+        deathSound = Gdx.audio.newSound(Gdx.files.internal(soundPath));
     }
 
     public boolean shouldAwardPoints() {
@@ -211,7 +223,6 @@ public class Enemy {
         float dx = playerX - x;
         updateFacing(dx, faceDeadzone);
 
-        // Vertical physics should run every tick (idle/attack/walk), otherwise jumps/falls freeze on early returns.
         stepVertical(delta);
 
         float dy = playerY - y;
@@ -335,7 +346,6 @@ public class Enemy {
         if (g <= 0f) {
             return 0f;
         }
-        // h = v^2 / (2g)
         return (jumpImpulse * jumpImpulse) / (2f * g);
     }
 
@@ -373,8 +383,6 @@ public class Enemy {
     private float planJumpImpulseToPlatform(float dirX) {
         if (!jumpsEnabled) return -1f;
 
-        // Compute the impulse needed to land on top of a platform in front while moving forward in-air.
-        // We use the same "feet probe" X position that stepVertical() uses for ground contact.
         float g = Math.abs(gravity);
         if (g <= 1f) {
             return -1f;
@@ -424,7 +432,6 @@ public class Enemy {
         float bestDx = Float.POSITIVE_INFINITY;
 
         for (Rectangle rectangle : collisionRectangles) {
-            // Only consider platforms generally in the movement direction.
             if (dirX > 0) {
                 if (rectangle.x + rectangle.width < takeoffFeetX + 1f) continue;
             } else {
@@ -467,7 +474,6 @@ public class Enemy {
                 }
 
                 float deltaY = top - y;
-                // y(t) = y + v*t - 0.5*g*t^2  => v = (deltaY + 0.5*g*t^2)/t
                 float requiredV = (deltaY + 0.5f * g * t * t) / t;
                 if (requiredV < 0f) {
                     continue;
@@ -477,7 +483,6 @@ public class Enemy {
                     continue;
                 }
 
-                // Must be descending at landing time to actually land on the top.
                 float vyAtT = requiredV - g * t;
                 if (vyAtT > 0f) {
                     continue;
@@ -560,7 +565,6 @@ public class Enemy {
         float stepX = moveSpeed * delta * dirX;
         float hitboxX = currentHitboxX();
 
-        // Don't let grounded enemies casually walk off ledges. While in-air (jumping/falling) allow movement.
         if (onGround && velocityY <= 0f && wouldStepOffEdge(dirX, delta)) {
             currState = State.idle;
             return;
@@ -610,23 +614,15 @@ public class Enemy {
 
     // Class Maintenance
     public void dispose() {
-        if (idle != null) {
-            idle.texture.dispose();
-        }
-        if (walk != null) {
-            walk.texture.dispose();
-        }
-        if (attack != null) {
-            attack.texture.dispose();
-        }
-        if (death != null) {
-            death.texture.dispose();
-        }
-        if (hurt != null) {
-            hurt.texture.dispose();
-        }
-        if (jump != null) {
-            jump.texture.dispose();
+        if (idle != null && idle.texture != null) idle.texture.dispose();
+        if (walk != null && walk.texture != null) walk.texture.dispose();
+        if (attack != null && attack.texture != null) attack.texture.dispose();
+        if (death != null && death.texture != null) death.texture.dispose();
+        if (hurt != null && hurt.texture != null) hurt.texture.dispose();
+        if (jump != null && jump.texture != null) jump.texture.dispose();
+        if (deathSound != null) {
+            deathSound.dispose();
+            deathSound = null;
         }
     }
 
