@@ -140,14 +140,13 @@ public class Enemy {
                 currFrame = idle.animation.getKeyFrame(stateTime, true);
         }
 
+        syncFacingOffset();
         if (facingRight) {
             drawX = x;
             scaleX = 1;
-            innerXOffset = innerXOffsetFacingRight;
         } else {
             drawX = x + size;
             scaleX = -1;
-            innerXOffset = innerXOffsetFacingLeft;
         }
 
         batch.draw(currFrame, drawX, y, 0, 0, size, size, scaleX, 1, 0);
@@ -165,7 +164,6 @@ public class Enemy {
     }
 
     private void updateEnemyDeath() {
-        currFrame = death.animation.getKeyFrame(stateTime, false);
         if (death.animation.isAnimationFinished(stateTime)) {
             removed = true;
             dispose();
@@ -199,48 +197,19 @@ public class Enemy {
          across a gap when a safe landing exists). */
 
     public void botLogic(float playerX, float playerY, float delta) {
-        if (removed) {
-            return;
-        }
+        if (removed) return;
 
         float attackRange = 80;
         float attackVerticalRange = 80;
         float stopRange = 70;
         float faceDeadzone = 40f;
 
-        // Cooldowns tick even when hurt/dead so we don't get "stuck jumping" behavior after a state switch.
-        if (jumpCooldownTimer > 0f) {
-            jumpCooldownTimer -= delta;
-            if (jumpCooldownTimer < 0f) {
-                jumpCooldownTimer = 0f;
-            }
-        }
+        tickJumpCooldown(delta);
 
-        if (hurtActive) {
-            // Still apply gravity/collisions so a hurt enemy doesn't freeze mid-air.
-            // Keep the hitbox aligned with the current facing direction.
-            innerXOffset = facingRight ? innerXOffsetFacingRight : innerXOffsetFacingLeft;
-            stepVertical(delta);
-            return;
-        }
-
-        if (health <= 0) {
-            if (currState != State.death) {
-                currState = State.death;
-                stateTime = 0;
-                enemyDead.play(0.25f);
-            }
-            // Let dead enemies settle on the ground naturally.
-            innerXOffset = facingRight ? innerXOffsetFacingRight : innerXOffsetFacingLeft;
-            stepVertical(delta);
-            return;
-        }
+        if (handleInactiveState(delta)) return;
 
         float dx = playerX - x;
-        if (Math.abs(dx) > faceDeadzone) {
-            facingRight = dx > 0;
-        }
-        innerXOffset = facingRight ? innerXOffsetFacingRight : innerXOffsetFacingLeft;
+        updateFacing(dx, faceDeadzone);
 
         // Vertical physics should run every tick (idle/attack/walk), otherwise jumps/falls freeze on early returns.
         stepVertical(delta);
@@ -248,56 +217,102 @@ public class Enemy {
         float dy = playerY - y;
 
         // Only do stop/attack logic on the ground. In-air we keep chasing so jumps can actually clear gaps.
-        if (onGround && Math.abs(dx) <= stopRange) {
-            if (Math.abs(dx) <= attackRange && Math.abs(dy) <= attackVerticalRange) {
-                facingRight = dx > 0;
-                innerXOffset = facingRight ? innerXOffsetFacingRight : innerXOffsetFacingLeft;
-                if (currState != State.attack) {
-                    stateTime = 0;
-                }
-                currState = State.attack;
-            } else {
-                currState = State.idle;
-            }
+        if (handleGroundedCombat(dx, dy, stopRange, attackRange, attackVerticalRange)) return;
+
+        float dirX = directionX();
+        if (shouldStopForHazardAhead(dirX, delta)) {
+            currState = State.idle;
             return;
         }
 
-        float dirX = facingRight ? 1f : -1f;
-        innerXOffset = facingRight ? innerXOffsetFacingRight : innerXOffsetFacingLeft;
-
-        // If the next step would put us on spikes, attempt a planned jump to a safe platform.
-        if (onGround && velocityY <= 0f && wouldStepOnSpike(dirX, delta)) {
-            if (!jumpsEnabled) {
-                currState = State.idle;
-                return;
-            }
-
-            float plannedImpulse = planJumpImpulseToPlatform(dirX);
-            if (jumpCooldownTimer <= 0f && plannedImpulse >= 0f) {
-                jump(plannedImpulse);
-            } else {
-                currState = State.idle;
-                return;
-            }
-        }
-
-        // If we're about to walk off an edge, try to jump to a reachable platform ("hanging block") ahead.
-        if (onGround && velocityY <= 0f && wouldStepOffEdge(dirX, delta)) {
-            if (!jumpsEnabled) {
-                currState = State.idle;
-                return;
-            }
-
-            float plannedImpulse = planJumpImpulseToPlatform(dirX);
-            if (jumpCooldownTimer <= 0f && plannedImpulse >= 0f) {
-                jump(plannedImpulse);
-            } else {
-                currState = State.idle;
-                return;
-            }
-        }
-
         moveHorizontal(dirX, delta);
+    }
+
+    private void tickJumpCooldown(float delta) {
+        // Cooldowns tick even when hurt/dead so we don't get "stuck jumping" behavior after a state switch.
+        if (jumpCooldownTimer > 0f) jumpCooldownTimer = Math.max(0f, jumpCooldownTimer - delta);
+    }
+
+    private boolean handleInactiveState(float delta) {
+        if (hurtActive) {
+            settleVertically(delta);
+            return true;
+        }
+
+        if (health > 0) return false;
+
+        if (currState != State.death) {
+            currState = State.death;
+            stateTime = 0;
+            enemyDead.play(0.25f);
+        }
+
+        // Let dead enemies settle on the ground naturally.
+        settleVertically(delta);
+        return true;
+    }
+
+    private void settleVertically(float delta) {
+        syncFacingOffset();
+        stepVertical(delta);
+    }
+
+    private void updateFacing(float dx, float deadzone) {
+        if (Math.abs(dx) > deadzone) {
+            facingRight = dx > 0;
+        }
+        syncFacingOffset();
+    }
+
+    private boolean handleGroundedCombat(float dx, float dy, float stopRange, float attackRange, float attackVerticalRange) {
+        if (!onGround || Math.abs(dx) > stopRange) return false;
+
+        if (Math.abs(dx) <= attackRange && Math.abs(dy) <= attackVerticalRange) {
+            facingRight = dx > 0;
+            syncFacingOffset();
+            if (currState != State.attack) {
+                stateTime = 0;
+            }
+            currState = State.attack;
+        } else {
+            currState = State.idle;
+        }
+
+        return true;
+    }
+
+    private boolean shouldStopForHazardAhead(float dirX, float delta) {
+        if (!onGround || velocityY > 0f) {
+            return false;
+        }
+
+        if (!wouldStepOnSpike(dirX, delta) && !wouldStepOffEdge(dirX, delta)) {
+            return false;
+        }
+
+        return !tryPlannedJump(dirX);
+    }
+
+    private boolean tryPlannedJump(float dirX) {
+        if (!jumpsEnabled || jumpCooldownTimer > 0f) {
+            return false;
+        }
+
+        float plannedImpulse = planJumpImpulseToPlatform(dirX);
+        if (plannedImpulse < 0f) {
+            return false;
+        }
+
+        jump(plannedImpulse);
+        return true;
+    }
+
+    private void syncFacingOffset() {
+        innerXOffset = facingRight ? innerXOffsetFacingRight : innerXOffsetFacingLeft;
+    }
+
+    private float directionX() {
+        return facingRight ? 1f : -1f;
     }
 
     private void jump(float impulse) {
@@ -326,7 +341,7 @@ public class Enemy {
 
     private boolean wouldStepOffEdge(float dirX, float delta) {
         float stepX = speed * delta * dirX;
-        float nextHitboxX = (x + innerXOffset) + stepX;
+        float nextHitboxX = currentHitboxX() + stepX;
         float footX = dirX > 0
                 ? nextHitboxX + innerBoundaries.width + groundAhead
                 : nextHitboxX - groundAhead;
@@ -351,26 +366,12 @@ public class Enemy {
         }
 
         float stepX = speed * delta * dirX;
-        float nextHitboxX = (x + innerXOffset) + stepX;
-
-        float hitboxW = innerBoundaries.width;
-        float feetWidth = Math.min(10f, hitboxW);
-        float feetHeight = 2f;
-        float feetX = nextHitboxX + (hitboxW - feetWidth) / 2f;
-        Rectangle feet = new Rectangle(feetX, y, feetWidth, feetHeight);
-
-        for (Rectangle spike : spikeRectangles) {
-            if (feet.overlaps(spike)) {
-                return true;
-            }
-        }
-        return false;
+        float nextHitboxX = currentHitboxX() + stepX;
+        return overlapsSpike(createCenteredProbe(nextHitboxX, y, innerBoundaries.width, 2f));
     }
 
     private float planJumpImpulseToPlatform(float dirX) {
-        if (!jumpsEnabled) {
-            return -1f;
-        }
+        if (!jumpsEnabled) return -1f;
 
         // Compute the impulse needed to land on top of a platform in front while moving forward in-air.
         // We use the same "feet probe" X position that stepVertical() uses for ground contact.
@@ -380,11 +381,10 @@ public class Enemy {
         }
 
         float hitboxW = innerBoundaries.width;
-        float feetWidth = Math.min(10f, hitboxW);
-        float takeoffHitboxX = x + innerXOffset;
-        float takeoffFeetX = takeoffHitboxX + (hitboxW - feetWidth) / 2f;
+        float probeWidth = narrowProbeWidth(hitboxW);
+        float takeoffFeetX = currentHitboxX() + (hitboxW - probeWidth) / 2f;
 
-        float airSpeed = speed * Math.max(1f, jumpAirSpeedMultiplier);
+        float airSpeed = jumpAirSpeed();
         if (airSpeed <= 1f) {
             return -1f;
         }
@@ -416,14 +416,8 @@ public class Enemy {
                 /*maxTop=*/y - 2f);
     }
 
-    private float planJumpImpulseToPlatformInRange(
-            float dirX,
-            float takeoffFeetX,
-            float airSpeed,
-            float g,
-            float minImpulseAllowed,
-            float minTop,
-            float maxTop) {
+    private float planJumpImpulseToPlatformInRange(float dirX, float takeoffFeetX, float airSpeed,
+            float g, float minImpulseAllowed, float minTop, float maxTop) {
         float margin = 6f;
 
         float bestImpulse = -1f;
@@ -508,22 +502,14 @@ public class Enemy {
             return false;
         }
 
-        float hitboxW = innerBoundaries.width;
-        float feetWidth = Math.min(10f, hitboxW);
-        float feetHeight = 2f;
-        Rectangle feet = new Rectangle(feetX, topY, feetWidth, feetHeight);
-        for (Rectangle spike : spikeRectangles) {
-            if (feet.overlaps(spike)) {
-                return true;
-            }
-        }
-        return false;
+        Rectangle feet = new Rectangle(feetX, topY, narrowProbeWidth(innerBoundaries.width), 2f);
+        return overlapsSpike(feet);
     }
 
     private void stepVertical(float delta) {
         float hitboxW = innerBoundaries.width;
         float hitboxH = innerBoundaries.height;
-        float hitboxX = x + innerXOffset;
+        float hitboxX = currentHitboxX();
 
         onGround = false;
         velocityY += gravity * delta;
@@ -532,15 +518,12 @@ public class Enemy {
         if (velocityY > 0f) {
             float lowestCeiling = Float.POSITIVE_INFINITY;
             float headHeight = 2f;
-            float headWidth = Math.min(10f, hitboxW);
-            float headX = hitboxX + (hitboxW - headWidth) / 2f;
-            Rectangle head = new Rectangle(headX, newY + hitboxH - headHeight, headWidth, headHeight);
+            Rectangle head = createCenteredProbe(hitboxX, newY + hitboxH - headHeight, hitboxW, headHeight);
             for (Rectangle rectangle : collisionRectangles) {
                 if (head.overlaps(rectangle)) {
                     float rectBottom = rectangle.y;
-                    if (rectBottom < lowestCeiling) {
+                    if (rectBottom < lowestCeiling)
                         lowestCeiling = rectBottom;
-                    }
                 }
             }
             if (lowestCeiling != Float.POSITIVE_INFINITY) {
@@ -551,16 +534,12 @@ public class Enemy {
 
         if (velocityY <= 0f) {
             float highestFloor = Float.NEGATIVE_INFINITY;
-            float feetHeight = 2f;
-            float feetWidth = Math.min(10f, hitboxW);
-            float feetX = hitboxX + (hitboxW - feetWidth) / 2f;
-            Rectangle feet = new Rectangle(feetX, newY, feetWidth, feetHeight);
+            Rectangle feet = createCenteredProbe(hitboxX, newY, hitboxW, 2f);
             for (Rectangle rectangle : collisionRectangles) {
                 if (feet.overlaps(rectangle)) {
                     float top = rectangle.y + rectangle.height;
-                    if (top > highestFloor) {
+                    if (top > highestFloor)
                         highestFloor = top;
-                    }
                 }
             }
             if (highestFloor != Float.NEGATIVE_INFINITY) {
@@ -576,11 +555,10 @@ public class Enemy {
     }
 
     private void moveHorizontal(float dirX, float delta) {
-        currState = State.walk;
-        if(jumpInProgress) currState = State.jump;
-        float moveSpeed = jumpInProgress ? speed * Math.max(1f, jumpAirSpeedMultiplier) : speed;
+        currState = jumpInProgress ? State.jump : State.walk;
+        float moveSpeed = jumpInProgress ? jumpAirSpeed() : speed;
         float stepX = moveSpeed * delta * dirX;
-        float hitboxX = x + innerXOffset;
+        float hitboxX = currentHitboxX();
 
         // Don't let grounded enemies casually walk off ledges. While in-air (jumping/falling) allow movement.
         if (onGround && velocityY <= 0f && wouldStepOffEdge(dirX, delta)) {
@@ -599,6 +577,33 @@ public class Enemy {
 
         x += stepX;
         innerBoundaries.setPosition(x + innerXOffset, y);
+    }
+
+    private float currentHitboxX() {
+        return x + innerXOffset;
+    }
+
+    private float jumpAirSpeed() {
+        return speed * Math.max(1f, jumpAirSpeedMultiplier);
+    }
+
+    private float narrowProbeWidth(float hitboxWidth) {
+        return Math.min(10f, hitboxWidth);
+    }
+
+    private Rectangle createCenteredProbe(float hitboxX, float probeY, float hitboxWidth, float probeHeight) {
+        float probeWidth = narrowProbeWidth(hitboxWidth);
+        float probeX = hitboxX + (hitboxWidth - probeWidth) / 2f;
+        return new Rectangle(probeX, probeY, probeWidth, probeHeight);
+    }
+
+    private boolean overlapsSpike(Rectangle probe) {
+        for (Rectangle spike : spikeRectangles) {
+            if (probe.overlaps(spike)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
