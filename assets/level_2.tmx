@@ -155,7 +155,7 @@
   <object id="167" x="1484.28" y="256.692" width="39.7428" height="62.8872"/>
  </objectgroup>
  <objectgroup id="12" name="potion">
-  <object id="172" x="2541" y="324" width="30" height="26.6667"/>
+  <object id="172" x="2464.04" y="323.716" width="30" height="26.6667"/>
  </objectgroup>
  <objectgroup id="11" name="final_door">
   <object id="168" x="2572.32" y="0.817219" width="40.4115" height="350.516"/>
