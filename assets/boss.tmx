@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.12.0" orientation="orthogonal" renderorder="right-down" width="20" height="12" tilewidth="32" tileheight="32" infinite="0" nextlayerid="10" nextobjectid="9">
+ <tileset firstgid="1" name="spritesheet" tilewidth="32" tileheight="32" tilecount="318" columns="53">
+  <image source="Maps/spritesheet.png" width="1696" height="192"/>
+ </tileset>
+ <layer id="1" name="Tile Layer 1" width="20" height="12">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup id="2" name="collision">
+  <object id="1" x="596" y="18"/>
+ </objectgroup>
+ <objectgroup id="3" name="walls">
+  <object id="2" x="571" y="18"/>
+ </objectgroup>
+ <objectgroup id="4" name="spike">
+  <object id="3" x="617" y="21"/>
+ </objectgroup>
+ <objectgroup id="5" name="ladder">
+  <object id="4" x="528" y="-39"/>
+ </objectgroup>
+ <objectgroup id="6" name="chest1">
+  <object id="5" x="582" y="-29"/>
+ </objectgroup>
+ <objectgroup id="7" name="chest2">
+  <object id="6" x="612" y="-27"/>
+ </objectgroup>
+ <objectgroup id="8" name="first_door">
+  <object id="7" x="592" y="-72"/>
+ </objectgroup>
+ <objectgroup id="9" name="last_door">
+  <object id="8" x="639" y="-58"/>
+ </objectgroup>
+</map>

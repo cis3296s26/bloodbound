@@ -425,6 +425,11 @@ public class GameScreen implements Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
             game.setScreen(new CreditScreen(game));
         }
+
+        // test boss screen
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)) {
+            game.setScreen(new BossScreen(game));
+        }
     }
 
     protected void logic(float delta) {
