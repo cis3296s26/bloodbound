@@ -633,10 +633,13 @@ public class GameScreen implements Screen {
             }
         }
     }
+    protected void drawBackground() {}
 
     protected void draw(float delta) {
         ScreenUtils.clear(Color.BLACK);
         viewport.apply();
+
+        drawBackground();
 
         OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
 

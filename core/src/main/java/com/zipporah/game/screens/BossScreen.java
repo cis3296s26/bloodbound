@@ -36,9 +36,10 @@ public class BossScreen extends GameScreen {
     }
 
     Texture bossBackground;
+    // FitViewport viewport;
 
     @Override
-    public void initLevel(){
+    protected void initLevel(){
         this.scale = 4f;
 
         map = new TmxMapLoader().load("boss.tmx");
@@ -47,27 +48,53 @@ public class BossScreen extends GameScreen {
         //restores player health
         player.curr_health = prefs.getFloat("hp");
 
+        bossBackground = new Texture(Gdx.files.internal("Maps/Battleground2.png"));
         // add music here later
+    }
+
+
+    @Override
+    protected void drawBackground() {
+        // bossBackground = new Texture(Gdx.files.internal("Maps/Battleground2.png"));
+        OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
+        game.batch.setProjectionMatrix(cam.combined);
+        game.batch.begin();
+        // game.batch.draw(bossBackground, 0, 0, 20 * 16 * scale, 12 * 16 * scale);
+
+        game.batch.draw(bossBackground,
+                cam.position.x - viewport.getWorldWidth() / 2f,   // start from camera left edge
+                cam.position.y - viewport.getWorldHeight() / 2f,  // start from camera bottom edge
+                viewport.getWorldWidth(),
+                viewport.getWorldHeight());
+
+        game.batch.end();
+    }
+
+    @Override
+    protected void logic(float delta) {
+        super.logic(delta);
+
+        OrthographicCamera cam = (OrthographicCamera) viewport.getCamera();
+        float mapCenterX = (20 * 16 * scale) / 2f;  // 640
+        float mapCenterY = (12 * 16 * scale) / 2f;  // 384
+        cam.position.set(mapCenterX, mapCenterY, 0);
+        cam.update();
+        game.batch.setProjectionMatrix(cam.combined);
     }
 
     @Override
     public void show() {
         super.show();
-        lastDoorTransitions = false; // boss room has no exit door transition
-
+        lastDoorTransitions = false;
         enemies.clear();
 
-        // add karasu scaled up
+        // change viewport
+
     }
 
     @Override
-    protected void draw(float delta) {
-        bossBackground = new Texture(Gdx.files.internal("Maps/Battleground2.png"));
-        super.draw(delta);
-        game.batch.begin();
-        game.batch.draw(bossBackground, 0, 0, 20 * 16 * scale, 12 * 16 * scale);
-        game.batch.end();
-
-        super.draw(delta);
+    public void dispose() {
+        if (bossBackground != null) bossBackground.dispose();
+        super.dispose();
     }
 }
