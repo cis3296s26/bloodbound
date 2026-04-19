@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.0" orientation="orthogonal" renderorder="right-down" width="20" height="12" tilewidth="16" tileheight="16" infinite="0" nextlayerid="12" nextobjectid="31">
+<map version="1.10" tiledversion="1.12.0" orientation="orthogonal" renderorder="right-down" width="20" height="12" tilewidth="16" tileheight="16" infinite="0" nextlayerid="12" nextobjectid="34">
  <tileset firstgid="1" name="spritesheet" tilewidth="32" tileheight="32" tilecount="318" columns="53">
   <image source="Maps/spritesheet.png" width="1696" height="192"/>
  </tileset>
@@ -14,7 +14,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,347,348,0,0,0,0,0,0,347,348,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -31,7 +31,9 @@
   <object id="24" x="22.5" y="260.5"/>
   <object id="25" x="39" y="293.5"/>
   <object id="27" x="24.5" y="218.5"/>
-  <object id="28" x="0.5" y="128" width="320" height="63.5"/>
+  <object id="28" x="0.5" y="136.5" width="320" height="55"/>
+  <object id="32" x="79" y="95.5" width="34" height="6"/>
+  <object id="33" x="207.5" y="96" width="33.5" height="6"/>
  </objectgroup>
  <objectgroup id="3" name="walls">
   <object id="2" x="571" y="18"/>
