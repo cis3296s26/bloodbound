@@ -27,7 +27,7 @@ public class Enemy {
 
     protected String path;
     protected int[] frameCount;
-    protected int size = 128;
+    public int size = 128;
 
     protected enum State {
         idle, walk, attack, jump, hurt, death
@@ -79,18 +79,18 @@ public class Enemy {
         this.frameCount = frameCount;
         innerXOffset = innerXOffsetFacingLeft;
 
-        idle = new AnimationBundle(path + "Idle", frameCount[0], 0.1f);
-        walk = new AnimationBundle(path + "Walk", frameCount[1], 0.1f);
-        attack = new AnimationBundle(path + "Attack_1", frameCount[2], 0.1f);
-        death = new AnimationBundle(path + "Dead", frameCount[3], 0.2f);
+        idle = new AnimationBundle(path + "Idle", frameCount[0], 0.1f, size, size);
+        walk = new AnimationBundle(path + "Walk", frameCount[1], 0.1f, size, size);
+        attack = new AnimationBundle(path + "Attack_1", frameCount[2], 0.1f, size, size);
+        death = new AnimationBundle(path + "Dead", frameCount[3], 0.2f, size, size);
 
         setDeathSound("Sounds/Enemy/death_3_alex.wav");
 
         if (frameCount.length > 4 && frameCount[4] > 0) {
-            hurt = new AnimationBundle(path + "Hurt", frameCount[4], 0.1f);
+            hurt = new AnimationBundle(path + "Hurt", frameCount[4], 0.1f, size, size);
         }
         if (frameCount.length > 5 && frameCount[5] > 0) {
-            jump = new AnimationBundle(path + "Jump", frameCount[5], 0.09f);
+            jump = new AnimationBundle(path + "Jump", frameCount[5], 0.09f, size, size);
         }
 
         innerBoundaries = new Rectangle(x, y, size, size);

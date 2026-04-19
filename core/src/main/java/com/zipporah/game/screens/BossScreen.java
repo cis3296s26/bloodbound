@@ -49,7 +49,12 @@ public class BossScreen extends GameScreen {
         player.curr_health = prefs.getFloat("hp");
 
         bossBackground = new Texture(Gdx.files.internal("Maps/Battleground2.png"));
+
+        enemies.clear();
         // add music here later
+
+
+        enemies.add(new Karasu(20, 50, 200, 60f, 70f, 62, 120));
     }
 
 
@@ -86,7 +91,7 @@ public class BossScreen extends GameScreen {
     public void show() {
         super.show();
         lastDoorTransitions = false;
-        enemies.clear();
+
 
         // change viewport
 
