@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.0" orientation="orthogonal" renderorder="right-down" width="200" height="13" tilewidth="32" tileheight="32" infinite="0" nextlayerid="13" nextobjectid="173">
+<map version="1.10" tiledversion="1.12.1" orientation="orthogonal" renderorder="right-down" width="200" height="13" tilewidth="32" tileheight="32" infinite="0" nextlayerid="13" nextobjectid="177">
  <tileset firstgid="1" name="spritesheet" tilewidth="32" tileheight="32" tilecount="318" columns="53">
   <image source="Maps/spritesheet.png" width="1696" height="192"/>
  </tileset>
@@ -112,7 +112,7 @@
  </objectgroup>
  <objectgroup id="3" name="walls">
   <object id="3" x="6084" y="11" width="53" height="35"/>
-  <object id="26" x="-0.666667" y="115" width="2.66667" height="305.667"/>
+  <object id="26" x="-10.6751" y="91.1977" width="2.66667" height="305.667"/>
   <object id="92" x="608" y="-0.666667" width="8.66667" height="125.333"/>
   <object id="116" x="1343.5" y="0.5" width="6.5" height="128.5"/>
   <object id="150" x="2625.33" y="0" width="8.66667" height="439.333"/>
@@ -125,6 +125,10 @@
   <object id="169" x="1373.8" y="162.17" width="5.38919" height="29.7653"/>
   <object id="170" x="1408.15" y="191.586" width="1.42781" height="32.1907"/>
   <object id="171" x="1440.18" y="224.364" width="2.30164" height="31.5786"/>
+  <object id="173" x="0.724094" y="44.7812" width="2.66667" height="305.667"/>
+  <object id="174" x="-5.01785" y="73.6598" width="2.66667" height="305.667"/>
+  <object id="175" x="-22.5128" y="83.7507" width="2.66667" height="305.667"/>
+  <object id="176" x="-16.6219" y="78.9272" width="2.66667" height="305.667"/>
  </objectgroup>
  <objectgroup id="4" name="ladder">
   <object id="4" x="5999" y="16" width="44" height="20"/>
