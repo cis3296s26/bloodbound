@@ -714,18 +714,6 @@ public class GameScreen implements Screen {
         game.timer.font.draw(game.batch, String.format("%dx", keyCount), 946, 700);
         game.batch.draw(homeButtonTexture, homeButtonX, homeButtonY, homeButtonWidth, homeButtonHeight);
         game.batch.end();
-
-
-        shapeRenderer.setProjectionMatrix(cam.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        for (Enemy enemy : enemies) {
-            if (enemy instanceof Karasu && enemy != null && !enemy.isRemoved()) {
-                shapeRenderer.rect(enemy.innerBoundaries.x, enemy.innerBoundaries.y,
-                        enemy.innerBoundaries.width, enemy.innerBoundaries.height);
-            }
-        }
-        shapeRenderer.end();
-
     }
     @Override
     public void pause() {
