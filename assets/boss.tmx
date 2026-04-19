@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.12.0" orientation="orthogonal" renderorder="right-down" width="20" height="12" tilewidth="16" tileheight="16" infinite="0" nextlayerid="12" nextobjectid="34">
+ <tileset firstgid="1" name="spritesheet" tilewidth="32" tileheight="32" tilecount="318" columns="53">
+  <image source="Maps/spritesheet.png" width="1696" height="192"/>
+ </tileset>
+ <tileset firstgid="319" name="Dungeon Tile Set" tilewidth="32" tileheight="32" tilecount="63" columns="7">
+  <image source="Maps/Dungeon Tile Set.png" width="240" height="288"/>
+ </tileset>
+ <layer id="11" name="Tile Layer 1" width="20" height="12">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,347,348,0,0,0,0,0,0,347,348,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup id="2" name="collision">
+  <object id="1" x="596" y="18"/>
+  <object id="17" x="3" y="489"/>
+  <object id="20" x="3" y="489"/>
+  <object id="19" x="58" y="468" width="1" height="1"/>
+  <object id="22" x="32" y="642" width="17" height="45"/>
+  <object id="24" x="22.5" y="260.5"/>
+  <object id="25" x="39" y="293.5"/>
+  <object id="27" x="24.5" y="218.5"/>
+  <object id="28" x="0.5" y="136.5" width="320" height="55"/>
+  <object id="32" x="79" y="95.5" width="34" height="6"/>
+  <object id="33" x="207.5" y="96" width="33.5" height="6"/>
+ </objectgroup>
+ <objectgroup id="3" name="walls">
+  <object id="2" x="571" y="18"/>
+  <object id="29" x="-0.5" y="-0.5" width="5" height="191"/>
+  <object id="30" x="316.5" y="-0.5" width="4.5" height="192"/>
+ </objectgroup>
+ <objectgroup id="4" name="spike">
+  <object id="3" x="617" y="21"/>
+ </objectgroup>
+ <objectgroup id="5" name="ladder">
+  <object id="4" x="528" y="-39"/>
+ </objectgroup>
+ <objectgroup id="6" name="chest1">
+  <object id="5" x="582" y="-29"/>
+ </objectgroup>
+ <objectgroup id="7" name="chest2">
+  <object id="6" x="612" y="-27"/>
+ </objectgroup>
+ <objectgroup id="8" name="first_door">
+  <object id="7" x="592" y="-72"/>
+ </objectgroup>
+ <objectgroup id="9" name="last_door">
+  <object id="8" x="639" y="-58"/>
+ </objectgroup>
+</map>

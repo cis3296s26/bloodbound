@@ -27,7 +27,7 @@ public class Enemy {
 
     protected String path;
     protected int[] frameCount;
-    protected int size = 128;
+    public int size = 128;
 
     protected enum State {
         idle, walk, attack, jump, hurt, death
@@ -79,18 +79,18 @@ public class Enemy {
         this.frameCount = frameCount;
         innerXOffset = innerXOffsetFacingLeft;
 
-        idle = new AnimationBundle(path + "Idle", frameCount[0], 0.1f);
-        walk = new AnimationBundle(path + "Walk", frameCount[1], 0.1f);
-        attack = new AnimationBundle(path + "Attack_1", frameCount[2], 0.1f);
-        death = new AnimationBundle(path + "Dead", frameCount[3], 0.2f);
+        idle = new AnimationBundle(path + "Idle", frameCount[0], 0.1f, size, size);
+        walk = new AnimationBundle(path + "Walk", frameCount[1], 0.1f, size, size);
+        attack = new AnimationBundle(path + "Attack_1", frameCount[2], 0.1f, size, size);
+        death = new AnimationBundle(path + "Dead", frameCount[3], 0.2f, size, size);
 
         setDeathSound("Sounds/Enemy/death_3_alex.wav");
 
         if (frameCount.length > 4 && frameCount[4] > 0) {
-            hurt = new AnimationBundle(path + "Hurt", frameCount[4], 0.1f);
+            hurt = new AnimationBundle(path + "Hurt", frameCount[4], 0.1f, size, size);
         }
         if (frameCount.length > 5 && frameCount[5] > 0) {
-            jump = new AnimationBundle(path + "Jump", frameCount[5], 0.09f);
+            jump = new AnimationBundle(path + "Jump", frameCount[5], 0.09f, size, size);
         }
 
         innerBoundaries = new Rectangle(x, y, size, size);
@@ -236,6 +236,10 @@ public class Enemy {
             return;
         }
 
+        if (tryJumpToPlayerHeight(playerX, playerY, dirX)) {
+            return;
+        }
+
         moveHorizontal(dirX, delta);
     }
 
@@ -310,6 +314,30 @@ public class Enemy {
         }
 
         float plannedImpulse = planJumpImpulseToPlatform(dirX);
+        if (plannedImpulse < 0f) {
+            return false;
+        }
+
+        jump(plannedImpulse);
+        return true;
+    }
+
+    private boolean tryJumpToPlayerHeight(float playerX, float playerY, float dirX) {
+        if (!onGround || !jumpsEnabled || jumpCooldownTimer > 0f || jumpInProgress) {
+            return false;
+        }
+
+        float dx = playerX - x;
+        if (dx * dirX <= 0f) {
+            return false;
+        }
+
+        float dy = playerY - y;
+        if (dy < 24f || dy > maxJumpHeight() + 40f) {
+            return false;
+        }
+
+        float plannedImpulse = planJumpImpulseTowardPlayerHeight(dirX, playerX, playerY);
         if (plannedImpulse < 0f) {
             return false;
         }
@@ -424,18 +452,59 @@ public class Enemy {
                 /*maxTop=*/y - 2f);
     }
 
+    private float planJumpImpulseTowardPlayerHeight(float dirX, float playerX, float playerY) {
+        if (!jumpsEnabled) return -1f;
+
+        float g = Math.abs(gravity);
+        if (g <= 1f) {
+            return -1f;
+        }
+
+        float hitboxW = innerBoundaries.width;
+        float probeWidth = narrowProbeWidth(hitboxW);
+        float takeoffFeetX = currentHitboxX() + (hitboxW - probeWidth) / 2f;
+
+        float airSpeed = jumpAirSpeed();
+        if (airSpeed <= 1f) {
+            return -1f;
+        }
+
+        float heightTolerance = Math.max(28f, innerBoundaries.height * 0.4f);
+        return planJumpImpulseToPlatformInRange(
+                dirX,
+                takeoffFeetX,
+                airSpeed,
+                g,
+                /*minImpulseAllowed=*/0f,
+                /*minTop=*/playerY - heightTolerance,
+                /*maxTop=*/playerY + heightTolerance,
+                playerX);
+    }
+
     private float planJumpImpulseToPlatformInRange(float dirX, float takeoffFeetX, float airSpeed,
             float g, float minImpulseAllowed, float minTop, float maxTop) {
+        return planJumpImpulseToPlatformInRange(dirX, takeoffFeetX, airSpeed, g, minImpulseAllowed, minTop, maxTop,
+                Float.NaN);
+    }
+
+    private float planJumpImpulseToPlatformInRange(float dirX, float takeoffFeetX, float airSpeed,
+            float g, float minImpulseAllowed, float minTop, float maxTop, float preferredPlayerX) {
         float margin = 6f;
 
         float bestImpulse = -1f;
-        float bestDx = Float.POSITIVE_INFINITY;
+        float bestScore = Float.POSITIVE_INFINITY;
 
         for (Rectangle rectangle : collisionRectangles) {
             if (dirX > 0) {
                 if (rectangle.x + rectangle.width < takeoffFeetX + 1f) continue;
             } else {
                 if (rectangle.x > takeoffFeetX - 1f) continue;
+            }
+
+            if (!Float.isNaN(preferredPlayerX)) {
+                float playerMargin = Math.max(48f, innerBoundaries.width);
+                if (dirX > 0 && rectangle.x > preferredPlayerX + playerMargin) continue;
+                if (dirX < 0 && rectangle.x + rectangle.width < preferredPlayerX - playerMargin) continue;
             }
 
             float top = rectangle.y + rectangle.height;
@@ -492,8 +561,13 @@ public class Enemy {
                     continue;
                 }
 
-                if (dx < bestDx) {
-                    bestDx = dx;
+                float score = dx;
+                if (!Float.isNaN(preferredPlayerX)) {
+                    score += Math.abs(targetFeetX - preferredPlayerX);
+                }
+
+                if (score < bestScore) {
+                    bestScore = score;
                     bestImpulse = requiredV;
                 }
             }
