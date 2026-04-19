@@ -47,4 +47,16 @@
 	points: 30
 	runNumber: 8
 }
+{
+	class: com.zipporah.game.entities.GameRun
+	elapsedTime: 71.49779
+	points: 10
+	runNumber: 9
+}
+{
+	class: com.zipporah.game.entities.GameRun
+	elapsedTime: 71.49779
+	points: 10
+	runNumber: 10
+}
 ]
