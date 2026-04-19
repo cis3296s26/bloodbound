@@ -37,6 +37,7 @@ public class BossScreen extends GameScreen {
 
     Texture bossBackground;
     // FitViewport viewport;
+    boolean bossDefeated = false;
 
     @Override
     protected void initLevel(){
@@ -53,8 +54,6 @@ public class BossScreen extends GameScreen {
         enemies.clear();
         // add music here later
 
-
-        enemies.add(new Karasu(20, 50, 230, 60f, 70f, 90, 150));
     }
 
 
@@ -85,12 +84,22 @@ public class BossScreen extends GameScreen {
         cam.position.set(mapCenterX, mapCenterY, 0);
         cam.update();
         game.batch.setProjectionMatrix(cam.combined);
+
+        boolean allDead = enemies.stream().allMatch(e -> e == null || e.isRemoved());
+        if (allDead && !enemies.isEmpty() && !bossDefeated) {
+            bossDefeated = true;
+            game.timer.stop();
+            game.playerData.saveRun(game.timer.getElapsedTime(), (int) game.timer.getPoints());
+            game.setScreen(new CreditScreen(game));
+        }
     }
 
     @Override
     public void show() {
         super.show();
         lastDoorTransitions = false;
+        enemies.clear();
+        enemies.add(new Karasu(900, 50, 230, 60f, 70f, 90, 150));
 
 
         // change viewport

@@ -36,6 +36,8 @@ Maps/Dungeon Tile Set.png
 Maps/chest_closed.png
 Maps/chest_open.png
 Maps/creditBackground.png
+Maps/creditBackground2.png
+Maps/creditBackground3.png
 Maps/door.png
 Maps/door2_closed.png
 Maps/door2_open.png
@@ -45,6 +47,7 @@ Maps/key.png
 Maps/more tiles.png
 Maps/potion.png
 Maps/spritesheet.png
+Music/(04-41) Super Mario Bros. 1,2,VS.mp3
 Music/lightyeartraxx-kim-lightyear-kings-and-dragons-275238.mp3
 Music/spencer_yk-castle-of-athanasius-151010.mp3
 Player/Attack_1.png
