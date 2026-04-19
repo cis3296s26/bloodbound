@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.0" orientation="orthogonal" renderorder="right-down" width="240" height="13" tilewidth="16" tileheight="16" infinite="0" nextlayerid="14" nextobjectid="174">
+<map version="1.10" tiledversion="1.12.1" orientation="orthogonal" renderorder="right-down" width="240" height="13" tilewidth="16" tileheight="16" infinite="0" nextlayerid="14" nextobjectid="174">
  <tileset firstgid="1" name="Dungeon Tile Set" tilewidth="16" tileheight="16" tilecount="270" columns="15">
   <image source="Maps/Dungeon Tile Set.png" trans="008000" width="240" height="288"/>
  </tileset>
@@ -69,7 +69,7 @@
   <object id="18" x="186.009" y="64.0047" width="12.0949" height="6.14688"/>
   <object id="19" x="192" y="64" width="80" height="16"/>
   <object id="21" x="306.158" y="48" width="61.8421" height="16"/>
-  <object id="24" x="320" y="96" width="111.013" height="16"/>
+  <object id="24" x="310.351" y="96" width="120.662" height="16"/>
   <object id="27" x="448" y="128" width="64" height="16"/>
   <object id="29" x="256" y="144" width="96" height="16"/>
   <object id="30" x="194.02" y="176" width="13.9804" height="32"/>
@@ -145,7 +145,6 @@
   <object id="126" x="800" y="112" width="176" height="16"/>
   <object id="129" x="786.341" y="112" width="13.6589" height="16"/>
   <object id="133" x="433.408" y="128" width="14.5922" height="16"/>
-  <object id="138" x="305.554" y="96" width="14.4463" height="16"/>
   <object id="141" x="786.634" y="80" width="13.3662" height="16"/>
  </objectgroup>
  <objectgroup id="12" name="walls">
@@ -167,7 +166,7 @@
   <object id="173" x="188.722" y="75.6974" width="0.407386" height="4.93955"/>
  </objectgroup>
  <objectgroup id="10" name="first_door">
-  <object id="117" x="304" y="112" width="16" height="32"/>
+  <object id="117" x="305.644" y="111.953" width="16" height="32"/>
  </objectgroup>
  <objectgroup id="11" name="last_door">
   <object id="118" x="1344" y="144" width="16" height="32"/>
