@@ -38,6 +38,10 @@ public class BossScreen extends GameScreen {
     Texture bossBackground;
     // FitViewport viewport;
     boolean bossDefeated = false;
+    Music victoryMusic;
+    boolean victoryStarted = false;
+    static final float VICTORY_DURATION = 6.5f;
+    float victoryTimer = 0f;
 
     @Override
     protected void initLevel(){
@@ -88,9 +92,16 @@ public class BossScreen extends GameScreen {
         boolean allDead = enemies.stream().allMatch(e -> e == null || e.isRemoved());
         if (allDead && !enemies.isEmpty() && !bossDefeated) {
             bossDefeated = true;
-            game.timer.stop();
-            game.playerData.saveRun(game.timer.getElapsedTime(), (int) game.timer.getPoints());
-            game.setScreen(new CreditScreen(game));
+            victoryMusic.play();
+        }
+
+        if (bossDefeated) {
+            victoryTimer += delta;
+            if (victoryTimer >= VICTORY_DURATION) {
+                game.timer.stop();
+                game.playerData.saveRun(game.timer.getElapsedTime(), (int) game.timer.getPoints());
+                Gdx.app.postRunnable(() -> game.setScreen(new CreditScreen(game)));
+            }
         }
     }
 
@@ -100,7 +111,9 @@ public class BossScreen extends GameScreen {
         lastDoorTransitions = false;
         enemies.clear();
         enemies.add(new Karasu(900, 50, 230, 60f, 70f, 90, 150));
-
+        victoryMusic = Gdx.audio.newMusic(Gdx.files.internal("Music/(04-41) Super Mario Bros. 1,2,VS.mp3"));
+        victoryMusic.setLooping(false);
+        victoryMusic.setVolume(game.musicVolume);
 
         // change viewport
 
@@ -109,6 +122,7 @@ public class BossScreen extends GameScreen {
     @Override
     public void dispose() {
         if (bossBackground != null) bossBackground.dispose();
+        if (victoryMusic != null) victoryMusic.dispose();
         super.dispose();
     }
 }
