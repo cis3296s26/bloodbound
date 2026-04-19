@@ -1,50 +1,12 @@
 [
 {
 	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 32.452106
-	points: 10
-	runNumber: 5
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 32.452106
-	points: 10
-	runNumber: 6
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 32.92379
-	points: 20
+	elapsedTime: 3.92542
 	runNumber: 1
 }
 {
 	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 37.249115
-	points: 30
+	elapsedTime: 31.224192
 	runNumber: 2
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 43.989407
-	points: 30
-	runNumber: 3
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 43.989407
-	points: 30
-	runNumber: 4
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 58.621883
-	points: 30
-	runNumber: 7
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 58.621883
-	points: 30
-	runNumber: 8
 }
 ]
