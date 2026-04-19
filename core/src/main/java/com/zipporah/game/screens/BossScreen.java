@@ -73,6 +73,7 @@ public class BossScreen extends GameScreen {
                 viewport.getWorldHeight());
 
         game.batch.end();
+
     }
 
     @Override
