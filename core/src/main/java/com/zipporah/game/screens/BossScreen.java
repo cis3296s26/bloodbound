@@ -54,7 +54,7 @@ public class BossScreen extends GameScreen {
         // add music here later
 
 
-        enemies.add(new Karasu(20, 50, 200, 60f, 70f, 62, 120));
+        enemies.add(new Karasu(20, 50, 200, 60f, 70f, 90, 180));
     }
 
 
