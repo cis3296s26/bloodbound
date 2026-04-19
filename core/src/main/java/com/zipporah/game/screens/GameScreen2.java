@@ -119,7 +119,9 @@ public class GameScreen2 extends GameScreen {
                     game.playerData.saveRun(game.timer.getElapsedTime(), (int) game.timer.getPoints());
 
                     game.playerData.saveRun(game.timer.getElapsedTime(), (int) game.timer.getPoints());
-                    game.setScreen(new CreditScreen(game));
+
+                    // changing to boss
+                    game.setScreen(new BossScreen(game));
                 }
             }
         }
