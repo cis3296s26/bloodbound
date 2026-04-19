@@ -1,1 +1,12 @@
-[]
+[
+{
+	class: com.zipporah.game.entities.GameRun
+	elapsedTime: 3.92542
+	runNumber: 1
+}
+{
+	class: com.zipporah.game.entities.GameRun
+	elapsedTime: 31.224192
+	runNumber: 2
+}
+]
