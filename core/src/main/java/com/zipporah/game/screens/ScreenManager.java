@@ -19,6 +19,7 @@ public class ScreenManager extends Game{
   public float musicVolume = 0.30f;
   public float sfxVolume = 0.40f;
   public Difficulty difficulty = Difficulty.NORMAL;
+  public float savedHealth = 100f;
 
   @Override
   public void create() {
