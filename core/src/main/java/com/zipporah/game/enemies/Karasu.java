@@ -8,19 +8,13 @@ public class Karasu extends Enemy {
     public Karasu(int spawnX, int spawnY, int spriteSize, float innerXOffsetFacingRight, float innerXOffsetFacingLeft, int boundaryWidth, int boundaryHeight) {
         super.x = spawnX;
         super.y = spawnY;
-        Texture hpForeground1 = new Texture("Enemies/Karasu/bossbar.png");
 
         // 0 - idle, 1 - walk, 2 - attack, 3 - dead, 4 - hurt, 5 - jump
         super.create("Enemies/Karasu/", new int[] {6, 8, 6, 6, 3, 15});
         super.size = spriteSize;
         super.speed = 200;
         super.health = 200;
-        float curr_health = super.health;
-        float health_percentage;
-        float bar_width;
 
-        health_percentage = curr_health / super.health;
-        bar_width = health_percentage * hpForeground1.getWidth();
 
 
         super.innerXOffsetFacingRight = innerXOffsetFacingRight;

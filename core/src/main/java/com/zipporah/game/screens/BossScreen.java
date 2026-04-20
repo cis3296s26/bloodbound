@@ -42,6 +42,7 @@ public class BossScreen extends GameScreen {
     boolean victoryStarted = false;
     static final float VICTORY_DURATION = 6.5f;
     float victoryTimer = 0f;
+    Texture bossHp;
 
     @Override
     protected void initLevel(){
@@ -51,10 +52,10 @@ public class BossScreen extends GameScreen {
         renderer = new OrthogonalTiledMapRenderer(map, scale);
 
         //restores player health
-        player.curr_health = prefs.getFloat("hp");
+       // player.curr_health = prefs.getFloat("hp");
 
         bossBackground = new Texture(Gdx.files.internal("Maps/Battleground2.png"));
-
+        bossHp = new Texture(Gdx.files.internal("Enemies/Karasu/bossbar.png"));
         enemies.clear();
         // add music here later
 
@@ -74,6 +75,7 @@ public class BossScreen extends GameScreen {
                 cam.position.y - viewport.getWorldHeight() / 2f,  // start from camera bottom edge
                 viewport.getWorldWidth(),
                 viewport.getWorldHeight());
+        game.batch.draw(bossHp, 400, 50, bossHp.getWidth() * 2, bossHp.getHeight() * 2);
 
         game.batch.end();
 
