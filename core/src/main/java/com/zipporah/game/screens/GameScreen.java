@@ -716,6 +716,27 @@ public class GameScreen implements Screen {
         game.timer.font.draw(game.batch, String.format("%dx", keyCount), 946, 700);
         game.batch.draw(homeButtonTexture, homeButtonX, homeButtonY, homeButtonWidth, homeButtonHeight);
         game.batch.end();
+
+        /*
+        // Comments for future devs:
+        // Once the enemy gets stuck and you move to another app for a few seconds and come back, it gets unstuck
+        // This stuff probably could be fixed in code as well as the collision logic, where collision blocks are the ones doing the teleporting glitches
+        // And once we put collision block near a wall block, the characters often get stuck
+        // If you want to add a new level, follow the .tmx map patterns from the previous levels unless you want to change the code
+
+        // Useful Debugging Hitboxes Visualization
+        shapeRenderer.setProjectionMatrix(cam.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+
+        for (Player.Projectile projectile : player.projectiles)
+            shapeRenderer.rect(projectile.box.x, projectile.box.y, projectile.box.width, projectile.box.height);
+
+        for (Enemy enemy : enemies)
+            if (enemy instanceof Karasu && enemy != null && !enemy.isRemoved())
+                shapeRenderer.rect(enemy.innerBoundaries.x, enemy.innerBoundaries.y, enemy.innerBoundaries.width, enemy.innerBoundaries.height);
+
+        shapeRenderer.end();
+        */
     }
     @Override
     public void pause() {
