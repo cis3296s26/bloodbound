@@ -406,6 +406,7 @@ public class GameScreen implements Screen {
                             @Override
                             public void run() {
                                 if (music1 != null) music1.stop();
+                                game.savedHealth = player.curr_health;
                                 game.setScreen(new GameScreen2(game));
                             }
                         });

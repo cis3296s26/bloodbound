@@ -118,6 +118,7 @@ public class GameScreen2 extends GameScreen {
                     game.timer.stop(); // we need to add this method to CurrentRun
 
                     // changing to boss
+                    game.savedHealth = player.curr_health;
                     game.setScreen(new BossScreen(game));
                 }
             }
@@ -249,7 +250,8 @@ public class GameScreen2 extends GameScreen {
         // clear old enemies
         enemies.clear();
 
-        player.curr_health = prefs.getFloat("hp");
+        player.curr_health = game.savedHealth;
+        player.health_percentage = player.curr_health / player.max_health;
         // add level 2 enemies
         enemies.add(new Skeleton(10, 400, 200, 60f, 70f, 62, 120));
         enemies.add(new Skeleton(1300, 200, 200, 60f, 70f, 62, 120));
