@@ -56,7 +56,7 @@ public class GameScreen2 extends GameScreen {
         //music
         music2 = Gdx.audio.newMusic(Gdx.files.internal("Music/lightyeartraxx-kim-lightyear-kings-and-dragons-275238.mp3"));
         music2.setLooping(true);
-        music2.setVolume(0.30f);
+        music2.setVolume(game.musicVolume);
         music2.play();
 
 
@@ -131,7 +131,7 @@ public class GameScreen2 extends GameScreen {
             if (!potionSipped) {
                 float dist1 = Vector2.dst(player.x, player.y, potionPosition.x, potionPosition.y);
                 if (dist1 < 150f) {
-                    drink.play(40);
+                    drink.play(game.sfxVolume);
                     potionSipped = true;
 
                     // player will enter boss battle wiht full health idk if this actually works tho

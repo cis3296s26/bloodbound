@@ -259,7 +259,7 @@ public class Enemy {
         if (currState != State.death) {
             currState = State.death;
             stateTime = 0;
-            deathSound.play(0.25f);
+            deathSound.play(sfxVolume);
         }
 
         // Let dead enemies settle on the ground naturally.

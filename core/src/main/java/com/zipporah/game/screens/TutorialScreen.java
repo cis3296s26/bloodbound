@@ -80,7 +80,7 @@ public class TutorialScreen extends GameScreen {
       charTimer -= CHAR_DELAY;
       charIndex++;
       displayText = fullText.substring(0, charIndex);
-      typeSound.play(0.4f);
+      typeSound.play(game.sfxVolume);
     }
   }
 

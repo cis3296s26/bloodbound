@@ -281,6 +281,7 @@ public class GameScreen implements Screen {
         // render in map
         map = new TmxMapLoader().load("level_1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, scale);
+        Enemy.sfxVolume = game.sfxVolume;
 
         music1 = Gdx.audio.newMusic(Gdx.files.internal("Music/spencer_yk-castle-of-athanasius-151010.mp3"));
         music1.setLooping(true);
@@ -357,7 +358,7 @@ public class GameScreen implements Screen {
                 float dist1 = Vector2.dst(player.x, player.y, chest1Position.x, chest1Position.y);
                 if (dist1 < chestInteractionRange) {
                     chest1Open = true;
-                    keyFound.play(30);
+                    keyFound.play(game.sfxVolume);
                     haveChest1key = true;
                     keyCount++;
                 }
@@ -368,7 +369,7 @@ public class GameScreen implements Screen {
                 float dist2 = Vector2.dst(player.x, player.y, chest2Position.x, chest2Position.y);
                 if (dist2 < chestInteractionRange) {
                     chest2Open = true;
-                    keyFound.play(30);
+                    keyFound.play(game.sfxVolume);
                     haveChest2key = true;
                     keyCount++;
                 }
@@ -382,7 +383,7 @@ public class GameScreen implements Screen {
                     firstDoorOpen = true;
                     // door can be walked through
                     wallRectangles.removeValue(firstDoorRect, true);
-                    doorUnlocked.play(30);
+                    doorUnlocked.play(game.sfxVolume);
                     float doorOpenTime = 0.1f;
                     keyCount--;
                 }
@@ -394,7 +395,7 @@ public class GameScreen implements Screen {
                     lastDoorOpen = true;
                     // door can be walked through
                     wallRectangles.removeValue(lastDoorRect, true);
-                    doorUnlocked.play(30);
+                    doorUnlocked.play(game.sfxVolume);
                     float doorOpenTime = 0.1f;
                     keyCount--;
                     prefs.putFloat("hp", player.curr_health);
