@@ -115,8 +115,6 @@ public class GameScreen2 extends GameScreen {
                         music1.stop();
                     }
 
-                    game.timer.stop(); // we need to add this method to CurrentRun
-
                     // changing to boss
                     game.savedHealth = player.curr_health;
                     game.setScreen(new BossScreen(game));
