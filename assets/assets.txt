@@ -48,6 +48,7 @@ Maps/more tiles.png
 Maps/potion.png
 Maps/spritesheet.png
 Music/(04-41) Super Mario Bros. 1,2,VS.mp3
+Music/alperomeresin-the-final-boss-battle-158700.mp3
 Music/lightyeartraxx-kim-lightyear-kings-and-dragons-275238.mp3
 Music/spencer_yk-castle-of-athanasius-151010.mp3
 Player/Attack_1.png
