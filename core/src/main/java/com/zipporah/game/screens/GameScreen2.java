@@ -116,9 +116,6 @@ public class GameScreen2 extends GameScreen {
                     }
 
                     game.timer.stop(); // we need to add this method to CurrentRun
-                    game.playerData.saveRun(game.timer.getElapsedTime(), (int) game.timer.getPoints());
-
-                    game.playerData.saveRun(game.timer.getElapsedTime(), (int) game.timer.getPoints());
 
                     // changing to boss
                     game.setScreen(new BossScreen(game));
