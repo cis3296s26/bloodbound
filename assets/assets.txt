@@ -17,6 +17,7 @@ Enemies/Karasu/Idle_2.png
 Enemies/Karasu/Jump.png
 Enemies/Karasu/Run.png
 Enemies/Karasu/Walk.png
+Enemies/Karasu/bossbar.png
 Enemies/Skeleton/Attack_1.png
 Enemies/Skeleton/Attack_2.png
 Enemies/Skeleton/Dead.png
