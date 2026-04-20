@@ -67,7 +67,7 @@ public class Enemy {
 
     protected float speed = 150.0f;
     public float health = 100;
-    public float b_max_health = 200;
+    public float b_max_health = 300;
     public float curr_health = b_max_health;
     public float hp_percentage;
     public float bar_width;

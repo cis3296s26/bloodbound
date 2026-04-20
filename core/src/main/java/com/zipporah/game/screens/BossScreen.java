@@ -78,8 +78,9 @@ public class BossScreen extends GameScreen {
         for(Enemy enemy : enemies) {
             enemy.hp_percentage = enemy.curr_health / enemy.b_max_health;
             enemy.bar_width = enemy.hp_percentage * enemy.bossHp.getWidth();
-            game.batch.draw(enemy.bossHp, 400, 50, enemy.bar_width * 3, enemy.bossHp.getHeight() * 2);
+            game.batch.draw(enemy.bossHp, 240, 50, enemy.bar_width * 3, enemy.bossHp.getHeight() * 2);
         }
+        game.timer.font.draw(game.batch, "Karasu, King of the Keep", 240, 100);
         game.batch.end();
     }
 
