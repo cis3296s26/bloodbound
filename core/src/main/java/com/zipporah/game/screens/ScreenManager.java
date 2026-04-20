@@ -35,6 +35,7 @@ public class ScreenManager extends Game{
 
   public void adjustSfxVolume(float amount) {
     sfxVolume = Math.max(0f, Math.min(1f, sfxVolume + amount));
+    com.zipporah.game.Enemy.sfxVolume = sfxVolume;
   }
 
   public void cycleDifficulty(int direction) {

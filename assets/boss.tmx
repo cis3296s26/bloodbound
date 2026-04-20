@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.0" orientation="orthogonal" renderorder="right-down" width="20" height="12" tilewidth="16" tileheight="16" infinite="0" nextlayerid="12" nextobjectid="34">
+<map version="1.10" tiledversion="1.12.1" orientation="orthogonal" renderorder="right-down" width="20" height="12" tilewidth="16" tileheight="16" infinite="0" nextlayerid="12" nextobjectid="77">
  <tileset firstgid="1" name="spritesheet" tilewidth="32" tileheight="32" tilecount="318" columns="53">
   <image source="Maps/spritesheet.png" width="1696" height="192"/>
  </tileset>
@@ -31,14 +31,19 @@
   <object id="24" x="22.5" y="260.5"/>
   <object id="25" x="39" y="293.5"/>
   <object id="27" x="24.5" y="218.5"/>
-  <object id="28" x="0.5" y="136.5" width="320" height="55"/>
   <object id="32" x="79" y="95.5" width="34" height="6"/>
   <object id="33" x="207.5" y="96" width="33.5" height="6"/>
+  <object id="63" x="16.1308" y="141.631" width="289.525" height="54.3929"/>
+  <object id="74" x="11.2153" y="134.333" width="297.166" height="2.52344"/>
  </objectgroup>
  <objectgroup id="3" name="walls">
   <object id="2" x="571" y="18"/>
-  <object id="29" x="-0.5" y="-0.5" width="5" height="191"/>
-  <object id="30" x="316.5" y="-0.5" width="4.5" height="192"/>
+  <object id="64" x="321.767" y="-0.14415" width="1.37952" height="150.065"/>
+  <object id="65" x="319.18" y="0.10085" width="1.37952" height="150.245"/>
+  <object id="69" x="-1.46227" y="1.7335" width="1.37952" height="150.065"/>
+  <object id="70" x="-4.04927" y="1.9785" width="1.37952" height="150.245"/>
+  <object id="72" x="0.884334" y="-17.2792" width="1.37952" height="150.065"/>
+  <object id="73" x="317.026" y="-16.6258" width="1.37952" height="150.245"/>
  </objectgroup>
  <objectgroup id="4" name="spike">
   <object id="3" x="617" y="21"/>
