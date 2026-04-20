@@ -51,7 +51,8 @@ public class BossScreen extends GameScreen {
         renderer = new OrthogonalTiledMapRenderer(map, scale);
 
         //restores player health
-        player.curr_health = prefs.getFloat("hp");
+        player.curr_health = game.savedHealth;
+        player.health_percentage = player.curr_health / player.max_health;
 
         bossBackground = new Texture(Gdx.files.internal("Maps/Battleground2.png"));
 

@@ -267,7 +267,7 @@ public class GameScreen implements Screen {
         enemies.add(new Skeleton(1800, 50, 200, 60f, 70f, 62, 120));
 
         // Second Chest Skeleton
-        enemies.add(new Skeleton(3774, 128, 200, 60f, 70f, 62, 120));
+        enemies.add(new Skeleton(3704, 130, 200, 60f, 70f, 62, 120));
         
         // sounds
         skeletonHurt = Gdx.audio.newSound(Gdx.files.internal("Sounds/Enemy/crunch_splat.wav"));
@@ -406,6 +406,7 @@ public class GameScreen implements Screen {
                             @Override
                             public void run() {
                                 if (music1 != null) music1.stop();
+                                game.savedHealth = player.curr_health;
                                 game.setScreen(new GameScreen2(game));
                             }
                         });
