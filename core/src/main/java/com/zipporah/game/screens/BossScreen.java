@@ -101,6 +101,7 @@ public class BossScreen extends GameScreen {
         boolean allDead = enemies.stream().allMatch(e -> e == null || e.isRemoved());
         if (allDead && !enemies.isEmpty() && !bossDefeated) {
             bossDefeated = true;
+            bossMusic.stop();
             victoryMusic.play();
         }
 
@@ -132,6 +133,7 @@ public class BossScreen extends GameScreen {
     public void dispose() {
         if (bossBackground != null) bossBackground.dispose();
         if (victoryMusic != null) victoryMusic.dispose();
+        if (bossMusic != null) bossMusic.dispose();
         super.dispose();
     }
 }
