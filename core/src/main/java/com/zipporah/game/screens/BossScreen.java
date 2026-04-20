@@ -43,6 +43,9 @@ public class BossScreen extends GameScreen {
     static final float VICTORY_DURATION = 6.5f;
     float victoryTimer = 0f;
 
+    // music and sound
+    Music bossMusic;
+
     @Override
     protected void initLevel(){
         this.scale = 4f;
@@ -57,6 +60,11 @@ public class BossScreen extends GameScreen {
         bossBackground = new Texture(Gdx.files.internal("Maps/Battleground2.png"));
         enemies.clear();
         // add music here later
+
+        bossMusic = Gdx.audio.newMusic(Gdx.files.internal("Music/alperomeresin-the-final-boss-battle-158700.mp3"));
+        bossMusic.setLooping(true);
+        bossMusic.setVolume(game.musicVolume);
+        bossMusic.play();
 
     }
 
@@ -98,6 +106,7 @@ public class BossScreen extends GameScreen {
         boolean allDead = enemies.stream().allMatch(e -> e == null || e.isRemoved());
         if (allDead && !enemies.isEmpty() && !bossDefeated) {
             bossDefeated = true;
+            bossMusic.stop();
             victoryMusic.play();
         }
 
@@ -132,6 +141,7 @@ public class BossScreen extends GameScreen {
     public void dispose() {
         if (bossBackground != null) bossBackground.dispose();
         if (victoryMusic != null) victoryMusic.dispose();
+        if (bossMusic != null) bossMusic.dispose();
         super.dispose();
     }
 }
