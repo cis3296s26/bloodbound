@@ -113,6 +113,11 @@ public class BossScreen extends GameScreen {
                 Gdx.app.postRunnable(() -> game.setScreen(new CreditScreen(game)));
             }
         }
+
+        // stop music if player dies
+        if (player.isDead) {
+            bossMusic.stop();
+        }
     }
 
     @Override
