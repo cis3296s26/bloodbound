@@ -1,5 +1,6 @@
 package com.zipporah.game.enemies;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.zipporah.game.Enemy;
 
@@ -12,7 +13,8 @@ public class Karasu extends Enemy {
         super.create("Enemies/Karasu/", new int[] {6, 8, 6, 6, 3, 15});
         super.size = spriteSize;
         super.speed = 200;
-        super.health = 200;
+        super.health = 300;
+
 
         super.innerXOffsetFacingRight = innerXOffsetFacingRight;
         super.innerXOffsetFacingLeft = innerXOffsetFacingLeft;

@@ -1,22 +1,8 @@
 [
 {
 	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 21.27044
-	runNumber: 3
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 21.27044
-	runNumber: 4
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 52.4132
+	elapsedTime: 29.649652
+	points: 10
 	runNumber: 1
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 52.4132
-	runNumber: 2
 }
 ]

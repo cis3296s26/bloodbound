@@ -2,6 +2,7 @@ package com.zipporah.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
@@ -63,8 +64,15 @@ public class Enemy {
     public float x;
     public float y;
 
+
     protected float speed = 150.0f;
     public float health = 100;
+    public float b_max_health = 300;
+    public float curr_health = b_max_health;
+    public float hp_percentage;
+    public float bar_width;
+    public Texture bossHp = new Texture(Gdx.files.internal("Enemies/Karasu/bossbar.png"));
+
 
     protected boolean removed = false;
     protected boolean hurtActive = false;

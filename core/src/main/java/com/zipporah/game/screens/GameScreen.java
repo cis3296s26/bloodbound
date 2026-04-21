@@ -623,6 +623,7 @@ public class GameScreen implements Screen {
                     Player.Projectile projectile = projectilesIterator.next();
                     if (projectile.box.overlaps(enemy.innerBoundaries)) {
                         enemy.health -= projectile.damage;
+                        enemy.curr_health -= projectile.damage;
                         Enemy.sfxVolume = game.sfxVolume;
                         skeletonHurt.play(game.sfxVolume);
                         enemy.triggerHurt();
