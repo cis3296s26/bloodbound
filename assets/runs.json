@@ -1,88 +1,8 @@
 [
 {
 	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 21.27044
-	runNumber: 3
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 21.27044
-	runNumber: 4
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 23.200829
+	elapsedTime: 29.649652
 	points: 10
-	runNumber: 13
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 25.514576
-	points: 10
-	runNumber: 14
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 30.381668
-	points: 10
-	runNumber: 12
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 33.312878
-	points: 10
-	runNumber: 16
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 33.782818
-	points: 10
-	runNumber: 15
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 48.31225
-	runNumber: 5
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 48.31225
-	runNumber: 6
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 49.896687
-	runNumber: 7
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 49.896687
-	runNumber: 8
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 49.896687
-	runNumber: 9
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 49.896687
-	runNumber: 10
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 49.896687
-	points: 10
-	runNumber: 11
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 52.4132
 	runNumber: 1
-}
-{
-	class: com.zipporah.game.entities.GameRun
-	elapsedTime: 52.4132
-	runNumber: 2
 }
 ]
