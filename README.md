@@ -7,7 +7,7 @@ https://www.oracle.com/java/technologies/downloads/
 
 2.) Download .jar file from most recent release page
 
-3.) If your are on mac run this command in your terminal: 
+3.) If you're are on mac run this command in your terminal: 
 ```bash
 xattr -d com.apple.quarantine ~/Downloads/GameDemo-1.0.0.jar
 ```
@@ -17,7 +17,7 @@ xattr -d com.apple.quarantine ~/Downloads/GameDemo-1.0.0.jar
 
 _**Enjoy!**_
 
-# How to contribute
+## How to contribute
 Needed resources:
 - Tiled (for map editing)
 - LibGDX for the project
