@@ -1,5 +1,5 @@
 # BloodBound: 2D Platformer
-   For bored gamers who are looking for something fun in their spare time, without spending any money, Bloodbound is a new 2D platformer that is fully free and open source. Unlike other platformers from publishers like Nintendo, which come at a high cost, Bloodbound is free and accessible to all who wish to play or contribute.  
+   For bored gamers who are looking for something fun in their spare time, without spending any money, Bloodbound is a new 2D platformer that is fully free and open source. Unlike other platformers from publishers like Nintendo, which come at a high cost, Bloodbound is completely accessible to all who wish to play or contribute. All needed info is down below.   
 
 ## How to run
 1.) Install most recent java SE version
